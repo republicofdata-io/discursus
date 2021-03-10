@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: gdelt
+    database: dio_sources
+    schema: public
+
+    freshness:
+      warn_after: {count: 1, period: day}
+      error_after: {count: 2, period: day}
+
+    tables:
+      - name: gdelt_events

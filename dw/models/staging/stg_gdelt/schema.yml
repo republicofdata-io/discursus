@@ -1,0 +1,12 @@
+version: 2
+
+models:
+- name: stg_gdelt_events
+  description: Source table for GDELT event
+
+  columns:
+  - name: gdelt_event_natural_key
+    description: Unique dw key
+    tests:
+    - dbt_utils.at_least_one
+    - not_null

@@ -1,0 +1,37 @@
+project wh_dio {
+
+    database_type: 'snowflake'
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// CORE WAREHOUSE
+
+table wh_events_fact [headercolor: #3498db] {
+
+    event_pk varchar [pk]
+
+    gdelt_event_natural_key int
+
+    published_date date
+    creation_ts timestamp
+
+    source_url varchar
+    action_geo_full_name varchar
+    action_geo_country_code varchar
+    action_geo_adm1_code varchar
+    action_geo_lat decimal
+    action_geo_long decimal
+    actor1_name varchar
+    actor1_type1_code varchar
+    actor2_name varchar
+    actor2_type1_code varchar
+    event_code varchar
+
+    goldstein_scale decimal
+    num_mentions int
+    num_sources int
+    num_articles int
+    avg_tone decimal
+
+}
