@@ -13,6 +13,7 @@ latest_gdelt_url="${content_components[2]}"
 #Get name of compressed file
 IFS='/' read -a url_components <<< "$latest_gdelt_url"
 compressed_file_name="${url_components[4]}"
+file_date=${compressed_file_name:0:8}
 
 
 #Get name of csv file
@@ -24,18 +25,18 @@ file_name="${file_components[0]}.${file_components[1]}.txt"
 #Download and extract latest events
 echo "Downloading and extracting latest events"
 
-curl $latest_gdelt_url > /home/ec2-user/dio_miner/gdelt_tmp/$compressed_file_name
-unzip -p "/home/ec2-user/dio_miner/gdelt_tmp/$compressed_file_name" $csv_file_name > /home/ec2-user/dio_miner/gdelt_tmp/$file_name
+curl $latest_gdelt_url > $DIO_MINER_GDELT_HOME/tmp/$compressed_file_name
+unzip -p "$DIO_MINER_GDELT_HOME/tmp/$compressed_file_name" $csv_file_name > $DIO_MINER_GDELT_HOME/tmp/$file_name
 
 
 #Save gdelt data to S3
 echo "Copying to S3"
 
-file_location="/home/ec2-user/dio_miner/gdelt_tmp/$file_name"
-aws s3 cp $file_location s3://discursus-io/sources/gdelt/$csv_file_name
+file_location="$DIO_MINER_GDELT_HOME/tmp/$file_name"
+aws s3 cp $file_location s3://discursus-io/sources/gdelt/$file_date/$csv_file_name
 
 
-#Delete local files
+# #Delete local files
 echo "Cleaning up"
 
-rm /home/ec2-user/dio_miner/gdelt_tmp/*
+rm $DIO_MINER_GDELT_HOME/tmp/*
