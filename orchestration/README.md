@@ -4,7 +4,6 @@ Dagster workspace, pipeline and solids to orchestrate building of discursus data
 
 # Deployment
 ## Deployment Environment
-* ec2: `ssh -i ~/Dropbox/Technical/AWS/discursus_io.pem ec2-user@54.88.102.177`
 * Preparing the environment
   * For Dagit to run, it needs a `DAGSTER_HOME` variable that points to a local directory. For example: `~/dagster/dagster_home` 
   * Solids are dependant on resources which are configured through the `environments/shared.yaml` variables. 
