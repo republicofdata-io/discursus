@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/zsh
+export PATH=/usr/local/bin:$PATH
 
 #Get url towards latest GDELT update
 echo "Get meta info from GDELT"

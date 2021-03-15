@@ -1,7 +1,0 @@
-export SNOWFLAKE_ACCOUNT="dz02451.us-east-1"
-export SNOWFLAKE_USER="odupuis"
-export SNOWFLAKE_PASSWORD="4\$U62e?MQM\$u3&pT"
-export SNOWFLAKE_ROLE="sysadmin"
-export SNOWFLAKE_WAREHOUSE="dio_load"
-export SNOWFLAKE_DATABASE="dio_sources"
-export SNOWFLAKE_SCHEMA="public"

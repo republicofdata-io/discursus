@@ -1,1 +1,39 @@
-nohup: dagit: No such file or directory
+2021-03-15 16:17:40 - dagster - DEBUG - data_mining_pipeline - 0b6b28ac-c51b-4b92-8919-2847b3b7ef2c - 26112 - gdelt_miner_solid - ENGINE_EVENT - Starting initialization of resources [io_manager].
+2021-03-15 16:17:40 - dagster - DEBUG - data_mining_pipeline - 0b6b28ac-c51b-4b92-8919-2847b3b7ef2c - 26112 - gdelt_miner_solid - ENGINE_EVENT - Finished initialization of resources [io_manager].
+2021-03-15 16:17:40 - dagster - DEBUG - data_mining_pipeline - 0b6b28ac-c51b-4b92-8919-2847b3b7ef2c - 26112 - PIPELINE_START - Started execution of pipeline "data_mining_pipeline".
+2021-03-15 16:17:40 - dagster - DEBUG - data_mining_pipeline - 0b6b28ac-c51b-4b92-8919-2847b3b7ef2c - 26112 - ENGINE_EVENT - Executing steps in process (pid: 26112)
+2021-03-15 16:17:40 - dagster - DEBUG - data_mining_pipeline - 0b6b28ac-c51b-4b92-8919-2847b3b7ef2c - 26112 - gdelt_miner_solid - STEP_START - Started execution of step "gdelt_miner_solid".
+2021-03-15 16:17:40 - dagster - INFO - system - 0b6b28ac-c51b-4b92-8919-2847b3b7ef2c - gdelt_miner_solid - Using temporary directory: /var/folders/q1/k3wwy4lj4bgc5n29p0j57vc40000gn/T
+2021-03-15 16:17:40 - dagster - INFO - system - 0b6b28ac-c51b-4b92-8919-2847b3b7ef2c - gdelt_miner_solid - Temporary script location: /var/folders/q1/k3wwy4lj4bgc5n29p0j57vc40000gn/T/tmpfti30drs
+2021-03-15 16:17:40 - dagster - INFO - system - 0b6b28ac-c51b-4b92-8919-2847b3b7ef2c - gdelt_miner_solid - Running command:
+zsh < miners/gdelt/gdelt_miner.zsh
+2021-03-15 16:17:40 - dagster - INFO - system - 0b6b28ac-c51b-4b92-8919-2847b3b7ef2c - gdelt_miner_solid - /var/folders/q1/k3wwy4lj4bgc5n29p0j57vc40000gn/T/tmpfti30drs: line 1: miners/gdelt/gdelt_miner.zsh: No such file or directory
+
+2021-03-15 16:17:40 - dagster - INFO - system - 0b6b28ac-c51b-4b92-8919-2847b3b7ef2c - gdelt_miner_solid - Command exited with return code 1
+2021-03-15 16:17:40 - dagster - ERROR - data_mining_pipeline - 0b6b28ac-c51b-4b92-8919-2847b3b7ef2c - 26112 - gdelt_miner_solid - STEP_FAILURE - Execution of step "gdelt_miner_solid" failed.
+
+dagster.core.definitions.events.Failure: Shell command execution failed with output: /var/folders/q1/k3wwy4lj4bgc5n29p0j57vc40000gn/T/tmpfti30drs: line 1: miners/gdelt/gdelt_miner.zsh: No such file or directory
+
+
+Stack Trace:
+  File "/Users/olivierdupuis/.pyenv/versions/3.7.4/envs/venv_dio_dw/lib/python3.7/site-packages/dagster/core/execution/plan/execute_plan.py", line 192, in _dagster_event_sequence_for_step
+    for step_event in check.generator(step_events):
+  File "/Users/olivierdupuis/.pyenv/versions/3.7.4/envs/venv_dio_dw/lib/python3.7/site-packages/dagster/core/execution/plan/execute_step.py", line 292, in core_dagster_event_sequence_for_step
+    _step_output_error_checked_user_event_sequence(step_context, user_event_sequence)
+  File "/Users/olivierdupuis/.pyenv/versions/3.7.4/envs/venv_dio_dw/lib/python3.7/site-packages/dagster/core/execution/plan/execute_step.py", line 57, in _step_output_error_checked_user_event_sequence
+    for user_event in user_event_sequence:
+  File "/Users/olivierdupuis/.pyenv/versions/3.7.4/envs/venv_dio_dw/lib/python3.7/site-packages/dagster/core/execution/plan/execute_step.py", line 478, in _user_event_sequence_for_step_compute_fn
+    gen,
+  File "/Users/olivierdupuis/.pyenv/versions/3.7.4/envs/venv_dio_dw/lib/python3.7/site-packages/dagster/utils/__init__.py", line 355, in iterate_with_context
+    next_output = next(iterator)
+  File "/Users/olivierdupuis/.pyenv/versions/3.7.4/envs/venv_dio_dw/lib/python3.7/site-packages/dagster/core/execution/plan/compute.py", line 104, in execute_core_compute
+    for step_output in _yield_compute_results(compute_context, inputs, compute_fn):
+  File "/Users/olivierdupuis/.pyenv/versions/3.7.4/envs/venv_dio_dw/lib/python3.7/site-packages/dagster/core/execution/plan/compute.py", line 70, in _yield_compute_results
+    for event in user_event_sequence:
+  File "/Users/olivierdupuis/.pyenv/versions/3.7.4/envs/venv_dio_dw/lib/python3.7/site-packages/dagster/core/definitions/decorators/solid.py", line 233, in compute
+    result = fn(context, **kwargs)
+  File "/Users/olivierdupuis/.pyenv/versions/3.7.4/envs/venv_dio_dw/lib/python3.7/site-packages/dagster_shell/solids.py", line 141, in _shell_solid
+    output=output
+
+2021-03-15 16:17:40 - dagster - DEBUG - data_mining_pipeline - 0b6b28ac-c51b-4b92-8919-2847b3b7ef2c - 26112 - ENGINE_EVENT - Finished steps in process (pid: 26112) in 160ms
+2021-03-15 16:17:40 - dagster - ERROR - data_mining_pipeline - 0b6b28ac-c51b-4b92-8919-2847b3b7ef2c - 26112 - PIPELINE_FAILURE - Execution of pipeline "data_mining_pipeline" failed. Steps failed: ['gdelt_miner_solid'].

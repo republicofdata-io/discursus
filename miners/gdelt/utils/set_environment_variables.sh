@@ -1,1 +1,0 @@
-export DIO_MINER_GDELT_HOME="/home/ec2-user/dio/miners/gdelt/"
