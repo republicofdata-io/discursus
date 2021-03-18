@@ -86,7 +86,7 @@ test_dbt_transformation = dbt_cli_test.configured(
     mode_defs=[prod_mode], 
     preset_defs=[prod_presets]
 )
-def load_data_to_dw_pipeline():
+def transform_data_pipeline():
     snowpipe_result = launch_snowpipe()
     dbt_run_result = run_dbt_transformation(start_after=snowpipe_result)
     dbt_test_result = test_dbt_transformation(start_after=dbt_run_result)
@@ -94,10 +94,10 @@ def load_data_to_dw_pipeline():
 
 @schedule(
     cron_schedule="15 3,9,15,21 * * *",
-    pipeline_name="load_data_to_dw_pipeline", 
+    pipeline_name="transform_data_pipeline", 
     mode="prod"
 )  # Every hour
-def schedule_load_data_to_dw_pipeline(context):
+def schedule_transform_data_pipeline(context):
     return prod_presets.run_config
 
 
@@ -109,6 +109,6 @@ def dio_repository():
     return [
         data_mining_pipeline, 
         schedule_data_mining_pipeline, 
-        load_data_to_dw_pipeline, 
-        schedule_load_data_to_dw_pipeline
+        transform_data_pipeline, 
+        schedule_transform_data_pipeline
     ]
