@@ -45,7 +45,7 @@ prod_presets = PresetDefinition.from_files(
 )
 def data_mining_pipeline():
     #gdelt_miner = create_shell_script_solid(file_relative_path(__file__, "../miners/gdelt/gdelt_miner.zsh"), name="gdelt_miner_solid")
-    gdelt_miner = create_shell_command_solid("zsh < miners/gdelt/gdelt_miner.zsh", name="gdelt_miner_solid") 
+    gdelt_miner = create_shell_command_solid("zsh < $DIO_MINER_GDELT_HOME/gdelt_miner.zsh", name="gdelt_miner_solid") 
     gdelt_miner()
 
 
