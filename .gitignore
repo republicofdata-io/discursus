@@ -8,3 +8,4 @@ tmp/
 *.out
 .vscode/
 __pycache__/
+dio_data_stack.env

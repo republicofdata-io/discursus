@@ -1,7 +1,14 @@
 # Environment
 * Set environment variables
-    * Make file executable: `chmod u+x utils/set_environment_variables_fork.sh`
-    * To run: `. utils/set_environment_variables_fork.sh`
+    * Rename dio_data_stack.env.REPLACE to dio_data_stack.env
+    * Change the values of environment variables within
+
+# Run Docker image
+* `docker run -dp 3000:3000 --env-file dio_data_stack.env dio_data_stack`
+
+
+
+
 
 
 # Orchestration
