@@ -3,9 +3,7 @@ target/
 dbt_modules/
 logs/
 .DS_Store
-set_environment_variables_fork.sh
 tmp/
 *.out
 .vscode/
 __pycache__/
-dio_data_stack.env

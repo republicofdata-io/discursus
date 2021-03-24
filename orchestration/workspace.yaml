@@ -1,2 +1,5 @@
 load_from:
-  - python_file: dio_pipelines.py
+  - grpc_server:
+      host: dio_pipelines
+      port: 4000
+      location_name: "dio_pipelines"

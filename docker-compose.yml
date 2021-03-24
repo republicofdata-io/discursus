@@ -1,0 +1,82 @@
+version: "3.7"
+
+services:
+  dio_postgresql:
+    image: postgres:11
+    container_name: dio_postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "postgres_user"
+      POSTGRES_PASSWORD: "postgres_password"
+      POSTGRES_DB: "postgres_db"
+    networks:
+      - dio_network
+  
+  dio_pipelines:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_pipelines
+    container_name: dio_pipelines
+    ports:
+      - "4000:4000"
+    environment:
+      DAGSTER_POSTGRES_USER: "postgres_user"
+      DAGSTER_POSTGRES_PASSWORD: "postgres_password"
+      DAGSTER_POSTGRES_DB: "postgres_db"
+      DAGSTER_CURRENT_IMAGE: "data_stack_dio_pipelines"
+    networks:
+      - dio_network
+
+  dio_dagit:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_dagster
+    entrypoint:
+      - dagit
+      - -h
+      - "0.0.0.0"
+      - -p
+      - "3000"
+      - -w
+      - workspace.yaml
+    container_name: dio_dagit
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    environment:
+      DAGSTER_POSTGRES_USER: "postgres_user"
+      DAGSTER_POSTGRES_PASSWORD: "postgres_password"
+      DAGSTER_POSTGRES_DB: "postgres_db"
+    networks:
+      - dio_network
+    depends_on:
+      - dio_postgresql
+      - dio_pipelines
+
+  dio_daemon:
+    build:
+      context: .
+      dockerfile: ./Dockerfile_dagster
+    entrypoint:
+      - dagster-daemon
+      - run
+    container_name: dio_daemon
+    restart: on-failure
+    environment:
+      DAGSTER_POSTGRES_USER: "postgres_user"
+      DAGSTER_POSTGRES_PASSWORD: "postgres_password"
+      DAGSTER_POSTGRES_DB: "postgres_db"
+    volumes: # Make docker client accessible so we can launch containers using host docker
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - dio_network
+    depends_on:
+      - dio_postgresql
+      - dio_pipelines
+
+networks:
+  dio_network:
+    driver: bridge
+    name: dio_network

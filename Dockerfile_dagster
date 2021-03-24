@@ -1,0 +1,33 @@
+# Dagster libraries to run both dagit and the dagster-daemon. Does not
+# need to have access to any pipeline code.
+
+FROM python:3.7-slim
+
+# Environment variables
+ENV DAGSTER_HOME=/opt/dagster/dagster_home/
+ENV DIO_MINER_GDELT_HOME=/opt/dagster/app/miners/gdelt
+ENV SNOWFLAKE_ACCOUNT=dz02451.us-east-1
+ENV SNOWFLAKE_USER=odupuis
+ENV SNOWFLAKE_PASSWORD=4\$U62e\?MQM\$u3\&pT
+ENV SNOWFLAKE_ROLE=sysadmin
+ENV SNOWFLAKE_LOAD_WAREHOUSE=dio_load
+ENV SNOWFLAKE_LOAD_DATABASE=dio_sources
+ENV SNOWFLAKE_LOAD_SCHEMA=public
+ENV SNOWFLAKE_DW_WAREHOUSE=dio_etl
+ENV SNOWFLAKE_DW_DATABASE=dio_dw
+ENV SNOWFLAKE_DW_SCHEMA=dbt_odupuis
+
+
+RUN pip install \
+    dagster \
+    dagster-graphql \
+    dagit \
+    dagster-postgres \
+    dagster-docker
+
+# Copy dagster instance and workspace YAML
+RUN mkdir -p $DAGSTER_HOME
+
+COPY orchestration/dagster.yaml orchestration/workspace.yaml $DAGSTER_HOME
+
+WORKDIR $DAGSTER_HOME

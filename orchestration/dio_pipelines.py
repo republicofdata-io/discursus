@@ -16,7 +16,7 @@ from dagster_dbt import dbt_cli_run, dbt_cli_test
 
 
 DBT_PROFILES_DIR = "."
-DBT_PROJECT_DIR = file_relative_path(__file__, "../dw")
+DBT_PROJECT_DIR = file_relative_path(__file__, "./dw")
 
 
 ###########################
@@ -44,7 +44,6 @@ prod_presets = PresetDefinition.from_files(
     preset_defs=[prod_presets]
 )
 def data_mining_pipeline():
-    #gdelt_miner = create_shell_script_solid(file_relative_path(__file__, "../miners/gdelt/gdelt_miner.zsh"), name="gdelt_miner_solid")
     gdelt_miner = create_shell_command_solid("zsh < $DIO_MINER_GDELT_HOME/gdelt_miner.zsh", name="gdelt_miner_solid") 
     gdelt_miner()
 
