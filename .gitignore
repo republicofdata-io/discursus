@@ -7,3 +7,6 @@ tmp/
 *.out
 .vscode/
 __pycache__/
+docker-compose-ecs.yml
+Dockerfile_dagster
+Dockerfile_pipelines

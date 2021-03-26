@@ -17,14 +17,15 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile_pipelines
-    container_name: dio_pipelines
+    image: odupuis/dio_pipelines:latest
+    container_name: dio_dagster_pipelines
     ports:
       - "4000:4000"
     environment:
       DAGSTER_POSTGRES_USER: "postgres_user"
       DAGSTER_POSTGRES_PASSWORD: "postgres_password"
       DAGSTER_POSTGRES_DB: "postgres_db"
-      DAGSTER_CURRENT_IMAGE: "data_stack_dio_pipelines"
+      DAGSTER_CURRENT_IMAGE: "odupuis/dio_pipelines"
     networks:
       - dio_network
 
@@ -32,6 +33,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile_dagster
+    image: odupuis/dio_dagit:latest
     entrypoint:
       - dagit
       - -h
@@ -40,7 +42,7 @@ services:
       - "3000"
       - -w
       - workspace.yaml
-    container_name: dio_dagit
+    container_name: dio_dagster_dagit
     expose:
       - "3000"
     ports:
@@ -59,6 +61,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile_dagster
+    image: odupuis/dio_dagster_daemon:latest
     entrypoint:
       - dagster-daemon
       - run
