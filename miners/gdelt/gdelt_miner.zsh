@@ -40,4 +40,4 @@ aws s3 cp $file_location s3://discursus-io/sources/gdelt/$file_date/$csv_file_na
 # # #Delete local files
 echo "Cleaning up"
 
-rm $DIO_MINER_GDELT_HOME/tmp/*
+#rm $DIO_MINER_GDELT_HOME/tmp/*
