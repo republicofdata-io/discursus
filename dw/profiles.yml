@@ -1,0 +1,13 @@
+dio:
+  outputs:
+    analytics:
+      type:      snowflake
+      threads:   1
+      account:   "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user:      "{{ env_var('SNOWFLAKE_USER') }}"
+      password:  "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role:      "{{ env_var('SNOWFLAKE_ROLE') }}"
+      database:  "{{ env_var('SNOWFLAKE_DW_DATABASE') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_DW_WAREHOUSE') }}"
+      schema:    "{{ env_var('SNOWFLAKE_DW_SCHEMA') }}"
+  target: analytics

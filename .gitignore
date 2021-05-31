@@ -3,3 +3,9 @@ target/
 dbt_modules/
 logs/
 .DS_Store
+tmp/
+*.out
+.vscode/
+__pycache__/
+docker-compose-ecs.yml
+Dockerfile_pipelines

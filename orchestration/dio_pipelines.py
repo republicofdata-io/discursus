@@ -10,13 +10,13 @@ from dagster import (
     PresetDefinition, 
     file_relative_path
 )
-from dagster_shell import create_shell_script_solid
+from dagster_shell import create_shell_command_solid
 from dagster_snowflake import snowflake_resource
 from dagster_dbt import dbt_cli_run, dbt_cli_test
 
 
-DBT_PROFILES_DIR = "~/.dbt"
-DBT_PROJECT_DIR = file_relative_path(__file__, "../dw")
+DBT_PROFILES_DIR = "."
+DBT_PROJECT_DIR = file_relative_path(__file__, "./dw")
 
 
 ###########################
@@ -44,7 +44,7 @@ prod_presets = PresetDefinition.from_files(
     preset_defs=[prod_presets]
 )
 def data_mining_pipeline():
-    gdelt_miner = create_shell_script_solid(file_relative_path(__file__, "miners/gdelt_miner.sh"), name="gdelt_miner_solid")
+    gdelt_miner = create_shell_command_solid("zsh < $DIO_MINER_GDELT_HOME/gdelt_miner.zsh", name="gdelt_miner_solid") 
     gdelt_miner()
 
 
@@ -85,7 +85,7 @@ test_dbt_transformation = dbt_cli_test.configured(
     mode_defs=[prod_mode], 
     preset_defs=[prod_presets]
 )
-def load_data_to_dw_pipeline():
+def transform_data_pipeline():
     snowpipe_result = launch_snowpipe()
     dbt_run_result = run_dbt_transformation(start_after=snowpipe_result)
     dbt_test_result = test_dbt_transformation(start_after=dbt_run_result)
@@ -93,10 +93,10 @@ def load_data_to_dw_pipeline():
 
 @schedule(
     cron_schedule="15 3,9,15,21 * * *",
-    pipeline_name="load_data_to_dw_pipeline", 
+    pipeline_name="transform_data_pipeline", 
     mode="prod"
 )  # Every hour
-def schedule_load_data_to_dw_pipeline(context):
+def schedule_transform_data_pipeline(context):
     return prod_presets.run_config
 
 
@@ -108,6 +108,6 @@ def dio_repository():
     return [
         data_mining_pipeline, 
         schedule_data_mining_pipeline, 
-        load_data_to_dw_pipeline, 
-        schedule_load_data_to_dw_pipeline
+        transform_data_pipeline, 
+        schedule_transform_data_pipeline
     ]
