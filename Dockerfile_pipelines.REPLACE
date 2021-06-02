@@ -27,11 +27,12 @@ RUN apt-get update && apt-get install -y \
     git \
     python3.4 \
     python3-pip \
-    zsh
+    zsh \
+    unzip
 
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.1/zsh-in-docker.sh)"
 
-RUN pip3 install dagster dagit dagster-postgres dagster-docker dagster_shell dagster_snowflake dagster_dbt dbt==0.19.0
+RUN pip3 install awscli dagster dagit dagster-postgres dagster-docker dagster_shell dagster_snowflake dagster_dbt dbt==0.19.1
 
 COPY orchestration/dagster.yaml $DAGSTER_HOME
 
@@ -40,8 +41,11 @@ COPY orchestration/dagster.yaml $DAGSTER_HOME
 
 WORKDIR /opt/dagster/app
 
+COPY .aws/ /opt/dagster/app/.aws/
+
 COPY miners/ /opt/dagster/app/miners/
 COPY dw/ /opt/dagster/app/dw/
+RUN (cd /opt/dagster/app/dw/; dbt deps)
 
 COPY orchestration/dio_pipelines.py /opt/dagster/app
 COPY orchestration/configs /opt/dagster/app/configs
