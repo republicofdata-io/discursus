@@ -3,7 +3,6 @@ target/
 dbt_modules/
 logs/
 .DS_Store
-tmp/
 *.out
 .vscode/
 __pycache__/
