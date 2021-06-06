@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: gdelt
-    database: dio_sources
+    database: discursus_sources
     schema: public
 
     freshness:
