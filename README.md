@@ -7,7 +7,7 @@
     * Current version is to run locally
 
 # Run Docker stack locally
-* `docker compose -p "dio-data-stack" --file docker-compose.yml up --build`
+* `docker compose -p "discursus-data-stack" --file docker-compose.yml up --build`
 
 # Visit Dagster's app
 * Go to `http://127.0.0.1:3000/`

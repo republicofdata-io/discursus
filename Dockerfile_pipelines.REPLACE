@@ -2,7 +2,7 @@ FROM ubuntu:latest
 
 # Environment variables
 ENV DAGSTER_HOME=/opt/dagster/dagster_home/
-ENV DIO_MINER_GDELT_HOME=/opt/dagster/app/miners/gdelt
+ENV DISCURSUS_MINER_GDELT_HOME=/opt/dagster/app/miners/gdelt
 ENV AWS_ACCESS_KEY_ID=VALUE
 ENV AWS_SECRET_ACCESS_KEY=VALUE
 ENV SNOWFLAKE_ACCOUNT=VALUE
@@ -47,7 +47,7 @@ COPY miners/ /opt/dagster/app/miners/
 COPY dw/ /opt/dagster/app/dw/
 RUN (cd /opt/dagster/app/dw/; dbt deps)
 
-COPY orchestration/dio_pipelines.py /opt/dagster/app
+COPY orchestration/discursus_pipelines.py /opt/dagster/app
 COPY orchestration/configs /opt/dagster/app/configs
 
 
@@ -58,4 +58,4 @@ EXPOSE 4000
 
 # CMD allows this to be overridden from run launchers or executors that want
 # to run other commands against your repository
-CMD ["dagster", "api", "grpc", "-h", "0.0.0.0", "-p", "4000", "-f", "dio_pipelines.py"]
+CMD ["dagster", "api", "grpc", "-h", "0.0.0.0", "-p", "4000", "-f", "discursus_pipelines.py"]

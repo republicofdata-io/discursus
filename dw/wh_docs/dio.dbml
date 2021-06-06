@@ -1,4 +1,4 @@
-project wh_dio {
+project wh_discursus {
 
     database_type: 'snowflake'
 
