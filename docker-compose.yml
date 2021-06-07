@@ -1,9 +1,9 @@
 version: "3.7"
 
 services:
-  dio_postgresql:
+  discursus_postgresql:
     image: postgres:11
-    container_name: dio_postgresql
+    container_name: discursus_postgresql
     ports:
       - "5432:5432"
     environment:
@@ -11,29 +11,29 @@ services:
       POSTGRES_PASSWORD: "postgres_password"
       POSTGRES_DB: "postgres_db"
     networks:
-      - dio_network
+      - discursus_network
   
-  dio_pipelines:
+  discursus_pipelines:
     build:
       context: .
       dockerfile: ./Dockerfile_pipelines
-    image: odupuis/dio_pipelines:latest
-    container_name: dio_dagster_pipelines
+    image: odupuis/discursus_pipelines:latest
+    container_name: discursus_dagster_pipelines
     ports:
       - "4000:4000"
     environment:
       DAGSTER_POSTGRES_USER: "postgres_user"
       DAGSTER_POSTGRES_PASSWORD: "postgres_password"
       DAGSTER_POSTGRES_DB: "postgres_db"
-      DAGSTER_CURRENT_IMAGE: "odupuis/dio_pipelines"
+      DAGSTER_CURRENT_IMAGE: "odupuis/discursus_pipelines"
     networks:
-      - dio_network
+      - discursus_network
 
-  dio_dagit:
+  discursus_dagit:
     build:
       context: .
       dockerfile: ./Dockerfile_dagster
-    image: odupuis/dio_dagit:latest
+    image: odupuis/discursus_dagit:latest
     entrypoint:
       - dagit
       - -h
@@ -42,7 +42,7 @@ services:
       - "3000"
       - -w
       - workspace.yaml
-    container_name: dio_dagster_dagit
+    container_name: discursus_dagster_dagit
     expose:
       - "3000"
     ports:
@@ -52,20 +52,20 @@ services:
       DAGSTER_POSTGRES_PASSWORD: "postgres_password"
       DAGSTER_POSTGRES_DB: "postgres_db"
     networks:
-      - dio_network
+      - discursus_network
     depends_on:
-      - dio_postgresql
-      - dio_pipelines
+      - discursus_postgresql
+      - discursus_pipelines
 
-  dio_daemon:
+  discursus_daemon:
     build:
       context: .
       dockerfile: ./Dockerfile_dagster
-    image: odupuis/dio_dagster_daemon:latest
+    image: odupuis/discursus_dagster_daemon:latest
     entrypoint:
       - dagster-daemon
       - run
-    container_name: dio_daemon
+    container_name: discursus_daemon
     restart: on-failure
     environment:
       DAGSTER_POSTGRES_USER: "postgres_user"
@@ -74,12 +74,12 @@ services:
     volumes: # Make docker client accessible so we can launch containers using host docker
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - dio_network
+      - discursus_network
     depends_on:
-      - dio_postgresql
-      - dio_pipelines
+      - discursus_postgresql
+      - discursus_pipelines
 
 networks:
-  dio_network:
+  discursus_network:
     driver: bridge
-    name: dio_network
+    name: discursus_network

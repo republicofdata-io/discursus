@@ -1,5 +1,5 @@
 load_from:
   - grpc_server:
-      host: dio_pipelines
+      host: discursus_pipelines
       port: 4000
-      location_name: "dio_pipelines"
+      location_name: "discursus_pipelines"

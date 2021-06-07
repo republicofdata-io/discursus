@@ -44,7 +44,7 @@ prod_presets = PresetDefinition.from_files(
     preset_defs=[prod_presets]
 )
 def data_mining_pipeline():
-    gdelt_miner = create_shell_command_solid("zsh < $DIO_MINER_GDELT_HOME/gdelt_miner.zsh", name="gdelt_miner_solid") 
+    gdelt_miner = create_shell_command_solid("zsh < $DISCURSUS_MINER_GDELT_HOME/gdelt_miner.zsh", name="gdelt_miner_solid") 
     gdelt_miner()
 
 
@@ -104,7 +104,7 @@ def schedule_transform_data_pipeline(context):
 # REPOSITORY
 ###########################
 @repository
-def dio_repository():
+def discursus_repository():
     return [
         data_mining_pipeline, 
         schedule_data_mining_pipeline, 
