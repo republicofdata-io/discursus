@@ -1,3 +1,6 @@
+[Read here for a thorough introduction to the discursus project](https://www.olivierdupuis.com/introducing-discursus-io/)
+
+
 # Environment
 * Set environment variables
     * Rename the `Dockerfile_pipelines.REPLACE` file to `Dockerfile_pipelines`
