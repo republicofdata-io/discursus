@@ -4,12 +4,21 @@ project wh_discursus {
 
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////
 // CORE WAREHOUSE
 
-table wh_events_fact [headercolor: #3498db] {
+table country_dim {
+
+    country_pk varchar [pk]
+
+    country_code varchar
+    country_name varchar
+
+}
+
+table events_fct {
 
     event_pk varchar [pk]
+    action_country_fk varchar [ref: - country_dim.country_pk]
 
     gdelt_event_natural_key int
 
@@ -18,7 +27,6 @@ table wh_events_fact [headercolor: #3498db] {
 
     source_url varchar
     action_geo_full_name varchar
-    action_geo_country_code varchar
     action_geo_adm1_code varchar
     action_geo_lat decimal
     action_geo_long decimal

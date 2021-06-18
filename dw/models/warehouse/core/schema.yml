@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: countries_dim
+    description: Table of countries
+    columns:
+      - name: country_pk
+        description: >
+          Unique identifier for countries
+        tests:
+          - unique
+          - not_null
+
+  - name: events_fct
+    description: Table of events
+    columns:
+      - name: event_pk
+        description: >
+          Unique identifier for events
+        tests:
+          - unique
+          - not_null
+      - name: country_fk
+        description: >
+          Unique identifier for countries
+        tests:
+          - relationships:
+              to: ref('countries_dim')
+              field: country_pk
