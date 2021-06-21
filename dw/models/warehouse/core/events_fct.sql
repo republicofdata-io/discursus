@@ -36,6 +36,7 @@ final as (
 
     source_url, 
     action_geo_full_name,  
+    action_geo_country_code, 
     action_geo_adm1_code, 
     action_geo_lat, 
     action_geo_long, 

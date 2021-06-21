@@ -18,7 +18,7 @@ table countries_dim {
 table events_fct {
 
     event_pk varchar [pk]
-    action_country_fk varchar [ref: - country_dim.country_pk]
+    action_country_fk varchar [ref: - countries_dim.country_pk]
 
     gdelt_event_natural_key int
 
@@ -27,6 +27,7 @@ table events_fct {
 
     source_url varchar
     action_geo_full_name varchar
+    action_geo_country_code varchar
     action_geo_adm1_code varchar
     action_geo_lat decimal
     action_geo_long decimal

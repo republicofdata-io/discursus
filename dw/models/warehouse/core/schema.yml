@@ -20,10 +20,3 @@ models:
         tests:
           - unique
           - not_null
-      - name: country_fk
-        description: >
-          Unique identifier for countries
-        tests:
-          - relationships:
-              to: ref('countries_dim')
-              field: country_pk
