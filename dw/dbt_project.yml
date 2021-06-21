@@ -1,7 +1,7 @@
 
 name: 'discursus_dw'
 version: '0.0.1'
-require-dbt-version: ">=0.19.0"
+require-dbt-version: "0.19.1"
 config-version: 2
 
 profile: discursus
@@ -28,7 +28,3 @@ models:
             schema: integration
         warehouse:
             materialized: table
-        utils:
-            materialized: table
-            schema: logs
-            enabled: false

@@ -1,3 +1,5 @@
+[Read here for a thorough introduction to the discursus project](https://www.olivierdupuis.com/introducing-discursus-io/)
+
 # Prod specific instructions
 * Install docker and docker-compose
 * Add ec2-user to docker group - https://docs.docker.com/engine/install/linux-postinstall/
