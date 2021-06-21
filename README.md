@@ -2,7 +2,7 @@
 * Install docker and docker-compose
 * Add ec2-user to docker group - https://docs.docker.com/engine/install/linux-postinstall/
 * Start Docker: `sudo systemctl start docker`
-* Run stack `nohup docker-compose -p "dio-data-stack" --file docker-compose.yml up --build > dio_stack_log.out &`
+* Run stack `nohup docker-compose -p "discursus-data-stack" --file docker-compose.yml up --build > discursus_stack_log.out &`
 
 # Environment
 * Set environment variables
