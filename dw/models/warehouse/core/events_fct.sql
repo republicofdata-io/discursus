@@ -27,7 +27,7 @@ final as (
 
     {{ dbt_utils.surrogate_key(
       ['action_geo_country_code']
-    ) }} as country_fk,
+    ) }} as country_fk, 
 
     gdelt_event_natural_key, 
 

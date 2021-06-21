@@ -28,7 +28,3 @@ models:
             schema: integration
         warehouse:
             materialized: table
-        utils:
-            materialized: table
-            schema: logs
-            enabled: false
