@@ -6,7 +6,7 @@ project wh_discursus {
 
 // CORE WAREHOUSE
 
-table country_dim {
+table countries_dim {
 
     country_pk varchar [pk]
 
