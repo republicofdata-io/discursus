@@ -8,7 +8,7 @@ final as (
 
     select
         lower(code) as country_code, 
-        lower(country) as country_name      
+        lower(label) as country_name      
 
     from source
 
