@@ -6,7 +6,7 @@ with source as (
 
 final as (
 
-    select
+    select distinct
         lower(code) as country_code, 
         lower(label) as country_name      
 
