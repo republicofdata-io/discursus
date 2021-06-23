@@ -18,6 +18,18 @@ clean-targets:
     - "target"
     - "dbt_modules"
 
+seeds:
+    discursus_dw:
+        actor_types:
+            code: varchar(3)
+            label: varchar
+        event_types:
+            code: varchar(4)
+            label: varchar
+        fips_country:
+            code: varchar(2)
+            label: varchar
+
 models:
     discursus_dw:
         staging:
