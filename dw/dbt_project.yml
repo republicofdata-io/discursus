@@ -20,23 +20,33 @@ clean-targets:
 
 seeds:
     discursus_dw:
+        +schema: seed
+
         actor_types:
-            code: varchar(3)
-            label: varchar
+            +column_types:
+                CODE: varchar(3)
+                LABEL: varchar
+
         event_types:
-            code: varchar(4)
-            label: varchar
+            +column_types:
+                CODE: varchar
+                LABEL: varchar
+
         fips_country:
-            code: varchar(2)
-            label: varchar
+            +column_types:
+                CODE: varchar(2)
+                LABEL: varchar
+
 
 models:
     discursus_dw:
         staging:
             materialized: view
             schema: staging
+
         integration:
             materialized: view
             schema: integration
+            
         warehouse:
             materialized: table
