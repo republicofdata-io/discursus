@@ -1,134 +1,134 @@
 ﻿CODE,LABEL
-1,MAKE PUBLIC STATEMENT
-10,"Make statement, not specified below"
-11,Decline comment
-12,Make pessimistic comment
-13,Make optimistic comment
-14,Consider policy option
-15,Acknowledge or claim responsibility
-16,Deny responsibility
-17,Engage in symbolic act
-18,Make empathetic comment
-19,Express accord
-2,APPEAL
-20,"Appeal, not specified below"
-21,"Appeal for material cooperation, not specified below"
-211,Appeal for economic cooperation
-212,Appeal for military cooperation
-213,Appeal for judicial cooperation
-214,Appeal for intelligence
-22,"Appeal for diplomatic cooperation, such as policy support"
-23,"Appeal for aid, not specified below"
-231,Appeal for economic aid
-232,Appeal for military aid
-233,Appeal for humanitarian aid
-234,Appeal for military protection or peacekeeping
-24,"Appeal for political reform, not specified below"
-241,Appeal for change in leadership
-242,Appeal for policy change
-243,Appeal for rights
-244,"Appeal for change in institutions, regime"
-25,Appeal to yield
-251,Appeal for easing of administrative sanctions
-252,Appeal for easing of popular dissent
-253,Appeal for release of persons or property
-254,"Appeal for easing of economic sanctions, boycott, or embargo"
-255,Appeal for target to allow international involvement (non-mediation)
-256,Appeal for de-escalation of military engagement
-26,Appeal to others to meet or negotiate
-27,Appeal to others to settle dispute
-28,Appeal to others to engage in or accept mediation
-3,EXPRESS INTENT TO COOPERATE
-30,"Express intent to cooperate, not specified below"
-31,"Express intent to engage in material cooperation,  not specified below"
-311,Express intent to cooperate economically
-312,Express intent to cooperate militarily
-313,Express intent to cooperate on judicial matters
-314,Express intent to cooperate on intelligence
-32,Express intent to provide diplomatic cooperation such as policy support
-33,"Express intent to provide matyerial aid, not specified below"
-331,Express intent to provide economic aid
-332,Express intent to provide military aid
-333,Express intent to provide humanitarian aid
-334,Express intent to provide military protection or peacekeeping
-34,"Express intent to institute political reform, not specified below"
-341,Express intent to change leadership
-342,Express intent to change policy
-343,Express intent to provide rights
-344,"Express intent to change institutions, regime"
-35,"Express intent to yield, not specified below"
-351,Express intent to ease administrative sanctions
-352,Express intent to ease popular dissent
-353,Express intent to release persons or property
-354,"Express intent to ease economic sanctions, boycott, or embargo"
-355,Express intent allow international involvement (not mediation)
-356,Express intent to de-escalate military engagement
-36,Express intent to meet or negotiate
-37,Express intent to settle dispute
-38,Express intent to accept mediation
-39,Express intent to mediate
-4,CONSULT
-40,"Consult, not specified below"
-41,Discuss by telephone
-42,Make a visit
-43,Host a visit
-44,Meet at a Ã’hirdÃ“location
-45,Mediate
-46,Engage in negotiation
-5,ENGAGE IN DIPLOMATIC COOPERATION
-50,"Engage in diplomatic cooperation, not specified below"
-51,Praise or endorse
-52,Defend verbally
-53,Rally support on behalf of
-54,Grant diplomatic recognition
-55,Apologize
-56,Forgive
-57,Sign formal agreement
-6,ENGAGE IN MATERIAL COOPERATION
-60,"Engage in material cooperation, not specified below"
-61,Cooperate economically
-62,Cooperate militarily
-63,Engage in judicial cooperation
-64,Share intelligence or information
-7,PROVIDE AID
-70,"Provide aid, not specified below"
-71,Provide economic aid
-72,Provide military aid
-73,Provide humanitarian aid
-74,Provide military protection or peacekeeping
-75,Grant asylum
-8,YIELD
-80,"Yield, not specified below"
-81,"Ease administrative sanctions, not specified below"
-811,Ease restrictions on political freedoms
-812,Ease ban on political parties or politicians
-813,Ease curfew
-814,Ease state of emergency or martial law
-82,Ease political dissent
-83,Accede to requests or demands for political reform not specified below
-831,Accede to demands for change in leadership
-832,Accede to demands for change in policy
-833,Accede to demands for rights
-834,"Accede to demands for change in institutions, regime"
-84,"Return, release, not specified below"
-841,"Return, release person(s)"
-842,"Return, release property"
-85,"Ease economic sanctions, boycott, embargo"
-86,Allow international involvement not specified below
-861,Receive deployment of peacekeepers
-862,Receive inspectors
-863,Allow delivery of humanitarian aid
-87,De-escalate military engagement
-871,"Declare truce, ceasefire"
-872,Ease military blockade
-873,Demobilize armed forces
-874,Retreat or surrender militarily
-9,INVESTIGATE
-90,"Investigate, not specified below"
-91,"Investigate crime, corruption"
-92,Investigate human rights abuses
-93,Investigate military action
-94,Investigate war crimes
+01,MAKE PUBLIC STATEMENT
+010,"Make statement, not specified below"
+011,Decline comment
+012,Make pessimistic comment
+013,Make optimistic comment
+014,Consider policy option
+015,Acknowledge or claim responsibility
+016,Deny responsibility
+017,Engage in symbolic act
+018,Make empathetic comment
+019,Express accord
+02,APPEAL
+020,"Appeal, not specified below"
+021,"Appeal for material cooperation, not specified below"
+0211,Appeal for economic cooperation
+0212,Appeal for military cooperation
+0213,Appeal for judicial cooperation
+0214,Appeal for intelligence
+022,"Appeal for diplomatic cooperation, such as policy support"
+023,"Appeal for aid, not specified below"
+0231,Appeal for economic aid
+0232,Appeal for military aid
+0233,Appeal for humanitarian aid
+0234,Appeal for military protection or peacekeeping
+024,"Appeal for political reform, not specified below"
+0241,Appeal for change in leadership
+0242,Appeal for policy change
+0243,Appeal for rights
+0244,"Appeal for change in institutions, regime"
+025,Appeal to yield
+0251,Appeal for easing of administrative sanctions
+0252,Appeal for easing of popular dissent
+0253,Appeal for release of persons or property
+0254,"Appeal for easing of economic sanctions, boycott, or embargo"
+0255,Appeal for target to allow international involvement (non-mediation)
+0256,Appeal for de-escalation of military engagement
+026,Appeal to others to meet or negotiate
+027,Appeal to others to settle dispute
+028,Appeal to others to engage in or accept mediation
+03,EXPRESS INTENT TO COOPERATE
+030,"Express intent to cooperate, not specified below"
+031,"Express intent to engage in material cooperation,  not specified below"
+0311,Express intent to cooperate economically
+0312,Express intent to cooperate militarily
+0313,Express intent to cooperate on judicial matters
+0314,Express intent to cooperate on intelligence
+032,Express intent to provide diplomatic cooperation such as policy support
+033,"Express intent to provide matyerial aid, not specified below"
+0331,Express intent to provide economic aid
+0332,Express intent to provide military aid
+0333,Express intent to provide humanitarian aid
+0334,Express intent to provide military protection or peacekeeping
+034,"Express intent to institute political reform, not specified below"
+0341,Express intent to change leadership
+0342,Express intent to change policy
+0343,Express intent to provide rights
+0344,"Express intent to change institutions, regime"
+035,"Express intent to yield, not specified below"
+0351,Express intent to ease administrative sanctions
+0352,Express intent to ease popular dissent
+0353,Express intent to release persons or property
+0354,"Express intent to ease economic sanctions, boycott, or embargo"
+0355,Express intent allow international involvement (not mediation)
+0356,Express intent to de-escalate military engagement
+036,Express intent to meet or negotiate
+037,Express intent to settle dispute
+038,Express intent to accept mediation
+039,Express intent to mediate
+04,CONSULT
+040,"Consult, not specified below"
+041,Discuss by telephone
+042,Make a visit
+043,Host a visit
+044,Meet at a Ã’hirdÃ“location
+045,Mediate
+046,Engage in negotiation
+05,ENGAGE IN DIPLOMATIC COOPERATION
+050,"Engage in diplomatic cooperation, not specified below"
+051,Praise or endorse
+052,Defend verbally
+053,Rally support on behalf of
+054,Grant diplomatic recognition
+055,Apologize
+056,Forgive
+057,Sign formal agreement
+06,ENGAGE IN MATERIAL COOPERATION
+060,"Engage in material cooperation, not specified below"
+061,Cooperate economically
+062,Cooperate militarily
+063,Engage in judicial cooperation
+064,Share intelligence or information
+07,PROVIDE AID
+070,"Provide aid, not specified below"
+071,Provide economic aid
+072,Provide military aid
+073,Provide humanitarian aid
+074,Provide military protection or peacekeeping
+075,Grant asylum
+08,YIELD
+080,"Yield, not specified below"
+081,"Ease administrative sanctions, not specified below"
+0811,Ease restrictions on political freedoms
+0812,Ease ban on political parties or politicians
+0813,Ease curfew
+0814,Ease state of emergency or martial law
+082,Ease political dissent
+083,Accede to requests or demands for political reform not specified below
+0831,Accede to demands for change in leadership
+0832,Accede to demands for change in policy
+0833,Accede to demands for rights
+0834,"Accede to demands for change in institutions, regime"
+084,"Return, release, not specified below"
+0841,"Return, release person(s)"
+0842,"Return, release property"
+085,"Ease economic sanctions, boycott, embargo"
+086,Allow international involvement not specified below
+0861,Receive deployment of peacekeepers
+0862,Receive inspectors
+0863,Allow delivery of humanitarian aid
+087,De-escalate military engagement
+0871,"Declare truce, ceasefire"
+0872,Ease military blockade
+0873,Demobilize armed forces
+0874,Retreat or surrender militarily
+09,INVESTIGATE
+090,"Investigate, not specified below"
+091,"Investigate crime, corruption"
+092,Investigate human rights abuses
+093,Investigate military action
+094,Investigate war crimes
 10,DEMAND
 100,"Demand, not specified below"
 101,"Demand information, investigation"
