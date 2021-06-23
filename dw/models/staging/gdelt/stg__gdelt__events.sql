@@ -48,8 +48,8 @@ final as (
         lower(cast(actor1_geo_country_code as string)) as actor1_geo_country_code,
         lower(cast(actor1_geo_adm1_code as string)) as actor1_geo_adm1_code,
         lower(cast(actor1_geo_adm2_code as string)) as actor1_geo_adm2_code,
-        cast(actor1_geo_lat as real) as actor1_geo_lat,
-        cast(actor1_geo_long as real) as actor1_geo_long,
+        cast(actor1_geo_lat as number(8,6)) as actor1_geo_latitude,
+        cast(actor1_geo_long as number(9,6)) as actor1_geo_longitude,
         lower(cast(actor1_geo_feature_id as string)) as actor1_geo_feature_id,
 
         lower(cast(actor2_code as string)) as actor2_code,
@@ -67,8 +67,8 @@ final as (
         lower(cast(actor2_geo_country_code as string)) as actor2_geo_country_code,
         lower(cast(actor2_geo_adm1_code as string)) as actor2_geo_adm1_code,
         lower(cast(actor2_geo_adm2_code as string)) as actor2_geo_adm2_code,
-        cast(actor2_geo_lat as real) as actor2_geo_lat,
-        cast(actor2_geo_long as real) as actor2_geo_long,
+        cast(actor2_geo_lat as number(8,6)) as actor2_geo_latitude,
+        cast(actor2_geo_long as number(9,6)) as actor2_geo_longitude,
         lower(cast(actor2_geo_feature_id as string)) as actor2_geo_feature_id,
 
         cast(action_geo_type as integer) as action_geo_type,
@@ -76,8 +76,8 @@ final as (
         lower(cast(action_geo_country_code as string)) as action_geo_country_code,
         lower(cast(action_geo_adm1_code as string)) as action_geo_adm1_code,
         lower(cast(action_geo_adm2_code as string)) as action_geo_adm2_code,
-        cast(action_geo_lat as real) as action_geo_lat,
-        cast(action_geo_long as real) as action_geo_long,
+        cast(action_geo_lat as number(8,6)) as action_geo_latitude,
+        cast(action_geo_long as number(9,6)) as action_geo_longitude,
         lower(cast(action_geo_feature_id as string)) as action_geo_feature_id,
 
         cast(quad_class as integer) as quad_class,
