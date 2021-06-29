@@ -8,9 +8,7 @@ with s_countries as (
 final as (
 
   select
-    {{ dbt_utils.surrogate_key(
-      ['country_code']
-    ) }} as country_pk, 
+    {{ dbt_utils.surrogate_key(['country_code']) }} as country_pk, 
 
     country_code, 
     country_name

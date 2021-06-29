@@ -1,6 +1,17 @@
 version: 2
 
 models:
+
+  - name: articles_fct
+    description: Table of articles
+    columns:
+      - name: article_pk
+        description: >
+          Unique identifier for articles
+        tests:
+          - unique
+          - not_null
+
   - name: countries_dim
     description: Table of countries
     columns:

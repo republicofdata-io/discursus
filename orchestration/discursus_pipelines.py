@@ -44,8 +44,11 @@ prod_presets = PresetDefinition.from_files(
     preset_defs=[prod_presets]
 )
 def data_mining_pipeline():
-    gdelt_miner = create_shell_command_solid("zsh < $DISCURSUS_MINER_GDELT_HOME/gdelt_miner.zsh", name="gdelt_miner_solid") 
-    gdelt_miner()
+    gdelt_events_miner = create_shell_command_solid("zsh < $DISCURSUS_MINER_GDELT_HOME/gdelt_events_miner.zsh", name="gdelt_events_miner_solid") 
+    gdelt_events_miner()
+
+    gdelt_mentions_miner = create_shell_command_solid("zsh < $DISCURSUS_MINER_GDELT_HOME/gdelt_mentions_miner.zsh", name="gdelt_mentions_miner_solid") 
+    gdelt_mentions_miner()
 
 
 @schedule(
