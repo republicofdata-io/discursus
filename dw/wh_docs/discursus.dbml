@@ -4,7 +4,7 @@ project wh_discursus {
 
 }
 
-// CORE WAREHOUSE
+// CORE WAREHOUSE DIMENSIONS
 
 table countries_dim {
 
@@ -14,6 +14,9 @@ table countries_dim {
     country_name varchar
 
 }
+
+
+// CORE WAREHOUSE FACTS
 
 table events_fct {
 
@@ -41,5 +44,19 @@ table events_fct {
     num_sources int
     num_articles int
     avg_tone decimal
+
+}
+
+table articles_fct {
+
+    article_pk varchar [pk]
+    event_fk varchar [ref: - events_fct.event_pk]
+
+    gdelt_event_natural_key int
+    article_url varchar
+
+    article_ts timestamp
+
+    article_source_name varchar
 
 }

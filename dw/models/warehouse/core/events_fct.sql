@@ -21,20 +21,14 @@ with s_events as (
 final as (
 
   select
-    {{ dbt_utils.surrogate_key(
-      ['gdelt_event_natural_key']
-    ) }} as event_pk, 
-
-    {{ dbt_utils.surrogate_key(
-      ['action_geo_country_code']
-    ) }} as country_fk, 
+    {{ dbt_utils.surrogate_key(['gdelt_event_natural_key']) }} as event_pk, 
+    {{ dbt_utils.surrogate_key(['action_geo_country_code']) }} as country_fk, 
 
     gdelt_event_natural_key, 
 
     published_date, 
     creation_ts, 
 
-    source_url, 
     action_geo_full_name,  
     action_geo_adm1_code, 
     action_geo_latitude, 
