@@ -11,3 +11,4 @@ sources:
 
     tables:
       - name: gdelt_events
+      - name: gdelt_mentions
