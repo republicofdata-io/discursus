@@ -66,10 +66,12 @@ def schedule_data_mining_pipeline(context):
 # 2. RUN DBT TRANSFORMATION
 ###########################
 q_load_gdelt_events = "alter pipe gdelt_events_pipe refresh;"
+q_load_mentions_events = "alter pipe gdelt_mentions_pipe refresh;"
 
 @solid(required_resource_keys={"snowflake"})
-def launch_snowpipe(context):
+def launch_snowpipes(context):
     context.resources.snowflake.execute_query(q_load_gdelt_events)
+    context.resources.snowflake.execute_query(q_load_mentions_events)
 
 
 run_dbt_transformation = dbt_cli_run.configured(
@@ -89,8 +91,8 @@ test_dbt_transformation = dbt_cli_test.configured(
     preset_defs=[prod_presets]
 )
 def transform_data_pipeline():
-    snowpipe_result = launch_snowpipe()
-    dbt_run_result = run_dbt_transformation(start_after=snowpipe_result)
+    snowpipes_result = launch_snowpipes()
+    dbt_run_result = run_dbt_transformation(start_after=snowpipes_result)
     dbt_test_result = test_dbt_transformation(start_after=dbt_run_result)
 
 
