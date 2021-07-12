@@ -7,11 +7,13 @@ from dagster import (
 from dagster_snowflake import snowflake_resource
 from dagster_shell import create_shell_command_solid
 
-from solids import (
-    enhance_gdelt_mention,
+from solids.dw_solids import (
     launch_snowpipes, 
     run_dbt_transformation, 
     test_dbt_transformation
+)
+from solids.enhancement_solids import (
+    enhance_gdelt_mention
 )
 
 

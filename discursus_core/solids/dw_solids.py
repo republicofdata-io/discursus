@@ -6,7 +6,7 @@ from dagster_dbt import dbt_cli_run, dbt_cli_test
 
 
 DBT_PROFILES_DIR = "."
-DBT_PROJECT_DIR = file_relative_path(__file__, "./dw")
+DBT_PROJECT_DIR = file_relative_path(__file__, "../dw")
 
 
 @solid(required_resource_keys = {"snowflake"})
@@ -16,11 +16,6 @@ def launch_snowpipes(context):
 
     context.resources.snowflake.execute_query(q_load_gdelt_events)
     context.resources.snowflake.execute_query(q_load_mentions_events)
-
-
-@solid(required_resource_keys = {"snowflake"})
-def enhance_gdelt_mention(context):
-    print("Hello")
 
 
 run_dbt_transformation = dbt_cli_run.configured(
