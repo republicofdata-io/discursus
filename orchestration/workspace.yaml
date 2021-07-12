@@ -1,5 +1,0 @@
-load_from:
-  - grpc_server:
-      host: discursus_pipelines
-      port: 4000
-      location_name: "discursus_pipelines"

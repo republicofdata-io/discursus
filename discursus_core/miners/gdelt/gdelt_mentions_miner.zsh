@@ -30,14 +30,16 @@ curl $latest_gdelt_url > $DISCURSUS_MINER_GDELT_HOME/tmp/$compressed_file_name
 unzip -p "$DISCURSUS_MINER_GDELT_HOME/tmp/$compressed_file_name" $csv_file_name > $DISCURSUS_MINER_GDELT_HOME/tmp/$file_name
 
 
-# #Save gdelt data to S3
+#Save gdelt data to S3
 echo "Copying to S3"
 
 file_location="$DISCURSUS_MINER_GDELT_HOME/tmp/$file_name"
 aws s3 cp $file_location s3://discursus-io/sources/gdelt/$file_date/$csv_file_name
 
 
-# # #Delete local files
+#Delete local files
 echo "Cleaning up"
 
-#rm $DISCURSUS_MINER_GDELT_HOME/tmp/*
+
+#Return path to latest saved mention file
+echo "s3://discursus-io/sources/gdelt/$file_date/$csv_file_name"

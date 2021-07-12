@@ -1,0 +1,5 @@
+load_from:
+  - grpc_server:
+      host: discursus_app
+      port: 4000
+      location_name: "discursus_app"
