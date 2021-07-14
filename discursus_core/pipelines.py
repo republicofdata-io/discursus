@@ -12,8 +12,8 @@ from solids.dw_solids import (
     run_dbt_transformation, 
     test_dbt_transformation
 )
-from solids.enhancement_solids import (
-    enhance_gdelt_mention
+from solids.enhance_mentions_solid import (
+    enhance_mentions
 )
 
 
@@ -48,9 +48,9 @@ def mine_gdelt_data():
     gdelt_mentions_miner = create_shell_command_solid(
         "zsh < $DISCURSUS_MINER_GDELT_HOME/gdelt_mentions_miner.zsh", 
         name = "gdelt_mentions_miner_solid") 
-    gdelt_mentions_miner()
+    gdelt_mentions_miner_results = gdelt_mentions_miner()
 
-    enhance_gdelt_mention()
+    enhance_mentions(gdelt_mentions_miner_results)
 
 
 @pipeline(
@@ -59,5 +59,5 @@ def mine_gdelt_data():
 )
 def build_data_warehouse():
     snowpipes_result = launch_snowpipes()
-    dbt_run_result = run_dbt_transformation(start_after = snowpipes_result)
-    dbt_test_result = test_dbt_transformation(start_after = dbt_run_result)
+    dbt_run_result = run_dbt_transformation(snowpipes_result)
+    test_dbt_transformation(dbt_run_result)
