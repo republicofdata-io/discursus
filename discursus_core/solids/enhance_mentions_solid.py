@@ -1,8 +1,7 @@
 # Credit goes to...
 # https://github.com/quakerpunk/content-audit/blob/origin/content_audit.py
 
-# from dagster import solid
-
+from dagster import solid
 from bs4 import BeautifulSoup
 from optparse import OptionParser
 import urllib.request
@@ -12,23 +11,20 @@ import csv
 import urllib.parse
 import re
 import time
+import boto3
+import os
 
 class ContentAuditor:
-    """
-    ContentAuditor
-    This script takes a list of URLs and retrieves data such as meta tags
-    containing keywords, description and the page title. It then populates a
-    spreadsheet with the data for easy review.
-    """
 
     def __init__(self, filename):
         """
         Initialization method for the ContentAuditor class.
-        requirements:
-        BeautifulSoup for HTML parsing
-        xlwt for writing to an Excel spreadsheet without use of COM Interop
         """
-        self.filehandle = open(filename, 'r')
+        s3 = boto3.resource('s3')
+        obj = s3.Object('discursus-io', filename)
+
+        self.filehandle = obj.get()['Body'].read().decode('utf-8')
+        self.article_urls = []
         self.soupy_data = ""
         self.csv_output = ""
         self.content = ""
@@ -36,33 +32,38 @@ class ContentAuditor:
         self.site_info = []
         self.url_parts = ""
         self.reg_expres = re.compile(r"www.(.+?)(.com|.net|.org)")
+    
+
+    def get_list_of_urls(self):
+        """
+        Method which iterates over list of articles, only keep relevant ones and deduplicates.
+        """
+        for line in self.filehandle.splitlines():
+            line_url = line.split("\t")[5]
+            if int(line.split("\t")[3]) != 1:
+                print(line.split("\t")[3])
+                continue
+            if int(line.split("\t")[11]) != 100:
+                continue
+
+            self.article_urls.append(line_url)
+            self.article_urls = list(set(self.article_urls))
+
 
     def read_url(self):
         """
-        read_url
         Method which reads in a given url (to the constructor) and puts data
         into a BeautifulSoup context.
-        We begin setting a string for the user-agent. Checking for comment
-        lines in the URL list, we take a web address, one at a time, download
-        the HTML, parse it with BeautifulSoup then pass it off to extract tags.
-        Along the way, we check for any connectivity or remote server issues
-        and handle them appropriately.
         """
-        right_now = str(int(time.time()))
         ua_string = 'Content-Audit/2.0'
-        for line in self.filehandle:
-            line_url = line.split("\t")[5]
-            if line.startswith("#"):
-                continue
+        for article_url in self.article_urls:
             # print ("Parsing %s" % line_url)
-            self.url_parts = urllib.parse.urlparse(line_url)
-            req = urllib.request.Request(line_url)
+            self.url_parts = urllib.parse.urlparse(article_url)
+            req = urllib.request.Request(article_url)
             req.add_header('User-Agent', ua_string)
             try:
                 data = urllib.request.urlopen(req)
-            except urllib.error.HTTPError as ex:
-                continue
-            except urllib.error.URLError as urlex:
+            except:
                 continue
             self.soupy_data = BeautifulSoup(data, features="html.parser")
             try:
@@ -72,11 +73,9 @@ class ContentAuditor:
             time.sleep(random.uniform(1, 3))
         print("End of extraction")
 
-    #Extraction methods
 
     def extract_tags(self):
         """
-        extract_tags
         Searches through self.soupy_data and extracts meta tags such as page
         description and title for inclusion into content audit spreadsheet
         """
@@ -97,16 +96,16 @@ class ContentAuditor:
         self.site_info.append(page_info)
         self.soupy_data = ""
 
-    #Spreadsheet methods
 
-    def write_to_spreadsheet(self):
+    def write_to_spreadsheet(self, filename):
         """
-        write_to_spreadsheet
         Write data from self.meta_info to spreadsheet. 
         """
+
+        path_to_csv_export = filename.split(".")[0] + "." + filename.split(".")[1] + ".enhanced.csv"
         
         # open the file in the write mode
-        self.csv_output = open(options.output, 'w')
+        self.csv_output = open("mine_mention_tags.csv", 'w')
 
         # create the csv writer
         writer = csv.writer(self.csv_output)
@@ -128,12 +127,15 @@ class ContentAuditor:
 
         # close the file
         self.csv_output.close()
+        
+        # Save to S3
+        s3 = boto3.resource('s3')
+        s3.Bucket("discursus-io").upload_file("mine_mention_tags.csv", path_to_csv_export)
+        os.remove("mine_mention_tags.csv")
 
-    #Helper methods
 
     def add_necessary_tags(self, info_dict, needed_tags):
         """
-        add_necessary_tags
         This method insures that missing tags have a null value
         before they are written to the output spreadhseet.
         """
@@ -143,26 +145,16 @@ class ContentAuditor:
         return info_dict
 
 
-if __name__ == "__main__":
-    parser = OptionParser()
-    parser.add_option("-f", "--file", dest="filename",
-                      help="Filename containing URLs", metavar="FILE")
-    parser.add_option("-o", "--output", dest="output",
-                      help="Output file, usually a spreadsheet")
+@solid(required_resource_keys = {"snowflake"})
+def enhance_mentions(context, gdelt_mentions_miner_results):
+    filename = gdelt_mentions_miner_results.splitlines()[-1]
+    context.log.info("Enhancing " + filename)
 
-    (options, args) = parser.parse_args()
+    content_bot = ContentAuditor(filename)
+    content_bot.get_list_of_urls()
 
-    if not options.output:
-        parser.error("You did not specify an output file.")
+    context.log.info("Mining " + str(len(content_bot.article_urls)) + " articles")
+    content_bot.read_url()
 
-    if options.filename:
-        content_bot = ContentAuditor(options.filename)
-        content_bot.read_url()
-        content_bot.write_to_spreadsheet()
-    else:
-        parser.error("You did not specify an input file (a list of URLs)")
-    
-
-# @solid(required_resource_keys = {"snowflake"})
-# def enhance_mentions(context, gdelt_mentions_miner_results):
-#     context.log.info(gdelt_mentions_miner_results.splitlines()[-1])
+    context.log.info("Exporting to S3")
+    content_bot.write_to_spreadsheet(filename)

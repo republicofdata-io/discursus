@@ -42,4 +42,4 @@ echo "Cleaning up"
 
 
 #Return path to latest saved mention file
-echo "s3://discursus-io/sources/gdelt/$file_date/$csv_file_name"
+echo "sources/gdelt/$file_date/$csv_file_name"
