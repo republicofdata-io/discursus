@@ -41,9 +41,20 @@ class ContentAuditor:
         for line in self.filehandle.splitlines():
             line_url = line.split("\t")[5]
             if int(line.split("\t")[3]) != 1:
-                print(line.split("\t")[3])
+                continue
+            if int(line.split("\t")[6]) > 10:
+                continue
+            if int(line.split("\t")[7]) == -1:
+                continue
+            if int(line.split("\t")[8]) == -1:
+                continue
+            if int(line.split("\t")[9]) == -1:
+                continue
+            if int(line.split("\t")[10]) != 1:
                 continue
             if int(line.split("\t")[11]) != 100:
+                continue
+            if int(line.split("\t")[12]) < 1000:
                 continue
 
             self.article_urls.append(line_url)
@@ -67,19 +78,20 @@ class ContentAuditor:
                 continue
             self.soupy_data = BeautifulSoup(data, features="html.parser")
             try:
-                self.extract_tags()
+                self.extract_tags(article_url)
             except:
                 continue
             time.sleep(random.uniform(1, 3))
         print("End of extraction")
 
 
-    def extract_tags(self):
+    def extract_tags(self, article_url):
         """
         Searches through self.soupy_data and extracts meta tags such as page
         description and title for inclusion into content audit spreadsheet
         """
         page_info = {}
+        page_info['mention_identifier'] = article_url
 
         for tag in self.soupy_data.find_all('meta', attrs={"name": True}):
             try:
@@ -111,12 +123,13 @@ class ContentAuditor:
         writer = csv.writer(self.csv_output)
 
         # write header row to the csv file
-        row = ['page_name', 'file_name', 'page_title', 'page_description', 'keywords']
+        row = ['mention_identifier', 'page_name', 'file_name', 'page_title', 'page_description', 'keywords']
         writer.writerow(row)
 
         # write meta data
         for dex in self.site_info:
             row = [
+                dex['mention_identifier'], 
                 dex['name'], 
                 dex['filename'],
                 dex['title'],

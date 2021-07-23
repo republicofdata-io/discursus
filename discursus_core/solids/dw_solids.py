@@ -13,9 +13,11 @@ DBT_PROJECT_DIR = file_relative_path(__file__, "../dw")
 def launch_snowpipes(context):
     q_load_gdelt_events = "alter pipe gdelt_events_pipe refresh;"
     q_load_mentions_events = "alter pipe gdelt_mentions_pipe refresh;"
+    q_load_enhanced_mentions_events = "alter pipe gdelt_enhanced_mentions_pipe refresh;"
 
     context.resources.snowflake.execute_query(q_load_gdelt_events)
     context.resources.snowflake.execute_query(q_load_mentions_events)
+    context.resources.snowflake.execute_query(q_load_enhanced_mentions_events)
 
 
 run_dbt_transformation = dbt_cli_run.configured(

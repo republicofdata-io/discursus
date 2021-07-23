@@ -30,4 +30,5 @@ final as (
 
 select * from final
 where mention_type = 1
+and in_raw_text = 1
 and confidence > 50
