@@ -1,0 +1,66 @@
+FROM ubuntu:latest
+
+# Environment variables
+ENV DAGSTER_HOME=/opt/dagster/dagster_home/
+ENV DISCURSUS_MINER_GDELT_HOME=/opt/dagster/discursus_core/miners/gdelt
+ENV AWS_ACCESS_KEY_ID=REPLACE_VALUE
+ENV AWS_SECRET_ACCESS_KEY=REPLACE_VALUE
+ENV SNOWFLAKE_ACCOUNT=REPLACE_VALUE
+ENV SNOWFLAKE_USER=REPLACE_VALUE
+ENV SNOWFLAKE_PASSWORD=REPLACE_VALUE
+ENV SNOWFLAKE_ROLE=REPLACE_VALUE
+ENV SNOWFLAKE_LOAD_WAREHOUSE=REPLACE_VALUE
+ENV SNOWFLAKE_LOAD_DATABASE=REPLACE_VALUE
+ENV SNOWFLAKE_LOAD_SCHEMA=REPLACE_VALUE
+ENV SNOWFLAKE_DW_WAREHOUSE=REPLACE_VALUE
+ENV SNOWFLAKE_DW_DATABASE=REPLACE_VALUE
+ENV SNOWFLAKE_DW_SCHEMA=REPLACE_VALUE
+
+
+# Create environment
+RUN mkdir -p $DAGSTER_HOME
+
+RUN apt-get update && apt-get install -y \
+    software-properties-common
+RUN add-apt-repository universe
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    python3.4 \
+    python3-pip \
+    zsh \
+    unzip
+
+RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.1/zsh-in-docker.sh)"
+
+RUN pip3 install \
+    awscli \
+    dagster==0.11.16 \
+    dagster-graphql==0.11.16 \
+    dagit==0.11.16 \
+    dagster-postgres==0.11.16 \
+    dagster-docker==0.11.16 \
+    dagster_shell==0.11.16 \
+    dagster_snowflake==0.11.16 \
+    dagster_dbt==0.11.16 \
+    dbt==0.19.1 \
+    bs4 \
+    optparse-pretty \
+    boto3
+
+
+# Copy resources for Dagster
+COPY discursus_core/dagster.yaml $DAGSTER_HOME
+
+
+# Copy and install discursus_core package
+COPY discursus_core/ /opt/dagster/discursus_core/
+RUN (cd /opt/dagster/discursus_core/dw/; dbt deps --profiles-dir ./; dbt seed --full-refresh --profiles-dir ./)
+
+WORKDIR /opt/dagster/discursus_core/
+
+
+# Run dagster gRPC server on port 4000
+EXPOSE 4000
+
+CMD ["dagster", "api", "grpc", "--host", "0.0.0.0", "--port", "4000", "--python-file", "discursus_repo.py", "--working-directory", "/opt/dagster/discursus_core/"]

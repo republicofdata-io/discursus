@@ -13,19 +13,19 @@ services:
     networks:
       - discursus_network
   
-  discursus_pipelines:
+  discursus_app:
     build:
       context: .
-      dockerfile: ./Dockerfile_pipelines
-    image: odupuis/discursus_pipelines:latest
-    container_name: discursus_dagster_pipelines
+      dockerfile: ./Dockerfile_app
+    image: odupuis/discursus_app:latest
+    container_name: discursus_app
     ports:
       - "4000:4000"
     environment:
       DAGSTER_POSTGRES_USER: "postgres_user"
       DAGSTER_POSTGRES_PASSWORD: "postgres_password"
       DAGSTER_POSTGRES_DB: "postgres_db"
-      DAGSTER_CURRENT_IMAGE: "odupuis/discursus_pipelines"
+      DAGSTER_CURRENT_IMAGE: "odupuis/discursus_app"
     networks:
       - discursus_network
 
@@ -42,7 +42,7 @@ services:
       - "3000"
       - -w
       - workspace.yaml
-    container_name: discursus_dagster_dagit
+    container_name: discursus_dagit
     expose:
       - "3000"
     ports:
@@ -55,13 +55,13 @@ services:
       - discursus_network
     depends_on:
       - discursus_postgresql
-      - discursus_pipelines
+      - discursus_app
 
   discursus_daemon:
     build:
       context: .
       dockerfile: ./Dockerfile_dagster
-    image: odupuis/discursus_dagster_daemon:latest
+    image: odupuis/discursus_daemon:latest
     entrypoint:
       - dagster-daemon
       - run
@@ -77,7 +77,7 @@ services:
       - discursus_network
     depends_on:
       - discursus_postgresql
-      - discursus_pipelines
+      - discursus_app
 
 networks:
   discursus_network:

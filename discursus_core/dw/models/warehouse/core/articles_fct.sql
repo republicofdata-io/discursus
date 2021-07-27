@@ -32,7 +32,12 @@ final as (
 
     article_ts,
 
-    article_source_name
+    article_source_name,
+    article_page_name,
+    article_file_name,
+    article_page_title,
+    article_page_description,
+    article_keywords
 
   from s_articles
 
