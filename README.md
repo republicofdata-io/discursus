@@ -18,8 +18,10 @@ dbt DAG:
 # Prod specific instructions
 * Install docker and docker-compose
 * Add ec2-user to docker group - https://docs.docker.com/engine/install/linux-postinstall/
-* Start Docker: `sudo systemctl start docker`
-* Run stack `nohup docker-compose -p "discursus-data-stack" --file docker-compose.yml up --build > discursus_stack_log.out &`
+* If restarting, kill existing processes: `ps aux | grep discurus` then `sudo kill -9 ...`
+* (Re)start Docker: `sudo systemctl restart docker`
+* Prune all images and containers: `docker system prune -a`
+* Run stack `nohup docker-compose -p "discursus-data-stack" --file docker-compose.yml up --build >/dev/null 2>&1 &`
 
 # Environment
 * Set environment variables
