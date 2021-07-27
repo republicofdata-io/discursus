@@ -1,4 +1,5 @@
 discursus:
+  target: analytics
   outputs:
     analytics:
       type:      snowflake
@@ -10,4 +11,3 @@ discursus:
       database:  "{{ env_var('SNOWFLAKE_DW_DATABASE') }}"
       warehouse: "{{ env_var('SNOWFLAKE_DW_WAREHOUSE') }}"
       schema:    "{{ env_var('SNOWFLAKE_DW_SCHEMA') }}"
-  target: analytics

@@ -93,4 +93,6 @@ final as (
 )
 
 select * from final
-where event_root_code = '14'
+
+where creation_ts >= dateadd(day, -28, current_date)
+and event_root_code = '14'

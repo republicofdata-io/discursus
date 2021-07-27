@@ -8,4 +8,4 @@ logs/
 .vscode/
 __pycache__/
 docker-compose-ecs.yml
-Dockerfile_pipelines
+Dockerfile_app
