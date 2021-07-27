@@ -120,7 +120,7 @@ class ContentAuditor:
         self.csv_output = open("mine_mention_tags.csv", 'w')
 
         # create the csv writer
-        writer = csv.writer(self.csv_output)
+        writer = csv.writer(self.csv_output, quoting=csv.QUOTE_NONNUMERIC)
 
         # write header row to the csv file
         row = ['mention_identifier', 'page_name', 'file_name', 'page_title', 'page_description', 'keywords']

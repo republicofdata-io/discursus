@@ -58,5 +58,10 @@ table articles_fct {
     article_ts timestamp
 
     article_source_name varchar
+    article_page_name varchar
+    article_file_name varchar
+    article_page_title varchar
+    article_page_description varchar
+    article_keywords varchar
 
 }
