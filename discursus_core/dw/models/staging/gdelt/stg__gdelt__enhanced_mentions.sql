@@ -13,7 +13,7 @@ final as (
         lower(cast(file_name as string)) as file_name,
         lower(cast(page_title as string)) as page_title,
         lower(cast(page_description as string)) as page_description,
-        lower(cast(keywords as string)) as keywords        
+        lower(cast(keywords as string)) as keywords
 
     from source
 

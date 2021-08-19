@@ -7,8 +7,8 @@ with source as (
 final as (
 
     select distinct
-        lower(code) as event_code, 
-        lower(label) as event_type      
+        lower(code) as event_code,
+        lower(label) as event_type
 
     from source
 

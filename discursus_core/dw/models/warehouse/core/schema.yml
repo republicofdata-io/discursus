@@ -2,6 +2,16 @@ version: 2
 
 models:
 
+  - name: actors_dim
+    description: Table of actors
+    columns:
+      - name: actor_pk
+        description: >
+          Unique identifier for actors
+        tests:
+          - unique
+          - not_null
+
   - name: articles_fct
     description: Table of articles
     columns:
@@ -31,3 +41,19 @@ models:
         tests:
           - unique
           - not_null
+      - name: country_fk
+        tests:
+          - relationships:
+              to: ref('countries_dim')
+              field: country_pk
+              severity: warn
+      - name: actor1_fk
+        tests:
+          - relationships:
+              to: ref('actors_dim')
+              field: actor_pk
+      - name: actor2_fk
+        tests:
+          - relationships:
+              to: ref('actors_dim')
+              field: actor_pk

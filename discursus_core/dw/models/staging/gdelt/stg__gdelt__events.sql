@@ -27,12 +27,12 @@ final as (
             as numeric(8,4)
         ) as published_date_fraction_date,
 
-        cast(url as string) as source_url, 
+        cast(url as string) as source_url,
         cast(is_root_event as integer) as is_root_event,
         lower(cast(event_code as string)) as event_code,
         lower(cast(event_base_code as string)) as event_base_code,
         lower(cast(event_root_code as string)) as event_root_code,
-        
+
         lower(cast(actor1_code as string)) as actor1_code,
         lower(cast(actor1_name as string)) as actor1_name,
         lower(cast(actor1_country_code as string)) as actor1_country_code,
@@ -61,7 +61,7 @@ final as (
         lower(cast(actor2_religion2_code as string)) as actor2_religion2_code,
         lower(cast(actor2_type1_code as string)) as actor2_type1_code,
         lower(cast(actor2_type2_code as string)) as actor2_type2_code,
-        lower(cast(actor2_type3_code as string)) as actor2_type3_code, 
+        lower(cast(actor2_type3_code as string)) as actor2_type3_code,
         cast(actor2_geo_type as integer) as actor2_geo_type,
         lower(cast(actor2_geo_full_name as string)) as actor2_geo_full_name,
         lower(cast(actor2_geo_country_code as string)) as actor2_geo_country_code,
@@ -86,7 +86,7 @@ final as (
         cast(num_sources as integer) as num_sources,
         cast(num_articles as integer) as num_articles,
         cast(avg_tone as real) as avg_tone
-        
+
 
     from source
 
@@ -95,4 +95,4 @@ final as (
 select * from final
 
 where creation_ts >= dateadd(day, -28, current_date)
-and event_root_code = '14'
+    and event_root_code = '14'
