@@ -4,46 +4,17 @@ project wh_discursus {
 
 }
 
-// CORE WAREHOUSE DIMENSIONS
+// CORE WAREHOUSE
 
-table countries_dim {
+table actors_dim {
 
-    country_pk varchar [pk]
+    actor_pk varchar [pk]
+    actor_geo_country_fk varchar [ref: - countries_dim.country_pk]
 
-    country_code varchar
-    country_name varchar
-
-}
-
-
-// CORE WAREHOUSE FACTS
-
-table events_fct {
-
-    event_pk varchar [pk]
-    action_country_fk varchar [ref: - countries_dim.country_pk]
-
-    gdelt_event_natural_key int
-
-    published_date date
-    creation_ts timestamp
-
-    source_url varchar
-    action_geo_full_name varchar
-    action_geo_adm1_code varchar
-    action_geo_latitude decimal
-    action_geo_longitude decimal
-    actor1_name varchar
-    actor1_type1 varchar //change
-    actor2_name varchar
-    actor2_type1 varchar //change
-    event_type varchar //change
-
-    goldstein_scale decimal
-    num_mentions int
-    num_sources int
-    num_articles int
-    avg_tone decimal
+    actor_code varchar
+    actor_name varchar
+    actor_geo_country_code varchar
+    actor_type_code varchar
 
 }
 
@@ -63,5 +34,41 @@ table articles_fct {
     article_page_title varchar
     article_page_description varchar
     article_keywords varchar
+
+}
+
+table countries_dim {
+
+    country_pk varchar [pk]
+
+    country_code varchar
+    country_name varchar
+
+}
+
+table events_fct {
+
+    event_pk varchar [pk]
+    action_country_fk varchar [ref: - countries_dim.country_pk]
+    actor1_fk varchar [ref: - actors_dim.actor_pk]
+    actor2_fk varchar [ref: - actors_dim.actor_pk]
+
+    gdelt_event_natural_key int
+
+    published_date date
+    creation_ts timestamp
+
+    source_url varchar
+    action_geo_full_name varchar
+    action_geo_adm1_code varchar
+    action_geo_latitude decimal
+    action_geo_longitude decimal
+    event_type varchar //change
+
+    goldstein_scale decimal
+    num_mentions int
+    num_sources int
+    num_articles int
+    avg_tone decimal
 
 }
