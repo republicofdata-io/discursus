@@ -1,3 +1,4 @@
+.aws/config
 *.env
 .python-version
 target/
@@ -8,4 +9,4 @@ logs/
 .vscode/
 __pycache__/
 docker-compose-ecs.yml
-Dockerfile_app
+Dockerfile_pipelines

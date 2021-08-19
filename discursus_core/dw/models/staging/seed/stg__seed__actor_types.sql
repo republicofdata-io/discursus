@@ -7,8 +7,8 @@ with source as (
 final as (
 
     select distinct
-        lower(code) as actor_type_code, 
-        lower(label) as actor_type      
+        lower(code) as actor_type_code,
+        lower(label) as actor_type
 
     from source
 

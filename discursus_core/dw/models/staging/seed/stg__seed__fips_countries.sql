@@ -7,8 +7,8 @@ with source as (
 final as (
 
     select distinct
-        lower(code) as country_code, 
-        lower(label) as country_name      
+        lower(code) as country_code,
+        lower(label) as country_name
 
     from source
 
