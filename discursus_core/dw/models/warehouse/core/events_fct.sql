@@ -1,8 +1,5 @@
 {{ 
   config(
-    materialized='incremental',
-    incremental_strategy='merge',
-    alias='events_fct',
     unique_key='event_pk'
   )
 }}
@@ -10,11 +7,6 @@
 with s_events as (
 
   select * from {{ ref('int__events') }}
-
-  {% if is_incremental() %}
-      where creation_ts > (select max(creation_ts) from {{ this }})
-  {% endif %}
-
 
 ),
 

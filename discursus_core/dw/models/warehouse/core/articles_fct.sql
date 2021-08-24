@@ -1,8 +1,5 @@
 {{ 
   config(
-    materialized='incremental',
-    incremental_strategy='merge',
-    alias='articles_fct',
     unique_key='article_pk'
   )
 }}
@@ -10,11 +7,6 @@
 with s_articles as (
 
   select * from {{ ref('int__articles') }}
-
-  {% if is_incremental() %}
-      where article_ts > (select max(article_ts) from {{ this }})
-  {% endif %}
-
 
 ),
 
