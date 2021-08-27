@@ -6,11 +6,18 @@ from dagster import (
 )
 from dagster_snowflake import snowflake_resource
 from dagster_shell import create_shell_command_solid
+from dagster_dbt import dbt_cli_resource
 
 from solids.dw_solids import (
-    launch_snowpipes, 
-    run_dbt_transformation, 
-    test_dbt_transformation
+    launch_snowpipes,
+    seed_dw_staging_layer,
+    build_dw_staging_layer,
+    test_dw_staging_layer,
+    build_dw_integration_layer,
+    test_dw_integration_layer,
+    build_dw_warehouse_layer,
+    test_dw_warehouse_layer,
+    data_test_warehouse
 )
 from solids.enhance_mentions_solid import (
     enhance_mentions
@@ -20,11 +27,16 @@ from solids.enhance_mentions_solid import (
 DBT_PROFILES_DIR = "."
 DBT_PROJECT_DIR = file_relative_path(__file__, "./dw")
 
+my_dbt_resource = dbt_cli_resource.configured({
+    "profiles_dir": DBT_PROFILES_DIR, 
+    "project_dir": DBT_PROJECT_DIR})
+
 
 prod_mode = ModeDefinition(
     name = 'prod',
     resource_defs = {
-        'snowflake': snowflake_resource
+        'snowflake': snowflake_resource,
+        'dbt': my_dbt_resource
     }
 )
 
@@ -59,5 +71,11 @@ def mine_gdelt_data():
 )
 def build_data_warehouse():
     snowpipes_result = launch_snowpipes()
-    dbt_run_result = run_dbt_transformation(snowpipes_result)
-    test_dbt_transformation(dbt_run_result)
+    seed_dw_staging_layer_result = seed_dw_staging_layer(snowpipes_result)
+    build_dw_staging_layer_result = build_dw_staging_layer(seed_dw_staging_layer_result)
+    test_dw_staging_layer_result = test_dw_staging_layer(build_dw_staging_layer_result)
+    build_dw_integration_layer_result = build_dw_integration_layer(test_dw_staging_layer_result)
+    test_dw_integration_layer_result = test_dw_integration_layer(build_dw_integration_layer_result)
+    build_dw_warehouse_layer_result = build_dw_warehouse_layer(test_dw_integration_layer_result)
+    test_dw_warehouse_layer_result = test_dw_warehouse_layer(build_dw_warehouse_layer_result)
+    test_dw_staging_layer_result = data_test_warehouse(test_dw_warehouse_layer_result)
