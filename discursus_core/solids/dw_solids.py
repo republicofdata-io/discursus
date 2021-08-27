@@ -2,8 +2,7 @@ from dagster import (
     solid, 
     file_relative_path
 )
-from dagster_dbt import dbt_cli_run, dbt_cli_test
-
+from dagster_dbt import DbtCliOutput
 
 DBT_PROFILES_DIR = "."
 DBT_PROJECT_DIR = file_relative_path(__file__, "../dw")
@@ -19,14 +18,42 @@ def launch_snowpipes(context):
     context.resources.snowflake.execute_query(q_load_mentions_events)
     context.resources.snowflake.execute_query(q_load_enhanced_mentions_events)
 
+@solid(required_resource_keys={"dbt"})
+def seed_dw_staging_layer(context, snowpipes_result) -> DbtCliOutput:
+    context.log.info(f"Seeding the data warehouse")
+    return context.resources.dbt.seed()
 
-run_dbt_transformation = dbt_cli_run.configured(
-    config_or_config_fn = {"project-dir": DBT_PROJECT_DIR, "profiles-dir": DBT_PROFILES_DIR},
-    name = "run_dbt_transformation",
-)
+@solid(required_resource_keys={"dbt"})
+def build_dw_staging_layer(context, seed_dw_staging_layer_result: DbtCliOutput) -> DbtCliOutput:
+    context.log.info(f"Building the staging layer")
+    return context.resources.dbt.run(models=["staging.*"])
 
+@solid(required_resource_keys={"dbt"})
+def test_dw_staging_layer(context, build_dw_staging_layer_result: DbtCliOutput):
+    context.log.info(f"Testing the staging layer")
+    context.resources.dbt.test(models=["staging.*"], schema=True, data=False)
 
-test_dbt_transformation = dbt_cli_test.configured(
-    config_or_config_fn = {"project-dir": DBT_PROJECT_DIR, "profiles-dir": DBT_PROFILES_DIR},
-    name = "test_dbt_transformation",
-)
+@solid(required_resource_keys={"dbt"})
+def build_dw_integration_layer(context, test_dw_staging_layer_result) -> DbtCliOutput:
+    context.log.info(f"Building the integration layer")
+    return context.resources.dbt.run(models=["integration.*"])
+
+@solid(required_resource_keys={"dbt"})
+def test_dw_integration_layer(context, build_dw_integration_layer_result: DbtCliOutput):
+    context.log.info(f"Testing the integration layer")
+    context.resources.dbt.test(models=["integration.*"], schema=True, data=False)
+
+@solid(required_resource_keys={"dbt"})
+def build_dw_warehouse_layer(context, test_dw_integration_layer_result) -> DbtCliOutput:
+    context.log.info(f"Building the warehouse layer")
+    return context.resources.dbt.run(models=["warehouse.*"])
+
+@solid(required_resource_keys={"dbt"})
+def test_dw_warehouse_layer(context, build_dw_warehouse_layer_result: DbtCliOutput):
+    context.log.info(f"Testing the warehouse layer")
+    context.resources.dbt.test(models=["warehouse.*"], schema=True, data=False)
+
+@solid(required_resource_keys={"dbt"})
+def data_test_warehouse(context, test_dw_warehouse_layer_result):
+    context.log.info(f"Data tests")
+    context.resources.dbt.test(schema=False, data=True)
