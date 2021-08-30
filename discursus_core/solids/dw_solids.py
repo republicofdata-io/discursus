@@ -4,7 +4,7 @@ from dagster import (
 )
 from dagster_dbt import DbtCliOutput
 
-DBT_PROFILES_DIR = "."
+DBT_PROFILES_DIR = file_relative_path(__file__, "./dw")
 DBT_PROJECT_DIR = file_relative_path(__file__, "../dw")
 
 

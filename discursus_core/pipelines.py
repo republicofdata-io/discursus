@@ -24,7 +24,7 @@ from solids.enhance_mentions_solid import (
 )
 
 
-DBT_PROFILES_DIR = "."
+DBT_PROFILES_DIR = file_relative_path(__file__, "./dw")
 DBT_PROJECT_DIR = file_relative_path(__file__, "./dw")
 
 my_dbt_resource = dbt_cli_resource.configured({
