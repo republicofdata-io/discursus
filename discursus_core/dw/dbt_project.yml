@@ -1,7 +1,7 @@
 
 name: 'discursus_dw'
-version: '0.0.1'
-require-dbt-version: "0.19.1"
+version: '0.0.2'
+require-dbt-version: "0.20.1"
 config-version: 2
 
 profile: discursus
