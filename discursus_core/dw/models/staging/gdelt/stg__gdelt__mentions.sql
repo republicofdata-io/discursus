@@ -30,7 +30,7 @@ final as (
 
 select * from final
 
-where event_ts >= dateadd(day, -28, current_date)
+where event_ts >= dateadd(day, -90, current_date)
     and mention_type = 1
     and in_raw_text = 1
     and confidence > 50

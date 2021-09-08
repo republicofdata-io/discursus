@@ -4,7 +4,7 @@ with source as (
 
 ),
 
-final as (
+base as (
 
     select distinct
         cast(gdelt_id as bigint) as gdelt_event_natural_key,
@@ -90,9 +90,32 @@ final as (
 
     from source
 
+),
+
+classify_actors as (
+
+    select
+        *,
+        case
+            when actor1_type1_code in ('cvl', 'edu', 'env', 'hlh', 'hri', 'lab', 'ngo', 'ref') then 'civic'
+            when actor1_type1_code in ('opp', 'gov', 'igo', 'cop', 'leg', 'jud') then 'governmental'
+            else null
+        end as actor1_type1_group,
+        case
+            when actor2_type1_code in ('cvl', 'edu', 'env', 'hlh', 'hri', 'lab', 'ngo', 'ref') then 'civic'
+            when actor2_type1_code in ('opp', 'gov', 'igo', 'cop', 'leg', 'jud') then 'governmental'
+            else null
+        end as actor2_type1_group
+    
+    from base
+
 )
 
-select * from final
+select * from classify_actors
 
-where creation_ts >= dateadd(day, -28, current_date)
+where
+    creation_ts >= dateadd(day, -90, current_date)
     and event_root_code = '14'
+    and actor1_type1_group is not null
+    and actor2_type1_group is not null
+    and actor1_type1_group != actor2_type1_group

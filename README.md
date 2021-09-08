@@ -1,6 +1,8 @@
 # What is the discursus project
 The discursus project is an open source platform that mines, shapes and exposes the digital artifacts of protests, their discourses and the actors that influence social reforms.
 
+Protest event are collective actions from groups of citizens that supports state and institutional reforms.
+
 [For a full intro, read here](https://www.olivierdupuis.com/introducing-discursus-io/)
 
 
