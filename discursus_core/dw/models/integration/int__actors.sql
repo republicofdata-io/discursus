@@ -10,6 +10,7 @@ s_actors as (
         actor1_name as actor_name,
         actor1_code as actor_code,
         actor1_geo_country_code as actor_geo_country_code,
+        actor1_type1_group as actor_type_group,
         actor1_type1_code as actor_type_code,
         s_actor_type1.actor_type as actor_type_name
 
@@ -27,6 +28,7 @@ s_actors as (
         actor2_name as actor_name,
         actor2_code as actor_code,
         actor2_geo_country_code as actor_geo_country_code,
+        actor2_type1_group as actor_type_group,
         actor2_type1_code as actor_type_code,
         s_actor_type1.actor_type as actor_type_name
 
@@ -46,6 +48,7 @@ final as (
         actor_name,
         actor_code,
         actor_geo_country_code,
+        actor_type_group,
         actor_type_code,
         actor_type_name
 
