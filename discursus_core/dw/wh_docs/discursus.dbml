@@ -49,6 +49,7 @@ table countries_dim {
 table events_fct {
 
     event_pk varchar [pk]
+    protest_sk varchar //Combination of fields to associate similar protest events together: action_country_fk + action_geo_adm1_code + actor_type_combo + event_type
     action_country_fk varchar [ref: - countries_dim.country_pk]
     actor1_fk varchar [ref: - actors_dim.actor_pk]
     actor2_fk varchar [ref: - actors_dim.actor_pk]
