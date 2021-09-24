@@ -10,10 +10,30 @@ with s_events as (
 
 ),
 
+add_actor_type_combo as (
+
+  select
+    *,
+    case
+      when actor1_code < actor2_code then actor1_code || ' - ' || actor2_code
+      else actor2_code || ' - ' || actor1_code
+    end as actor_type_combo
+
+  
+  from s_events
+
+),
+
 final as (
 
   select
     {{ dbt_utils.surrogate_key(['gdelt_event_natural_key']) }} as event_pk,
+    {{ dbt_utils.surrogate_key([
+      'action_geo_country_code',
+      'action_geo_adm1_code',
+      'actor_type_combo',
+      'event_type'
+    ]) }} as protest_sk,
     case 
       when action_geo_country_code is null then null
       else {{ dbt_utils.surrogate_key(['action_geo_country_code']) }} 
@@ -46,7 +66,7 @@ final as (
     num_articles, 
     avg_tone
 
-  from s_events
+  from add_actor_type_combo
 
 )
 
