@@ -1,6 +1,6 @@
-with s_gdelt_articles as (
+with s_gdelt_events as (
 
-    select * from {{ ref('stg__gdelt__mentions') }}
+    select * from {{ ref('stg__gdelt__events') }}
 
 ),
 
@@ -12,20 +12,17 @@ s_gdelt_enhanced_articles as (
 
 final as (
 
-    select
-        gdelt_event_natural_key,
+    select distinct
+        s_gdelt_events.gdelt_event_natural_key,
 
-        mention_ts as article_ts,
+        s_gdelt_enhanced_articles.mention_url as article_url,
+        s_gdelt_enhanced_articles.page_name as article_page_name,
+        s_gdelt_enhanced_articles.file_name as article_file_name,
+        s_gdelt_enhanced_articles.page_title as article_page_title,
+        s_gdelt_enhanced_articles.page_description as article_page_description,
+        s_gdelt_enhanced_articles.keywords as article_keywords
 
-        mention_source_name as article_source_name,
-        mention_url as article_url,
-        page_name as article_page_name,
-        file_name as article_file_name,
-        page_title as article_page_title,
-        page_description as article_page_description,
-        keywords as article_keywords
-
-    from s_gdelt_articles
+    from s_gdelt_events
     left join s_gdelt_enhanced_articles using (mention_url)
 
 )
