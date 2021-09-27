@@ -41,3 +41,7 @@ aws s3 cp $file_location s3://discursus-io/sources/gdelt/$file_date/$csv_file_na
 echo "Cleaning up"
 
 #rm $DISCURSUS_MINER_GDELT_HOME/tmp/*
+
+
+#Return path to latest saved mention file
+echo "sources/gdelt/$file_date/$csv_file_name"

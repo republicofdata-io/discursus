@@ -26,9 +26,6 @@ table articles_fct {
     gdelt_event_natural_key int
     article_url varchar
 
-    article_ts timestamp
-
-    article_source_name varchar
     article_page_name varchar
     article_file_name varchar
     article_page_title varchar

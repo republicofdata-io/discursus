@@ -55,14 +55,9 @@ def mine_gdelt_data():
     gdelt_events_miner = create_shell_command_solid(
         "zsh < $DISCURSUS_MINER_GDELT_HOME/gdelt_events_miner.zsh", 
         name = "gdelt_events_miner_solid") 
-    gdelt_events_miner()
+    gdelt_events_miner_results = gdelt_events_miner()
 
-    gdelt_mentions_miner = create_shell_command_solid(
-        "zsh < $DISCURSUS_MINER_GDELT_HOME/gdelt_mentions_miner.zsh", 
-        name = "gdelt_mentions_miner_solid") 
-    gdelt_mentions_miner_results = gdelt_mentions_miner()
-
-    enhance_mentions(gdelt_mentions_miner_results)
+    enhance_mentions(gdelt_events_miner_results)
 
 
 @pipeline(
