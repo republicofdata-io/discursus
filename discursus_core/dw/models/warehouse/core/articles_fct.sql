@@ -10,35 +10,25 @@ with s_articles as (
 
 ),
 
-s_events as (
-
-  select * from {{ ref('events_fct') }}
-
-),
-
 final as (
 
   select distinct
     {{ dbt_utils.surrogate_key([
-        's_articles.gdelt_event_natural_key', 
-        's_articles.article_url'
+        'gdelt_event_natural_key', 
+        'article_url'
       ]) }} as article_pk, 
-    {{ dbt_utils.surrogate_key(['s_articles.gdelt_event_natural_key']) }} as event_fk, 
+    {{ dbt_utils.surrogate_key(['gdelt_event_natural_key']) }} as event_fk, 
 
-    s_articles.gdelt_event_natural_key, 
-    s_articles.article_url, 
+    gdelt_event_natural_key, 
+    article_url, 
 
-    s_articles.article_ts,
-
-    s_articles.article_source_name,
-    s_articles.article_page_name,
-    s_articles.article_file_name,
-    s_articles.article_page_title,
-    s_articles.article_page_description,
-    s_articles.article_keywords
+    article_page_name,
+    article_file_name,
+    article_page_title,
+    article_page_description,
+    article_keywords
 
   from s_articles
-  inner join s_events using (gdelt_event_natural_key)
 
 )
 

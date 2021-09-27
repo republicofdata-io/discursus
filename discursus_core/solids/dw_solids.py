@@ -11,11 +11,9 @@ DBT_PROJECT_DIR = file_relative_path(__file__, "../dw")
 @solid(required_resource_keys = {"snowflake"})
 def launch_snowpipes(context):
     q_load_gdelt_events = "alter pipe gdelt_events_pipe refresh;"
-    q_load_mentions_events = "alter pipe gdelt_mentions_pipe refresh;"
     q_load_enhanced_mentions_events = "alter pipe gdelt_enhanced_mentions_pipe refresh;"
 
     context.resources.snowflake.execute_query(q_load_gdelt_events)
-    context.resources.snowflake.execute_query(q_load_mentions_events)
     context.resources.snowflake.execute_query(q_load_enhanced_mentions_events)
 
 @solid(required_resource_keys={"dbt"})

@@ -39,22 +39,14 @@ class ContentAuditor:
         Method which iterates over list of articles, only keep relevant ones and deduplicates.
         """
         for line in self.filehandle.splitlines():
-            line_url = line.split("\t")[5]
-            if int(line.split("\t")[3]) != 1:
+            line_url = line.split("\t")[60]
+            if int(line.split("\t")[28]) == 14:
                 continue
-            if int(line.split("\t")[6]) > 10:
+            if line.split("\t")[12].strip() != '':
                 continue
-            if int(line.split("\t")[7]) == -1:
+            if line.split("\t")[12].strip() != '':
                 continue
-            if int(line.split("\t")[8]) == -1:
-                continue
-            if int(line.split("\t")[9]) == -1:
-                continue
-            if int(line.split("\t")[10]) != 1:
-                continue
-            if int(line.split("\t")[11]) != 100:
-                continue
-            if int(line.split("\t")[12]) < 1000:
+            if line.split("\t")[12].strip() != line.split("\t")[12].strip():
                 continue
 
             self.article_urls.append(line_url)
@@ -159,8 +151,8 @@ class ContentAuditor:
 
 
 @solid(required_resource_keys = {"snowflake"})
-def enhance_mentions(context, gdelt_mentions_miner_results):
-    filename = gdelt_mentions_miner_results.splitlines()[-1]
+def enhance_mentions(context, gdelt_events_miner_results):
+    filename = gdelt_events_miner_results.splitlines()[-1]
     context.log.info("Enhancing " + filename)
 
     content_bot = ContentAuditor(filename)
