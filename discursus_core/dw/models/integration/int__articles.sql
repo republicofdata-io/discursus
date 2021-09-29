@@ -1,12 +1,14 @@
 with s_gdelt_events as (
 
     select * from {{ ref('stg__gdelt__events') }}
+    where mention_url is not null
 
 ),
 
 s_gdelt_enhanced_articles as (
 
     select * from {{ ref('stg__gdelt__enhanced_mentions') }}
+    where mention_url is not null
 
 ),
 

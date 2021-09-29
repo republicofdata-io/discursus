@@ -9,7 +9,7 @@ DBT_PROJECT_DIR = file_relative_path(__file__, "../dw")
 
 
 @solid(required_resource_keys = {"snowflake"})
-def launch_snowpipes(context):
+def launch_snowpipes(context, enhance_mentions_result):
     q_load_gdelt_events = "alter pipe gdelt_events_pipe refresh;"
     q_load_enhanced_mentions_events = "alter pipe gdelt_enhanced_mentions_pipe refresh;"
 
@@ -17,7 +17,7 @@ def launch_snowpipes(context):
     context.resources.snowflake.execute_query(q_load_enhanced_mentions_events)
 
 @solid(required_resource_keys={"dbt"})
-def seed_dw_staging_layer(context, snowpipes_result) -> DbtCliOutput:
+def seed_dw_staging_layer(context) -> DbtCliOutput:
     context.log.info(f"Seeding the data warehouse")
     return context.resources.dbt.seed()
 

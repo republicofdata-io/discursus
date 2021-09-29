@@ -57,7 +57,8 @@ def mine_gdelt_data():
         name = "gdelt_events_miner_solid") 
     gdelt_events_miner_results = gdelt_events_miner()
 
-    enhance_mentions(gdelt_events_miner_results)
+    enhance_mentions_result = enhance_mentions(gdelt_events_miner_results)
+    launch_snowpipes(enhance_mentions_result)
 
 
 @pipeline(
@@ -65,8 +66,7 @@ def mine_gdelt_data():
     preset_defs = [prod_presets]
 )
 def build_data_warehouse():
-    snowpipes_result = launch_snowpipes()
-    seed_dw_staging_layer_result = seed_dw_staging_layer(snowpipes_result)
+    seed_dw_staging_layer_result = seed_dw_staging_layer()
     build_dw_staging_layer_result = build_dw_staging_layer(seed_dw_staging_layer_result)
     test_dw_staging_layer_result = test_dw_staging_layer(build_dw_staging_layer_result)
     build_dw_integration_layer_result = build_dw_integration_layer(test_dw_staging_layer_result)
