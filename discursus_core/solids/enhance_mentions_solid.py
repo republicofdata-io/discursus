@@ -39,7 +39,7 @@ class ContentAuditor:
         Method which iterates over list of articles, only keep relevant ones and deduplicates.
         """
         for line in self.filehandle.splitlines():
-            line_url = line.split("\t")[60]
+            line_url = line.split("\t")[60].strip()
             if int(line.split("\t")[28]) == 14:
                 continue
             if line.split("\t")[12].strip() != '':
@@ -49,7 +49,8 @@ class ContentAuditor:
             if line.split("\t")[12].strip() != line.split("\t")[12].strip():
                 continue
 
-            self.article_urls.append(line_url)
+            if line_url != '': 
+                self.article_urls.append(line_url)
             self.article_urls = list(set(self.article_urls))
 
 
