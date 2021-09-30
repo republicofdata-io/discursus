@@ -66,7 +66,7 @@ class ContentAuditor:
             req = urllib.request.Request(article_url)
             req.add_header('User-Agent', ua_string)
             try:
-                data = urllib.request.urlopen(req)
+                data = urllib.request.urlopen(req, timeout = 10)
             except:
                 continue
             self.soupy_data = BeautifulSoup(data, features="html.parser")
