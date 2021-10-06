@@ -5,6 +5,7 @@ create table gdelt_enhanced_mentions (
     file_name varchar,
     page_title varchar,
     page_description varchar,
-    keywords varchar
+    keywords varchar,
+    metadata_filename varchar
 
 )
