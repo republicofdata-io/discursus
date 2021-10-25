@@ -18,8 +18,6 @@
     </a>
 </p>
 
-[Blog](https://blog.discursus.io) • [Twitter](https://twitter.com/discursus_io)
-
 # What is the discursus core platform?
 
 Protest movements are powerful dynamics between citzens and institutions. Behind the physical manifestation of protests are discourses that morphes. They are incubators of ideas. Like viruses that mutate, spread and can change our collective ethos.
