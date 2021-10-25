@@ -7,13 +7,13 @@
     <a href="https://blog.discursus.io/">Blog</a> |
     <a href="https://twitter.com/discursus_io">Twitter</a>
     <br /><br />
-    <a href="https://github.com/TryGhost/Ghost/releases/">
+    <a href="https://github.com/discursus-io/discursus_core/releases">
         <img src="https://img.shields.io/github/release/discursus-io/discursus_core" alt="Latest release" />
     </a>
     <a href="https://github.com/discursus-io/discursus_core/issues">
         <img src="https://img.shields.io/github/issues/discursus-io/discursus_core" alt="Open issues" />
     </a>
-    <a href="https://github.com/TryGhost/Ghost/contributors/">
+    <a href="https://github.com/discursus-io/discursus_core/contributors/">
         <img src="https://img.shields.io/github/contributors/discursus-io/discursus_core" alt="Contributors" />
     </a>
     <a href="https://github.com/discursus-io/discursus_core/LICENSE.md">
