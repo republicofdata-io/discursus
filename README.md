@@ -23,7 +23,7 @@
 
 [Blog](https://blog.discursus.io) • [Twitter](https://twitter.com/discursus_io)
 
-## What is the discursus core platform?
+# What is the discursus core platform?
 
 Protest movements are powerful dynamics between citzens and institutions. Behind the physical manifestation of protests are discourses that morphes. They are incubators of ideas. Like viruses that mutate, spread and can change our collective ethos.
 
@@ -33,8 +33,9 @@ __The discursus project is an open source data platform__ that mines, shapes and
 
 [For a full introduction, read here](https://www.olivierdupuis.com/introducing-discursus-io/)
 
+&nbsp;
 
-## Architecture
+# Architecture
 
 <img src="images/discursus_core_stack.png" width="750px" alt="discursus" />
 
@@ -45,22 +46,28 @@ Here are the main components of the discursus core architecture:
 - A Dagster orchestrator that schedules the mining and transformation pipelines.
 
 
-## ERD
+&nbsp;
+
+# ERD
 
 The following entities are exposed as the final output of our architecture.
 
 <img src="images/discursus_core_erd.png" width="650px" alt="discursus" />
 
 
-## Getting Started 🚀
+&nbsp;
 
-### Services
+# Getting Started 🚀
+
+## Services
 The discursus core architecture requires accounts to the following services:
 - AWS S3 bucket to hold the events, articles and enhancements
 - AWS ec2 instance to run app from
 - Snowflake to stage data from S3, perform transformations of data and expose entities
 
-### Environment
+&nbsp;
+
+## Environment
 To configure your instance of the discursus core project, you'll need to perform the following actions:
 - Rename the `Dockerfile_app.REPLACE` file to `Dockerfile_app`.
 - Change the values of environment variables within the `Dockerfile_app` file.
@@ -68,7 +75,9 @@ To configure your instance of the discursus core project, you'll need to perform
 - To run the Docker stack locally: `docker compose -p "discursus-data-platform" --file docker-compose.yml up --build`
 - Visit Dagster's app: `http://127.0.0.1:3000/`
 
-### Contributing
+&nbsp;
+
+# Contributing
 
 There are many ways you can contribute and help discursus core. Here a few ones:
 
@@ -79,6 +88,8 @@ There are many ways you can contribute and help discursus core. Here a few ones:
 
 All sort of contributions are **welcome and extremely helpful** 🙌 
 
-## License
+&nbsp;
+
+# License
 
 discursus core is [MIT licensed](./LICENSE.md).
