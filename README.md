@@ -16,9 +16,6 @@
     <a href="https://github.com/discursus-io/discursus_core/contributors/">
         <img src="https://img.shields.io/github/contributors/discursus-io/discursus_core" alt="Contributors" />
     </a>
-    <a href="https://github.com/discursus-io/discursus_core/LICENSE.md">
-        <img src="https://img.shields.io/github/license/discursus-io/discursus_core" alt="License" />
-    </a>
 </p>
 
 [Blog](https://blog.discursus.io) • [Twitter](https://twitter.com/discursus_io)
