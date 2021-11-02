@@ -52,18 +52,22 @@ The following entities are exposed as the final output of our architecture.
 
 &nbsp;
 
-# Getting Started 🚀
+# Installation
+Spinning up your own discursus instance still isn't a breeze. But we know how important it is and are working on making our architecture and documentation more robust to that effect.
 
-## Services
-The discursus core architecture requires accounts to the following services:
-- AWS S3 bucket to hold the events, articles and enhancements
-- AWS ec2 instance to run app from
-- Snowflake to stage data from S3, perform transformations of data and expose entities
+For now, to spin up an instance of discursus Core, you will first need to have your own external service accounts in place:
+- An AWS S3 bucket to hold the events, articles and enhancements.
+- An AWS ec2 instance to run discursus.
+- A Snowflake account to stage data from S3, perform transformations of data and expose entities.
 
-&nbsp;
+On Snowflake, you will need to create a few objects prior to running your instance:
+- Source tables to stage the mined events.
+- Snowpipes to move data from S3 to your source tables.
+- File formats for Snowflake to read the source S3 csv files properly.
 
-## Environment
-To configure your instance of the discursus core project, you'll need to perform the following actions:
+Once you have all those in place, you can fork the discursus Core repo.
+
+Only thing left is to configure your instance:
 - Rename the `Dockerfile_app.REPLACE` file to `Dockerfile_app`.
 - Change the values of environment variables within the `Dockerfile_app` file.
 - Make any necessary changes to `docker-compose`
