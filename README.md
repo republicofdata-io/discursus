@@ -38,7 +38,7 @@ Here are the main components of the discursus core architecture:
 
 - A miner that sources events from the GDELT project (https://www.gdeltproject.org/) and saves it to AWS S3.
 - A dbt project that creates a data warehouse which exposes protest events.
-- A Dagster orchestrator that schedules the mining and transformation pipelines.
+- A Dagster orchestrator that schedules the mining and transformation jobs.
 
 
 &nbsp;

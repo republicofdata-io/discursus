@@ -1,7 +1,7 @@
 # Credit goes to...
 # https://github.com/quakerpunk/content-audit/blob/origin/content_audit.py
 
-from dagster import solid
+from dagster import op
 from bs4 import BeautifulSoup
 from optparse import OptionParser
 import urllib.request
@@ -151,7 +151,7 @@ class ContentAuditor:
         return info_dict
 
 
-@solid(required_resource_keys = {"snowflake"})
+@op
 def enhance_mentions(context, gdelt_events_miner_results):
     filename = gdelt_events_miner_results.splitlines()[-1]
     context.log.info("Enhancing " + filename)
