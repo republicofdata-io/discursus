@@ -36,5 +36,5 @@ This is for you as a developer. Have you done all the following tasks before sub
 -->
 - [ ] My pull request represents one story (logical piece of work).
 - [ ] I ran the Docker data platform in my development environment without error.
-- [ ] I ran the data pipelines in my development environment without error.
+- [ ] I ran the data jobs in my development environment without error.
 - [ ] I ran the sqlfluff linter in my development environment without error.

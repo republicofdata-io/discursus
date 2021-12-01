@@ -1,13 +1,13 @@
 from dagster import repository
 
-from pipelines import mine_gdelt_data
-from pipelines import build_data_warehouse
+from jobs import mine_gdelt_data
+from jobs import build_data_warehouse
 from schedules import mine_gdelt_data_schedule, build_data_warehouse_schedule
 
 
 @repository
 def discursus_repository():
-    pipelines = [
+    jobs = [
         mine_gdelt_data, 
         build_data_warehouse
     ]
@@ -16,4 +16,4 @@ def discursus_repository():
         build_data_warehouse_schedule
     ]
 
-    return pipelines + schedules
+    return jobs + schedules

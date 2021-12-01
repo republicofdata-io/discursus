@@ -1,14 +1,13 @@
 from dagster import (
-    pipeline, 
-    ModeDefinition, 
-    PresetDefinition, 
-    file_relative_path
+    job, 
+    file_relative_path,
+    config_from_files
 )
 from dagster_snowflake import snowflake_resource
-from dagster_shell import create_shell_command_solid
+from dagster_shell import create_shell_command_op
 from dagster_dbt import dbt_cli_resource
 
-from solids.dw_solids import (
+from ops.dw_ops import (
     launch_snowpipes,
     seed_dw_staging_layer,
     build_dw_staging_layer,
@@ -19,7 +18,7 @@ from solids.dw_solids import (
     test_dw_warehouse_layer,
     data_test_warehouse
 )
-from solids.enhance_mentions_solid import (
+from ops.enhance_mentions_op import (
     enhance_mentions
 )
 
@@ -32,38 +31,31 @@ my_dbt_resource = dbt_cli_resource.configured({
     "project_dir": DBT_PROJECT_DIR})
 
 
-prod_mode = ModeDefinition(
-    name = 'prod',
+snowflake_env_variables = config_from_files(['environments/snowflake_env_variables.yaml'])
+
+
+@job(
     resource_defs = {
-        'snowflake': snowflake_resource,
-        'dbt': my_dbt_resource
-    }
-)
-
-prod_presets = PresetDefinition.from_files(
-    name='prod',
-    mode='prod',
-    config_files=['environments/prod.yaml'],
-)
-
-
-@pipeline(
-    mode_defs = [prod_mode], 
-    preset_defs = [prod_presets]
+        'snowflake': snowflake_resource
+    },
+    config = snowflake_env_variables
 )
 def mine_gdelt_data():
-    gdelt_events_miner = create_shell_command_solid(
+    gdelt_events_miner = create_shell_command_op(
         "zsh < $DISCURSUS_MINER_GDELT_HOME/gdelt_events_miner.zsh", 
-        name = "gdelt_events_miner_solid") 
+        name = "gdelt_events_miner_op") 
     gdelt_events_miner_results = gdelt_events_miner()
 
     enhance_mentions_result = enhance_mentions(gdelt_events_miner_results)
     launch_snowpipes(enhance_mentions_result)
 
 
-@pipeline(
-    mode_defs = [prod_mode], 
-    preset_defs = [prod_presets]
+@job(
+    resource_defs = {
+        'snowflake': snowflake_resource,
+        'dbt': my_dbt_resource
+    },
+    config = snowflake_env_variables
 )
 def build_data_warehouse():
     seed_dw_staging_layer_result = seed_dw_staging_layer()
