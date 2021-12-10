@@ -1,0 +1,9 @@
+resources:
+  novacene:
+    config:
+      host: 
+        env: NOVACENE_HOST
+      login: 
+        env: NOVACENE_LOGIN
+      password: 
+        env: NOVACENE_PASSWORD
