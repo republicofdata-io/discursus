@@ -142,6 +142,25 @@ class ContentAuditor:
         os.remove("mine_mention_tags.csv")
 
 
+    def create_df(self):
+        # Convert enhanced info to dataframe
+        df_gdelt_enhanced_articles_column_names = ['mention_identifier', 'page_name', 'file_name', 'page_title', 'page_description', 'keywords']
+        df_gdelt_enhanced_articles = pd.DataFrame(columns = df_gdelt_enhanced_articles_column_names)
+
+        for dex in self.site_info:
+            row = [
+                dex['mention_identifier'], 
+                dex['name'], 
+                dex['filename'],
+                dex['title'],
+                dex['description'],
+                dex['keywords']
+            ]
+            df_gdelt_enhanced_articles.append(row)
+
+        return df_gdelt_enhanced_articles
+
+
     def add_necessary_tags(self, info_dict, needed_tags):
         """
         This method insures that missing tags have a null value
@@ -154,9 +173,9 @@ class ContentAuditor:
 
 
 @op
-def materialize_gdelt_mining_asset(context, gdelt_events_miner_result):
+def materialize_gdelt_mining_asset(context, gdelt_mined_events_filename):
     # Extracting which file we're materializing
-    filename = gdelt_events_miner_result.splitlines()[-1]
+    filename = gdelt_mined_events_filename.splitlines()[-1]
 
     # Getting csv file and transform to pandas dataframe
     s3 = boto3.resource('s3')
@@ -176,20 +195,41 @@ def materialize_gdelt_mining_asset(context, gdelt_events_miner_result):
 
 
 @op
-def enhance_mentions(context, gdelt_events_miner_result):
+def enhance_articles(context, gdelt_mined_events_filename):
     # Extracting which file we're enhancing
-    filename = gdelt_events_miner_result.splitlines()[-1]
+    filename = gdelt_mined_events_filename.splitlines()[-1]
 
     # Get a unique list of urls to enhance
     content_bot = ContentAuditor(filename)
     content_bot.get_list_of_urls()
 
     # Enhance urls
-    context.log.info("Mining " + str(len(content_bot.article_urls)) + " articles")
+    context.log.info("Enhancing " + str(len(content_bot.article_urls)) + " articles")
     content_bot.read_url()
+
+    # Create dataframe
+    df_gdelt_enhanced_articles = content_bot.create_df()
+    context.log.info("Enhanced " + str(df_gdelt_enhanced_articles['mention_identifier'].size) + " articles")
 
     # Save enhanced urls to S3
     context.log.info("Exporting to S3")
     content_bot.write_to_spreadsheet(filename)
 
-    return content_bot.site_info
+    return df_gdelt_enhanced_articles
+
+
+@op
+def materialize_enhanced_articles_asset(context, df_gdelt_enhanced_articles, gdelt_mined_events_filename):
+    # Extracting which file we're enhancing
+    filename = gdelt_mined_events_filename.splitlines()[-1]
+
+    # Materialize asset
+    yield AssetMaterialization(
+        asset_key="gdelt_enhanced_articles",
+        description="List of enhanced articles mined from GDELT",
+        metadata={
+            "path": "s3://discursus-io/" + filename.split(".")[0] + "." + filename.split(".")[1] + ".enhanced.csv",
+            "rows": df_gdelt_enhanced_articles['mention_identifier'].size
+        }
+    )
+    yield Output(df_gdelt_enhanced_articles)

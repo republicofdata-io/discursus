@@ -18,7 +18,7 @@ from ops.dw_ops import (
     test_dw_warehouse_layer,
     data_test_warehouse
 )
-from ops.gdelt_mining_ops import enhance_mentions, materialize_gdelt_mining_asset
+from ops.gdelt_mining_ops import enhance_articles, materialize_gdelt_mining_asset, materialize_enhanced_articles_asset
 from ops.ml_enrichment_ops import get_protest_relevancy
 from resources.novacene_ml_resource import novacene_ml_api_client
 
@@ -51,16 +51,19 @@ def mine_gdelt_data():
     gdelt_events_miner = create_shell_command_op(
         "zsh < $DISCURSUS_MINER_GDELT_HOME/gdelt_events_miner.zsh", 
         name = "gdelt_events_miner_op") 
-    gdelt_events_miner_result = gdelt_events_miner()
+    gdelt_mined_events_filename = gdelt_events_miner()
 
     # Materialize gdelt mining asset
-    materialize_gdelt_mining_asset(gdelt_events_miner_result)
+    materialize_gdelt_mining_asset(gdelt_mined_events_filename)
 
     # Enhance article urls with their metadata
-    enhance_mentions_result = enhance_mentions(gdelt_events_miner_result)
+    df_gdelt_enhanced_articles = enhance_articles(gdelt_mined_events_filename)
+
+    # Materialize enhanced articles asset
+    materialize_enhanced_articles_asset_result = materialize_enhanced_articles_asset(df_gdelt_enhanced_articles, gdelt_mined_events_filename)
 
     # Load to Snowflake
-    launch_snowpipes(enhance_mentions_result)
+    launch_snowpipes(materialize_enhanced_articles_asset_result)
 
 
 @job(
