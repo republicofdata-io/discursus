@@ -1,12 +1,18 @@
-from dagster import resource
+import requests
+from dagster import resource, StringSource
 from dagster.builtins import String
 
 
 class NovaceneAPIClient:
-    def __init__(self, conn_id, retry=3):
-        self._conn_id = conn_id
-        self._retry = retry
+    def __init__(self, host, login, password):
+        self._conn_host = host
+        self._conn_login = login
+        self._conn_password = password
+
+        self._session = None
+        self._base_url = None
     
+
     def get_conn(self):
         """
         Returns the connection used by the resource for querying data.
@@ -14,25 +20,16 @@ class NovaceneAPIClient:
         """
 
         if self._session is None:
-            # Fetch config for the given connection (host, login, etc).
-            config = self.get_connection(self._conn_id)
-
-            if not config.host:
-                raise ValueError(f"No host specified in connection {self._conn_id}")
-
-            schema = config.schema or self.DEFAULT_SCHEMA
-            port = config.port or self.DEFAULT_PORT
-
-            self._base_url = f"{schema}://{config.host}"
+            self._base_url = self._conn_host
 
             # Build our session instance, which we will use for any
             # requests to the API.
             self._session = requests.Session()
 
-            if config.login:
-                self._session.auth = (config.login, config.password)
+            self._session.auth = (self._conn_login, self._conn_password)
 
         return self._session, self._base_url
+
 
     def close(self):
         """Closes any active session."""
@@ -44,7 +41,27 @@ class NovaceneAPIClient:
     
     # API methods
     ######################
-    def list_jobs(self, jobId):
+    def list_datasets(self):
+        """
+        List all datasets and their information.
+        """
+        
+        endpoint="/dataset/list/"
+        
+        session, base_url = self.get_conn()
+        url = base_url + endpoint
+        
+        response = session.get(
+            url
+        )
+        
+        response.raise_for_status()
+        response_json = response.json()
+        
+        return(response_json)
+
+
+    def list_jobs(self):
         """
         List all jobs and their information.
         """
@@ -67,11 +84,21 @@ class NovaceneAPIClient:
 
 @resource(
     config_schema={
-        "host": String,
-        "login": String,
-        "password": String
+        "resources": {
+            "novacene_client": {
+                "config": {
+                    "host": StringSource,
+                    "login": StringSource,
+                    "password": StringSource
+                }
+            }
+        }
     },
     description="A Novacene API client.",
 )
-def novacene_ml_api_client(init_context):
-    return NovaceneAPIClient()
+def novacene_ml_api_client(context):
+    return NovaceneAPIClient(
+        host = context.resource_config["resources"]["novacene_client"]["config"]["host"],
+        login = context.resource_config["resources"]["novacene_client"]["config"]["login"],
+        password = context.resource_config["resources"]["novacene_client"]["config"]["password"]
+    )

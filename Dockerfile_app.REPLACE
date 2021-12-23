@@ -29,7 +29,7 @@ RUN add-apt-repository universe
 RUN apt-get update && apt-get install -y \
     curl \
     git \
-    python3.4 \
+    python3.7 \
     python3-pip \
     zsh \
     unzip
@@ -38,18 +38,19 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
 
 RUN pip3 install \
     awscli \
-    dagster==0.13.11 \
-    dagster-graphql==0.13.11 \
-    dagit==0.13.11 \
-    dagster-postgres==0.13.11 \
-    dagster-docker==0.13.11 \
-    dagster_shell==0.13.11 \
-    dagster_snowflake==0.13.11 \
-    dagster_dbt==0.13.11 \
+    dagster==0.13.12 \
+    dagster-graphql==0.13.12 \
+    dagit==0.13.12 \
+    dagster-postgres==0.13.12 \
+    dagster-docker==0.13.12 \
+    dagster_shell==0.13.12 \
+    dagster_snowflake==0.13.12 \
+    dagster_dbt==0.13.12 \
     dbt==0.20.1 \
     bs4 \
     optparse-pretty \
-    boto3
+    boto3 \
+    fsspec
 
 
 # Copy resources for Dagster

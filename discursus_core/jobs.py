@@ -18,8 +18,8 @@ from ops.dw_ops import (
     test_dw_warehouse_layer,
     data_test_warehouse
 )
-from ops.enhance_mentions_op import enhance_mentions
-from ops.get_protest_relevancy import get_protest_relevancy
+from ops.gdelt_mining_ops import enhance_mentions, materialize_gdelt_mining_asset
+from ops.ml_enrichment_ops import get_protest_relevancy
 from resources.novacene_ml_resource import novacene_ml_api_client
 
 
@@ -28,14 +28,14 @@ from resources.novacene_ml_resource import novacene_ml_api_client
 DBT_PROFILES_DIR = file_relative_path(__file__, "./dw")
 DBT_PROJECT_DIR = file_relative_path(__file__, "./dw")
 
+snowflake_env_variables = config_from_files(['environments/snowflake_env_variables.yaml'])
+novacene_env_variables = config_from_files(['environments/novacene_env_variables.yaml'])
+
 my_dbt_resource = dbt_cli_resource.configured({
     "profiles_dir": DBT_PROFILES_DIR, 
     "project_dir": DBT_PROJECT_DIR})
 
-my_novacene_client_client = novacene_ml_api_client.configured({})
-
-snowflake_env_variables = config_from_files(['environments/snowflake_env_variables.yaml'])
-novacene_env_variables = config_from_files(['environments/novacene_env_variables.yaml'])
+my_novacene_client_client = novacene_ml_api_client.configured(novacene_env_variables)
 
 
 #Jobs
@@ -47,22 +47,29 @@ novacene_env_variables = config_from_files(['environments/novacene_env_variables
     config = snowflake_env_variables
 )
 def mine_gdelt_data():
+    # Mine data from GDELT
     gdelt_events_miner = create_shell_command_op(
         "zsh < $DISCURSUS_MINER_GDELT_HOME/gdelt_events_miner.zsh", 
         name = "gdelt_events_miner_op") 
-    gdelt_events_miner_results = gdelt_events_miner()
+    gdelt_events_miner_result = gdelt_events_miner()
 
-    enhance_mentions_result = enhance_mentions(gdelt_events_miner_results)
+    # Materialize gdelt mining asset
+    materialize_gdelt_mining_asset(gdelt_events_miner_result)
+
+    # Enhance article urls with their metadata
+    enhance_mentions_result = enhance_mentions(gdelt_events_miner_result)
+
+    # Load to Snowflake
     launch_snowpipes(enhance_mentions_result)
 
 
 @job(
     resource_defs = {
         'novacene_client': my_novacene_client_client
-    },
-    config = novacene_env_variables
+    }
 )
-def enrich_events():
+def enrich_mined_data():
+    # Classify articles that are relevant protest events
     get_protest_relevancy_result = get_protest_relevancy()
 
 
@@ -70,8 +77,7 @@ def enrich_events():
     resource_defs = {
         'snowflake': snowflake_resource,
         'dbt': my_dbt_resource
-    },
-    config = snowflake_env_variables
+    }
 )
 def build_data_warehouse():
     seed_dw_staging_layer_result = seed_dw_staging_layer()

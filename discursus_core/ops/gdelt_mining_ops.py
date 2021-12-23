@@ -1,7 +1,7 @@
 # Credit goes to...
 # https://github.com/quakerpunk/content-audit/blob/origin/content_audit.py
 
-from dagster import op
+from dagster import op, AssetMaterialization, Output
 from bs4 import BeautifulSoup
 from optparse import OptionParser
 import urllib.request
@@ -13,6 +13,8 @@ import re
 import time
 import boto3
 import os
+from io import StringIO
+import pandas as pd
 
 class ContentAuditor:
 
@@ -66,7 +68,7 @@ class ContentAuditor:
             req = urllib.request.Request(article_url)
             req.add_header('User-Agent', ua_string)
             try:
-                data = urllib.request.urlopen(req, timeout = 10)
+                data = urllib.request.urlopen(req, timeout = 5)
             except:
                 continue
             self.soupy_data = BeautifulSoup(data, features="html.parser")
@@ -152,15 +154,42 @@ class ContentAuditor:
 
 
 @op
-def enhance_mentions(context, gdelt_events_miner_results):
-    filename = gdelt_events_miner_results.splitlines()[-1]
-    context.log.info("Enhancing " + filename)
+def materialize_gdelt_mining_asset(context, gdelt_events_miner_result):
+    # Extracting which file we're materializing
+    filename = gdelt_events_miner_result.splitlines()[-1]
 
+    # Getting csv file and transform to pandas dataframe
+    s3 = boto3.resource('s3')
+    obj = s3.Object('discursus-io', filename)
+    df_gdelt_events = pd.read_csv(StringIO(obj.get()['Body'].read().decode('utf-8')), sep='\t')
+    
+    # Materialize asset
+    yield AssetMaterialization(
+        asset_key="gdelt_events",
+        description="List of events mined on GDELT",
+        metadata={
+            "path": "s3://discursus-io/" + filename,
+            "rows": len(df_gdelt_events.index)
+        }
+    )
+    yield Output(df_gdelt_events)
+
+
+@op
+def enhance_mentions(context, gdelt_events_miner_result):
+    # Extracting which file we're enhancing
+    filename = gdelt_events_miner_result.splitlines()[-1]
+
+    # Get a unique list of urls to enhance
     content_bot = ContentAuditor(filename)
     content_bot.get_list_of_urls()
 
+    # Enhance urls
     context.log.info("Mining " + str(len(content_bot.article_urls)) + " articles")
     content_bot.read_url()
 
+    # Save enhanced urls to S3
     context.log.info("Exporting to S3")
     content_bot.write_to_spreadsheet(filename)
+
+    return content_bot.site_info

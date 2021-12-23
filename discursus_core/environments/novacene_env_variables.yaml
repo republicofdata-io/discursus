@@ -1,5 +1,5 @@
 resources:
-  novacene:
+  novacene_client:
     config:
       host: 
         env: NOVACENE_HOST
