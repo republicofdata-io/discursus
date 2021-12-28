@@ -190,7 +190,6 @@ def enhance_articles(context, gdelt_mined_events_filename):
 
     # Create dataframe
     df_gdelt_enhanced_articles = pd.DataFrame (content_bot.site_info, columns = ['mention_identifier', 'page_name', 'file_name', 'page_title', 'page_description', 'keywords'])
-    context.log.info(df_gdelt_enhanced_articles)
     context.log.info("Enhanced " + str(df_gdelt_enhanced_articles['mention_identifier'].size) + " articles")
 
     # Save enhanced urls to S3
