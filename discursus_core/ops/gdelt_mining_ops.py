@@ -142,25 +142,6 @@ class ContentAuditor:
         os.remove("mine_mention_tags.csv")
 
 
-    def create_df(self):
-        # Convert enhanced info to dataframe
-        df_gdelt_enhanced_articles_column_names = ['mention_identifier', 'page_name', 'file_name', 'page_title', 'page_description', 'keywords']
-        df_gdelt_enhanced_articles = pd.DataFrame(columns = df_gdelt_enhanced_articles_column_names)
-
-        for dex in self.site_info:
-            row = [
-                dex['mention_identifier'], 
-                dex['name'], 
-                dex['filename'],
-                dex['title'],
-                dex['description'],
-                dex['keywords']
-            ]
-            df_gdelt_enhanced_articles.append(row)
-
-        return df_gdelt_enhanced_articles
-
-
     def add_necessary_tags(self, info_dict, needed_tags):
         """
         This method insures that missing tags have a null value
@@ -208,7 +189,8 @@ def enhance_articles(context, gdelt_mined_events_filename):
     content_bot.read_url()
 
     # Create dataframe
-    df_gdelt_enhanced_articles = content_bot.create_df()
+    df_gdelt_enhanced_articles = pd.DataFrame (content_bot.site_info, columns = ['mention_identifier', 'page_name', 'file_name', 'page_title', 'page_description', 'keywords'])
+    context.log.info(df_gdelt_enhanced_articles)
     context.log.info("Enhanced " + str(df_gdelt_enhanced_articles['mention_identifier'].size) + " articles")
 
     # Save enhanced urls to S3
