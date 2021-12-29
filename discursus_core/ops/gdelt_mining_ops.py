@@ -165,8 +165,8 @@ def materialize_gdelt_mining_asset(context, gdelt_mined_events_filename):
     
     # Materialize asset
     yield AssetMaterialization(
-        asset_key="gdelt_events",
-        description="List of events mined on GDELT",
+        asset_key = "gdelt_events",
+        description = "List of events mined on GDELT",
         metadata={
             "path": "s3://discursus-io/" + filename,
             "rows": len(df_gdelt_events.index)

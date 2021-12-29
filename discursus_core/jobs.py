@@ -19,7 +19,7 @@ from ops.dw_ops import (
     data_test_warehouse
 )
 from ops.gdelt_mining_ops import enhance_articles, materialize_gdelt_mining_asset, materialize_enhanced_articles_asset
-from ops.ml_enrichment_ops import get_protest_relevancy
+from ops.ml_enrichment_ops import classify_protest_relevancy
 from resources.novacene_ml_resource import novacene_ml_api_client
 
 
@@ -73,7 +73,7 @@ def mine_gdelt_data():
 )
 def enrich_mined_data():
     # Classify articles that are relevant protest events
-    get_protest_relevancy_result = get_protest_relevancy()
+    classify_protest_relevancy_result = classify_protest_relevancy()
 
 
 @job(
