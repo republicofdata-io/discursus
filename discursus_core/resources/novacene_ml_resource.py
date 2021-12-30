@@ -1,13 +1,14 @@
 import requests
-from dagster import resource, StringSource
+from dagster import resource, StringSource, IntSource
 from dagster.builtins import String
 
 
 class NovaceneAPIClient:
-    def __init__(self, host, login, password):
+    def __init__(self, host, login, password, enrichment_model_id):
         self._conn_host = host
         self._conn_login = login
         self._conn_password = password
+        self._enrichment_model_id = enrichment_model_id
 
         self._session = None
         self._base_url = None
@@ -41,18 +42,29 @@ class NovaceneAPIClient:
     
     # API methods
     ######################
-    def list_datasets(self):
+    def create_dataset(self, filename, df_gdelt_articles):
         """
-        List all datasets and their information.
+        Upload a dataset.
         """
         
-        endpoint="/dataset/list/"
+        endpoint = "/dataset/"
         
         session, base_url = self.get_conn()
         url = base_url + endpoint
+
         
-        response = session.get(
-            url
+        payload = {
+            "name": filename,
+            "set_type": "file",
+            "file_type": "csv"
+        }
+
+        files = [
+            ('path',(filename, df_gdelt_articles.to_csv(), 'csv'))
+        ]
+        
+        response = session.post(
+            url, data = payload, files = files
         )
         
         response.raise_for_status()
@@ -61,18 +73,29 @@ class NovaceneAPIClient:
         return(response_json)
 
 
-    def list_jobs(self):
+    def enrich_dataset(self, dataset_id):
         """
-        List all jobs and their information.
+        Enriches a dataset.
         """
         
-        endpoint="/job/list/"
+        endpoint = "/studio/get_local_model_analysis/"
         
         session, base_url = self.get_conn()
         url = base_url + endpoint
+
         
-        response = session.get(
-            url
+        payload = {
+            "name": filename,
+            "set_type": "file",
+            "file_type": "csv"
+        }
+
+        files = [
+            ('path',(filename, df_gdelt_articles.to_csv(), 'csv'))
+        ]
+        
+        response = session.post(
+            url, data = payload, files = files
         )
         
         response.raise_for_status()
@@ -89,7 +112,8 @@ class NovaceneAPIClient:
                 "config": {
                     "host": StringSource,
                     "login": StringSource,
-                    "password": StringSource
+                    "password": StringSource,
+                    "enrichment_model_id": IntSource
                 }
             }
         }
@@ -100,5 +124,6 @@ def novacene_ml_api_client(context):
     return NovaceneAPIClient(
         host = context.resource_config["resources"]["novacene_client"]["config"]["host"],
         login = context.resource_config["resources"]["novacene_client"]["config"]["login"],
-        password = context.resource_config["resources"]["novacene_client"]["config"]["password"]
+        password = context.resource_config["resources"]["novacene_client"]["config"]["password"],
+        enrichment_model_id = context.resource_config["resources"]["novacene_client"]["config"]["enrichment_model_id"]
     )
