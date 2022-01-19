@@ -51,7 +51,6 @@ class NovaceneAPIClient:
         
         session, base_url = self.get_conn()
         url = base_url + endpoint
-
         
         payload = {
             "name": filename,
@@ -82,20 +81,15 @@ class NovaceneAPIClient:
         
         session, base_url = self.get_conn()
         url = base_url + endpoint
-
         
         payload = {
-            "name": filename,
-            "set_type": "file",
-            "file_type": "csv"
+            "datasetId": dataset_id,
+            "methodIdx": self._enrichment_model_id,
+            "colIdx": 5
         }
 
-        files = [
-            ('path',(filename, df_gdelt_articles.to_csv(), 'csv'))
-        ]
-        
-        response = session.post(
-            url, data = payload, files = files
+        response = session.get(
+            url, data = payload
         )
         
         response.raise_for_status()

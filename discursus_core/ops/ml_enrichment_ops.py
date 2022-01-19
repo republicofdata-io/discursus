@@ -23,6 +23,8 @@ def classify_protest_relevancy(context):
     context.log.info("Sending " + str(df_gdelt_articles.index.size) + " articles for relevancy classification")
 
     protest_classification_dataset_id = context.resources.novacene_client.create_dataset(filename.split("/")[2], df_gdelt_articles)
+    #context.log.info("new dataset created: " + str(protest_classification_dataset_id.id))
     context.log.info(protest_classification_dataset_id)
-    #yield AssetMaterialization(asset_key="novacene_jobs", description="List of jobs being ran by Novacene")
-    #yield Output(job_list)
+
+    protest_classification_job_id = context.resources.novacene_client.enrich_dataset(protest_classification_dataset_id.id)
+    context.log.info(protest_classification_job_id)
