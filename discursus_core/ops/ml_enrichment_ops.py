@@ -14,7 +14,6 @@ import pandas as pd
 def classify_protest_relevancy(context): 
     # Get latest asset of gdelt articles
     filename = context.op_config["asset_materialization_path"].split("s3://discursus-io/")[1]
-    context.log.info(filename)
     s3 = boto3.resource('s3')
     obj = s3.Object('discursus-io', filename)
     df_gdelt_articles = pd.read_csv(StringIO(obj.get()['Body'].read().decode('utf-8')))
@@ -22,9 +21,8 @@ def classify_protest_relevancy(context):
     # Sending latest batch of articles to Novacene for relevancy classification
     context.log.info("Sending " + str(df_gdelt_articles.index.size) + " articles for relevancy classification")
 
-    protest_classification_dataset_id = context.resources.novacene_client.create_dataset(filename.split("/")[2], df_gdelt_articles)
-    #context.log.info("new dataset created: " + str(protest_classification_dataset_id.id))
-    context.log.info(protest_classification_dataset_id)
-
-    protest_classification_job_id = context.resources.novacene_client.enrich_dataset(protest_classification_dataset_id.id)
+    protest_classification_dataset_id = context.resources.novacene_client.create_dataset("protest_events_" + filename.split("/")[3], df_gdelt_articles)
+    protest_classification_job_id = context.resources.novacene_client.enrich_dataset(protest_classification_dataset_id['id'])
     context.log.info(protest_classification_job_id)
+
+    return protest_classification_job_id['id']

@@ -83,13 +83,13 @@ class NovaceneAPIClient:
         url = base_url + endpoint
         
         payload = {
-            "datasetId": dataset_id,
-            "methodIdx": self._enrichment_model_id,
+            "datasetId": int(dataset_id),
+            "methodIdx": int(self._enrichment_model_id),
             "colIdx": 5
         }
 
         response = session.get(
-            url, data = payload
+            url, params = payload
         )
         
         response.raise_for_status()
