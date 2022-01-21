@@ -1,24 +1,33 @@
 from dagster import op, AssetMaterialization, Output
 
 import boto3
-from io import StringIO
+from io import StringIO, BytesIO
 import pandas as pd
 
 class MLEnrichmentJobTracker:
 
     def __init__(self):
-        s3 = boto3.resource('s3')
+        self.s3 = boto3.resource('s3')
 
         try:
-            obj = s3.Object('discursus-io', 'ops/ml_enrichment_jobs.csv').get()
-            df_ml_enrichment_jobs = pd.read_csv(obj)
+            obj = self.s3.Object('discursus-io', 'ops/ml_enrichment_jobs.csv')
+            df_ml_enrichment_jobs = pd.read_csv(StringIO(obj.get()['Body'].read().decode('utf-8')))
         except:
             df_ml_enrichment_jobs = pd.DataFrame(None, columns = ['job_id', 'status'])
-            csv_buffer = StringIO()
-            df_ml_enrichment_jobs.to_csv(csv_buffer)
-            s3.Object('discursus-io', 'ops/ml_enrichment_jobs.csv').put(Body=csv_buffer.getvalue())
         
         self.df_ml_enrichment_jobs = df_ml_enrichment_jobs
+    
+    def upload_job_log(self):
+        csv_buffer = StringIO()
+        self.df_ml_enrichment_jobs.to_csv(csv_buffer, index = False)
+        self.s3.Object('discursus-io', 'ops/ml_enrichment_jobs.csv').put(Body=csv_buffer.getvalue())
+    
+    def add_new_job(self, job_id, job_status):
+        # Append new job to existing list
+        data_ml_enrichment_jobs = [[job_id, job_status]]
+        df_new_ml_enrichment_job = pd.DataFrame(data_ml_enrichment_jobs, columns = ['job_id', 'status'])
+        self.df_ml_enrichment_jobs = self.df_ml_enrichment_jobs.append(df_new_ml_enrichment_job)
+
 
 
 @op(
@@ -29,39 +38,44 @@ class MLEnrichmentJobTracker:
     }
 )
 def classify_protest_relevancy(context): 
+    # Create instance of ml enrichment tracker
+    my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
+    
     # Get latest asset of gdelt articles
     filename = context.op_config["asset_materialization_path"].split("s3://discursus-io/")[1]
-    s3 = boto3.resource('s3')
-    obj = s3.Object('discursus-io', filename)
+    obj = my_ml_enrichment_jobs_tracker.s3.Object('discursus-io', filename)
     df_gdelt_articles = pd.read_csv(StringIO(obj.get()['Body'].read().decode('utf-8')))
 
     # Sending latest batch of articles to Novacene for relevancy classification
     context.log.info("Sending " + str(df_gdelt_articles.index.size) + " articles for relevancy classification")
 
     protest_classification_dataset_id = context.resources.novacene_client.create_dataset("protest_events_" + filename.split("/")[3], df_gdelt_articles)
-    protest_classification_job_id = context.resources.novacene_client.enrich_dataset(protest_classification_dataset_id['id'])
-    context.log.info(protest_classification_job_id)
+    protest_classification_job = context.resources.novacene_client.enrich_dataset(protest_classification_dataset_id['id'])
 
-    return protest_classification_job_id['id']
+    # Update log of enrichment jobs
+    my_ml_enrichment_jobs_tracker.add_new_job(protest_classification_job['id'], 'processing')
+    my_ml_enrichment_jobs_tracker.upload_job_log()
 
-
-@op
-def get_ml_enrichment_jobs(context):
-     # Get a unique list of urls to enhance
-    my_ml_enrichment_jobs = MLEnrichmentJobTracker()
-    context.log.info(my_ml_enrichment_jobs.df_ml_enrichment_jobs)
-    
-    # Create Enrichments jobs dataframe
-    data_ml_enrichment_jobs = [[1, 'complete'], [2, 'processing']]
-    df_ml_enrichment_jobs = pd.DataFrame(data_ml_enrichment_jobs, columns = ['job_id', 'status'])
-
-     # Materialize asset
+    # Materialize asset
     yield AssetMaterialization(
         asset_key="ml_enrichment_jobs",
         description="List of ml enrichment jobs and their statuses",
         metadata={
             "path": "s3://discursus-io/ops/ml_enrichment_jobs.csv",
-            "jobs": df_ml_enrichment_jobs['job_id'].size
+            "jobs": my_ml_enrichment_jobs_tracker.df_ml_enrichment_jobs['job_id'].size
         }
     )
-    yield Output(df_ml_enrichment_jobs)
+    yield Output(my_ml_enrichment_jobs_tracker.df_ml_enrichment_jobs)
+
+
+@op
+def get_ml_enrichment_jobs(context):
+    # Create instance of ml enrichment tracker
+    my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
+
+    for index, row in my_ml_enrichment_jobs_tracker.df_ml_enrichment_jobs.iterrows():
+        context.log.info(row)
+
+    my_ml_enrichment_jobs_tracker.upload_job_log()
+
+    return None
