@@ -1,6 +1,6 @@
 from dagster import repository
 
-from jobs import mine_gdelt_data, enrich_mined_data, build_data_warehouse
+from jobs import mine_gdelt_data, enrich_mined_data, build_data_warehouse, test_asset
 from sensors import gdelt_enhanced_articles_sensor
 from schedules import mine_gdelt_data_schedule, build_data_warehouse_schedule
 
@@ -10,7 +10,8 @@ def discursus_repository():
     jobs = [
         mine_gdelt_data,
         enrich_mined_data,
-        build_data_warehouse
+        build_data_warehouse,
+        test_asset
     ]
     sensors = [
         gdelt_enhanced_articles_sensor

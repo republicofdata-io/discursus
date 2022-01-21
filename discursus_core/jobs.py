@@ -19,7 +19,7 @@ from ops.dw_ops import (
     data_test_warehouse
 )
 from ops.gdelt_mining_ops import enhance_articles, materialize_gdelt_mining_asset, materialize_enhanced_articles_asset
-from ops.ml_enrichment_ops import classify_protest_relevancy
+from ops.ml_enrichment_ops import classify_protest_relevancy, get_ml_enrichment_jobs
 from resources.novacene_ml_resource import novacene_ml_api_client
 
 
@@ -91,3 +91,8 @@ def build_data_warehouse():
     build_dw_warehouse_layer_result = build_dw_warehouse_layer(test_dw_integration_layer_result)
     test_dw_warehouse_layer_result = test_dw_warehouse_layer(build_dw_warehouse_layer_result)
     test_dw_staging_layer_result = data_test_warehouse(test_dw_warehouse_layer_result)
+
+
+@job
+def test_asset():
+    df_ml_enrichment_jobs = get_ml_enrichment_jobs()
