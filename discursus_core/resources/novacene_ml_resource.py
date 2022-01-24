@@ -98,6 +98,24 @@ class NovaceneAPIClient:
         return(response_json)
 
 
+    def job_info(self, job_id):
+        """
+        Get job information.
+        """
+        
+        endpoint = "/job/" + str(job_id) + "/"
+        
+        session, base_url = self.get_conn()
+        url = base_url + endpoint
+
+        response = session.get(url)
+        
+        response.raise_for_status()
+        response_json = response.json()
+        
+        return(response_json)
+
+
 
 @resource(
     config_schema={
