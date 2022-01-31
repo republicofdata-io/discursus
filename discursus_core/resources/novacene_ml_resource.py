@@ -1,7 +1,8 @@
 import requests
 from dagster import resource, StringSource, IntSource
 from dagster.builtins import String
-
+import pandas as pd
+from io import StringIO
 
 class NovaceneAPIClient:
     def __init__(self, host, login, password, enrichment_model_id):
@@ -96,6 +97,20 @@ class NovaceneAPIClient:
         response_json = response.json()
         
         return(response_json)
+    
+
+    def get_file(self, file_url):
+        """
+        Get file
+        """
+        
+        session, base_url = self.get_conn()
+
+        response = session.get(file_url)
+        df_file = pd.read_csv(StringIO(response.text))
+        
+        return(df_file)
+
 
 
     def job_info(self, job_id):

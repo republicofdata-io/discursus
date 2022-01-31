@@ -1,7 +1,7 @@
 from dagster import op, AssetMaterialization, Output
 
 import boto3
-from io import StringIO, BytesIO
+from io import StringIO
 import pandas as pd
 
 class MLEnrichmentJobTracker:
@@ -77,7 +77,7 @@ def classify_protest_relevancy(context):
 )
 def get_ml_enrichment_files(context):
     # Empty dataframe of files to fetch
-    df_ml_enrichment_files = pd.DataFrame(None, columns = ['job_id', 'file_path'])
+    df_ml_enrichment_files = pd.DataFrame(None, columns = ['job_id', 'name', 'file_path'])
 
     # Lit of jobs to remove
     l_completed_job_indexes = []
@@ -90,19 +90,36 @@ def get_ml_enrichment_files(context):
 
         if job_info['status'] == 'Completed':
             # Append new job to existing list
-            data_ml_enrichment_file = [[row['job_id'], job_info['result']['path']]]
-            df_ml_enrichment_file = pd.DataFrame(data_ml_enrichment_file, columns = ['job_id', 'file_path'])
+            data_ml_enrichment_file = [[row['job_id'], job_info['source']['name'], job_info['result']['path']]]
+            df_ml_enrichment_file = pd.DataFrame(data_ml_enrichment_file, columns = ['job_id', 'name', 'file_path'])
             df_ml_enrichment_files = df_ml_enrichment_files.append(df_ml_enrichment_file)
 
             # Keep track of jobs to remove from tracking log
             l_completed_job_indexes.append(index)
 
     # Remove job from log of enrichment jobs
-    context.log.info(my_ml_enrichment_jobs_tracker.df_ml_enrichment_jobs)
     my_ml_enrichment_jobs_tracker.remove_completed_job(l_completed_job_indexes)
-    context.log.info(my_ml_enrichment_jobs_tracker.df_ml_enrichment_jobs)
-    
-    # ***UNCOMMENT ONCE DOWNLOAD OF ENRICHED FILES OP IS COMPLETED***
-    # my_ml_enrichment_jobs_tracker.upload_job_log()
+    my_ml_enrichment_jobs_tracker.upload_job_log()
 
     return df_ml_enrichment_files
+
+
+@op(
+    required_resource_keys = {"novacene_client"}
+)
+def store_ml_enrichment_files(context, df_ml_enrichment_files):# Create instance of ml enrichment tracker
+    s3 = boto3.resource('s3')
+
+    for index, row in df_ml_enrichment_files.iterrows():
+        # Read csv as pandas
+        df_ml_enrichment_file = context.resources.novacene_client.get_file(row['file_path'])
+
+        # Extract date from file name
+        file_date = row['name'].split("_")[2].split(".")[0][0 : 7]
+
+        # Save df as csv in S3
+        csv_buffer = StringIO()
+        df_ml_enrichment_file.to_csv(csv_buffer, index = False)
+        s3.Object('discursus-io', 'sources/ml/' + file_date + '/' + row['name']).put(Body=csv_buffer.getvalue())
+    
+    return None

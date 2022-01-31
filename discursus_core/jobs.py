@@ -19,7 +19,7 @@ from ops.dw_ops import (
     data_test_warehouse
 )
 from ops.gdelt_mining_ops import enhance_articles, materialize_gdelt_mining_asset, materialize_enhanced_articles_asset
-from ops.ml_enrichment_ops import classify_protest_relevancy, get_ml_enrichment_files
+from ops.ml_enrichment_ops import classify_protest_relevancy, get_ml_enrichment_files, store_ml_enrichment_files
 from resources.novacene_ml_resource import novacene_ml_api_client
 
 
@@ -83,6 +83,8 @@ def enrich_mined_data():
 )
 def get_enriched_mined_data():
     df_ml_enrichment_files = get_ml_enrichment_files()
+    store_ml_enrichment_files_result = store_ml_enrichment_files(df_ml_enrichment_files)
+    #launch_snowpipes(store_ml_enrichment_files_result)
 
 
 @job(
