@@ -1,0 +1,11 @@
+resources:
+  novacene_client:
+    config:
+      host: 
+        env: NOVACENE_HOST
+      login: 
+        env: NOVACENE_LOGIN
+      password: 
+        env: NOVACENE_PASSWORD
+      enrichment_model_id:
+        env: NOVACENE_ENRICHMENT_MODEL_ID

@@ -30,24 +30,28 @@ __The discursus project is an open source data platform__ that mines, shapes and
 
 &nbsp;
 
+# Data Assets
+
+discursus Core is a data platform that creates data assets that are then exposed to end users.
+
+<img src='images/discursus_data_platform.png' width='750px' alt='discursus data platform' />
+
+The following entities are exposed as the final output of our architecture.
+
+<img src="images/discursus_core_erd.png" width="650px" alt="discursus" />
+
+
+&nbsp;
+
 # Architecture
 
-<img src="images/discursus_core_stack.png" width="750px" alt="discursus" />
+<img src="images/discursus_core_architecture.png" width="750px" alt="discursus" />
 
 Here are the main components of the discursus core architecture:
 
 - A miner that sources events from the GDELT project (https://www.gdeltproject.org/) and saves it to AWS S3.
 - A dbt project that creates a data warehouse which exposes protest events.
 - A Dagster orchestrator that schedules the mining and transformation jobs.
-
-
-&nbsp;
-
-# ERD
-
-The following entities are exposed as the final output of our architecture.
-
-<img src="images/discursus_core_erd.png" width="650px" alt="discursus" />
 
 
 &nbsp;
