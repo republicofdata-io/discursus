@@ -30,24 +30,28 @@ __The discursus project is an open source data platform__ that mines, shapes and
 
 &nbsp;
 
+# Data Assets
+
+discursus Core is a data platform that creates data assets that are then exposed to end users.
+
+<img src='images/discursus_data_platform.png' width='750px' alt='discursus data platform' />
+
+The following entities are exposed as the final output of our architecture.
+
+<img src="images/discursus_core_erd.png" width="650px" alt="discursus" />
+
+
+&nbsp;
+
 # Architecture
 
-<img src="images/discursus_core_stack.png" width="750px" alt="discursus" />
+<img src="images/discursus_core_architecture.png" width="750px" alt="discursus" />
 
 Here are the main components of the discursus core architecture:
 
 - A miner that sources events from the GDELT project (https://www.gdeltproject.org/) and saves it to AWS S3.
 - A dbt project that creates a data warehouse which exposes protest events.
 - A Dagster orchestrator that schedules the mining and transformation jobs.
-
-
-&nbsp;
-
-# ERD
-
-The following entities are exposed as the final output of our architecture.
-
-<img src="images/discursus_core_erd.png" width="650px" alt="discursus" />
 
 
 &nbsp;
@@ -73,14 +77,6 @@ Only thing left is to configure your instance:
 - Make any necessary changes to `docker-compose`
 - To run the Docker stack locally: `docker compose -p "discursus-data-platform" --file docker-compose.yml up --build`
 - Visit Dagster's app: `http://127.0.0.1:3000/`
-
-## Prod specific instructions
-* Install docker and docker-compose
-* Add ec2-user to docker group - https://docs.docker.com/engine/install/linux-postinstall/
-* If restarting, kill existing processes: `ps aux | grep discurus` then `sudo kill -9 ...`
-* (Re)start Docker: `sudo systemctl restart docker`
-* Prune all images and containers: `docker system prune -a`
-* Run stack `nohup docker-compose -p "discursus-data-stack" --file docker-compose.yml up --build >/dev/null 2>&1 &`
 
 &nbsp;
 

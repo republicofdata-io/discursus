@@ -15,6 +15,10 @@ ENV SNOWFLAKE_LOAD_SCHEMA=REPLACE_VALUE
 ENV SNOWFLAKE_DW_WAREHOUSE=REPLACE_VALUE
 ENV SNOWFLAKE_DW_DATABASE=REPLACE_VALUE
 ENV SNOWFLAKE_DW_SCHEMA=REPLACE_VALUE
+ENV NOVACENE_HOST=REPLACE_VALUE
+ENV NOVACENE_LOGIN=REPLACE_VALUE
+ENV NOVACENE_PASSWORD=REPLACE_VALUE
+ENV NOVACENE_ENRICHMENT_MODEL_ID=REPLACE_VALUE
 
 
 # Create environment
@@ -26,7 +30,7 @@ RUN add-apt-repository universe
 RUN apt-get update && apt-get install -y \
     curl \
     git \
-    python3.4 \
+    python3.7 \
     python3-pip \
     zsh \
     unzip
@@ -35,18 +39,19 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
 
 RUN pip3 install \
     awscli \
-    dagster==0.13.8 \
-    dagster-graphql==0.13.8 \
-    dagit==0.13.8 \
-    dagster-postgres==0.13.8 \
-    dagster-docker==0.13.8 \
-    dagster_shell==0.13.8 \
-    dagster_snowflake==0.13.8 \
-    dagster_dbt==0.13.8 \
+    dagster==0.13.17 \
+    dagster-graphql==0.13.17 \
+    dagit==0.13.17 \
+    dagster-postgres==0.13.17 \
+    dagster-docker==0.13.17 \
+    dagster_shell==0.13.17 \
+    dagster_snowflake==0.13.17 \
+    dagster_dbt==0.13.17 \
     dbt==0.20.1 \
     bs4 \
     optparse-pretty \
-    boto3
+    boto3 \
+    fsspec
 
 
 # Copy resources for Dagster
