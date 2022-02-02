@@ -63,13 +63,14 @@ def classify_protest_relevancy(context):
     # Materialize asset
     yield AssetMaterialization(
         asset_key="ml_enrichment_jobs",
-        description="List of ml enrichment jobs and their statuses",
+        description="List of ml enrichment jobs",
         metadata={
-            "path": "s3://discursus-io/ops/ml_enrichment_jobs.csv",
-            "jobs": my_ml_enrichment_jobs_tracker.df_ml_enrichment_jobs['job_id'].size
+            "job id": protest_classification_job['id'],
+            "dataset enriched": filename,
+            "dataset enrtries": df_gdelt_articles.index.size
         }
     )
-    yield Output(my_ml_enrichment_jobs_tracker.df_ml_enrichment_jobs)
+    yield Output(protest_classification_job)
 
 
 @op(
@@ -97,7 +98,7 @@ def get_ml_enrichment_files(context):
             # Keep track of jobs to remove from tracking log
             l_completed_job_indexes.append(index)
 
-    # Remove job from log of enrichment jobs
+    # Updating job from log of enrichment jobs
     my_ml_enrichment_jobs_tracker.remove_completed_job(l_completed_job_indexes)
     my_ml_enrichment_jobs_tracker.upload_job_log()
 
@@ -107,7 +108,7 @@ def get_ml_enrichment_files(context):
 @op(
     required_resource_keys = {"novacene_client"}
 )
-def store_ml_enrichment_files(context, df_ml_enrichment_files):# Create instance of ml enrichment tracker
+def store_ml_enrichment_files(context, df_ml_enrichment_files):
     s3 = boto3.resource('s3')
 
     for index, row in df_ml_enrichment_files.iterrows():
@@ -115,11 +116,11 @@ def store_ml_enrichment_files(context, df_ml_enrichment_files):# Create instance
         df_ml_enrichment_file = context.resources.novacene_client.get_file(row['file_path'])
 
         # Extract date from file name
-        file_date = row['name'].split("_")[2].split(".")[0][0 : 7]
+        file_date = row['name'].split("_")[2].split(".")[0][0 : 8]
 
         # Save df as csv in S3
         csv_buffer = StringIO()
         df_ml_enrichment_file.to_csv(csv_buffer, index = False)
-        s3.Object('discursus-io', 'sources/ml/' + file_date + '/' + row['name']).put(Body=csv_buffer.getvalue())
+        s3.Object('discursus-io', 'sources/ml/' + file_date + '/ml_enriched_' + row['name']).put(Body=csv_buffer.getvalue())
     
     return None
