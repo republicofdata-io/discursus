@@ -9,12 +9,19 @@ DBT_PROJECT_DIR = file_relative_path(__file__, "../dw")
 
 
 @op(required_resource_keys = {"snowflake"})
-def launch_snowpipes(context, enhance_mentions_result):
+def launch_gdelt_events_snowpipe(context, materialize_enhanced_articles_asset_result):
     q_load_gdelt_events = "alter pipe gdelt_events_pipe refresh;"
-    q_load_enhanced_mentions_events = "alter pipe gdelt_enhanced_mentions_pipe refresh;"
-
     context.resources.snowflake.execute_query(q_load_gdelt_events)
+
+@op(required_resource_keys = {"snowflake"})
+def launch_enhanced_articles_snowpipe(context, launch_gdelt_events_snowpipe_result):
+    q_load_enhanced_mentions_events = "alter pipe gdelt_enhanced_mentions_pipe refresh;"
     context.resources.snowflake.execute_query(q_load_enhanced_mentions_events)
+
+@op(required_resource_keys = {"snowflake"})
+def launch_ml_enriched_articles_snowpipe(context, store_ml_enrichment_files_result):
+    q_load_ml_enriched_mentions = "alter pipe gdelt_ml_enriched_mentions_pipe refresh;"
+    context.resources.snowflake.execute_query(q_load_ml_enriched_mentions)
 
 @op(required_resource_keys={"dbt"})
 def seed_dw_staging_layer(context) -> DbtCliOutput:

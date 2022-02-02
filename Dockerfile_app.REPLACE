@@ -47,7 +47,8 @@ RUN pip3 install \
     dagster_shell==0.13.17 \
     dagster_snowflake==0.13.17 \
     dagster_dbt==0.13.17 \
-    dbt==0.20.1 \
+    dbt-core==1.0.1 \
+    dbt-snowflake==1.0.0 \
     bs4 \
     optparse-pretty \
     boto3 \
