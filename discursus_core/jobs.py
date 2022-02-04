@@ -8,7 +8,9 @@ from dagster_shell import create_shell_command_op
 from dagster_dbt import dbt_cli_resource
 
 from ops.dw_ops import (
-    launch_snowpipes,
+    launch_gdelt_events_snowpipe,
+    launch_enhanced_articles_snowpipe,
+    launch_ml_enriched_articles_snowpipe,
     seed_dw_staging_layer,
     build_dw_staging_layer,
     test_dw_staging_layer,
@@ -63,7 +65,8 @@ def mine_gdelt_data():
     materialize_enhanced_articles_asset_result = materialize_enhanced_articles_asset(df_gdelt_enhanced_articles, gdelt_mined_events_filename)
 
     # Load to Snowflake
-    launch_snowpipes(materialize_enhanced_articles_asset_result)
+    launch_gdelt_events_snowpipe_result = launch_gdelt_events_snowpipe(materialize_enhanced_articles_asset_result)
+    launch_enhanced_articles_snowpipe_result = launch_enhanced_articles_snowpipe(launch_gdelt_events_snowpipe_result)
 
 
 @job(
@@ -78,13 +81,15 @@ def enrich_mined_data():
 
 @job(
     resource_defs = {
+        'snowflake': snowflake_resource,
         'novacene_client': my_novacene_client_client
     }
 )
 def get_enriched_mined_data():
     df_ml_enrichment_files = get_ml_enrichment_files()
     store_ml_enrichment_files_result = store_ml_enrichment_files(df_ml_enrichment_files)
-    #launch_snowpipes(store_ml_enrichment_files_result)
+    
+    launch_ml_enriched_articles_snowpipe_result = launch_ml_enriched_articles_snowpipe(store_ml_enrichment_files_result)
 
 
 @job(

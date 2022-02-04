@@ -16,6 +16,14 @@ s_event_types as (
 
 ),
 
+s_gdelt_ml_enriched_mentions as (
+
+    select * from {{ ref('stg__gdelt__ml_enriched_mentions') }}
+    where mention_url is not null
+    and is_relevant
+
+),
+
 final as (
 
     select
@@ -52,6 +60,7 @@ final as (
     left join s_actor_types as s_actor_types2
         on s_gdelt_events.actor2_type1_code = s_actor_types2.actor_type_code
     left join s_event_types using (event_code)
+    inner join s_gdelt_ml_enriched_mentions using (mention_url)
 
 )
 

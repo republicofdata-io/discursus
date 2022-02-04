@@ -116,8 +116,5 @@ classify_actors as (
 select * from classify_actors
 
 where
-    creation_ts >= dateadd(day, -90, current_date)
+    creation_ts >= dateadd(week, -52, current_date)
     and event_root_code = '14'
-    and actor1_type1_group is not null
-    and actor2_type1_group is not null
-    and actor1_type1_group != actor2_type1_group
