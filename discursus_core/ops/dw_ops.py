@@ -31,34 +31,34 @@ def seed_dw_staging_layer(context) -> DbtCliOutput:
 @op(required_resource_keys={"dbt"})
 def build_dw_staging_layer(context, seed_dw_staging_layer_result: DbtCliOutput) -> DbtCliOutput:
     context.log.info(f"Building the staging layer")
-    return context.resources.dbt.run(models=["staging.*"])
+    return context.resources.dbt.run(select=["staging"])
 
 @op(required_resource_keys={"dbt"})
 def test_dw_staging_layer(context, build_dw_staging_layer_result: DbtCliOutput):
     context.log.info(f"Testing the staging layer")
-    context.resources.dbt.test(models=["staging.*"], schema=True, data=False)
+    context.resources.dbt.test(select=["staging,test_type:generic"])
 
 @op(required_resource_keys={"dbt"})
 def build_dw_integration_layer(context, test_dw_staging_layer_result) -> DbtCliOutput:
     context.log.info(f"Building the integration layer")
-    return context.resources.dbt.run(models=["integration.*"])
+    return context.resources.dbt.run(select=["integration"])
 
 @op(required_resource_keys={"dbt"})
 def test_dw_integration_layer(context, build_dw_integration_layer_result: DbtCliOutput):
     context.log.info(f"Testing the integration layer")
-    context.resources.dbt.test(models=["integration.*"], schema=True, data=False)
+    context.resources.dbt.test(select=["integration,test_type:generic"])
 
 @op(required_resource_keys={"dbt"})
 def build_dw_warehouse_layer(context, test_dw_integration_layer_result) -> DbtCliOutput:
     context.log.info(f"Building the warehouse layer")
-    return context.resources.dbt.run(models=["warehouse.*"])
+    return context.resources.dbt.run(select=["warehouse"])
 
 @op(required_resource_keys={"dbt"})
 def test_dw_warehouse_layer(context, build_dw_warehouse_layer_result: DbtCliOutput):
     context.log.info(f"Testing the warehouse layer")
-    context.resources.dbt.test(models=["warehouse.*"], schema=True, data=False)
+    context.resources.dbt.test(select=["warehouse,test_type:generic"])
 
 @op(required_resource_keys={"dbt"})
 def data_test_warehouse(context, test_dw_warehouse_layer_result):
     context.log.info(f"Data tests")
-    context.resources.dbt.test(schema=False, data=True)
+    context.resources.dbt.test(models=["test_type:singular"])
