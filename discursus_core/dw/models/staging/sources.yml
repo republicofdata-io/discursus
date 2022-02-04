@@ -12,3 +12,4 @@ sources:
     tables:
       - name: gdelt_events
       - name: gdelt_enhanced_mentions
+      - name: gdelt_ml_enriched_mentions

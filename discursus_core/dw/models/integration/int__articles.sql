@@ -12,6 +12,14 @@ s_gdelt_enhanced_articles as (
 
 ),
 
+s_gdelt_ml_enriched_mentions as (
+
+    select * from {{ ref('stg__gdelt__ml_enriched_mentions') }}
+    where mention_url is not null
+    and is_relevant
+
+),
+
 final as (
 
     select distinct
@@ -25,7 +33,8 @@ final as (
         s_gdelt_enhanced_articles.keywords as article_keywords
 
     from s_gdelt_events
-    left join s_gdelt_enhanced_articles using (mention_url)
+    inner join s_gdelt_enhanced_articles using (mention_url)
+    inner join s_gdelt_ml_enriched_mentions using (mention_url)
 
 )
 
