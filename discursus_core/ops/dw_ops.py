@@ -9,12 +9,19 @@ DBT_PROJECT_DIR = file_relative_path(__file__, "../dw")
 
 
 @op(required_resource_keys = {"snowflake"})
-def launch_snowpipes(context, enhance_mentions_result):
+def launch_gdelt_events_snowpipe(context, materialize_enhanced_articles_asset_result):
     q_load_gdelt_events = "alter pipe gdelt_events_pipe refresh;"
-    q_load_enhanced_mentions_events = "alter pipe gdelt_enhanced_mentions_pipe refresh;"
-
     context.resources.snowflake.execute_query(q_load_gdelt_events)
+
+@op(required_resource_keys = {"snowflake"})
+def launch_enhanced_articles_snowpipe(context, launch_gdelt_events_snowpipe_result):
+    q_load_enhanced_mentions_events = "alter pipe gdelt_enhanced_mentions_pipe refresh;"
     context.resources.snowflake.execute_query(q_load_enhanced_mentions_events)
+
+@op(required_resource_keys = {"snowflake"})
+def launch_ml_enriched_articles_snowpipe(context, store_ml_enrichment_files_result):
+    q_load_ml_enriched_mentions = "alter pipe gdelt_ml_enriched_mentions_pipe refresh;"
+    context.resources.snowflake.execute_query(q_load_ml_enriched_mentions)
 
 @op(required_resource_keys={"dbt"})
 def seed_dw_staging_layer(context) -> DbtCliOutput:
@@ -24,34 +31,34 @@ def seed_dw_staging_layer(context) -> DbtCliOutput:
 @op(required_resource_keys={"dbt"})
 def build_dw_staging_layer(context, seed_dw_staging_layer_result: DbtCliOutput) -> DbtCliOutput:
     context.log.info(f"Building the staging layer")
-    return context.resources.dbt.run(models=["staging.*"])
+    return context.resources.dbt.run(select=["staging"])
 
 @op(required_resource_keys={"dbt"})
 def test_dw_staging_layer(context, build_dw_staging_layer_result: DbtCliOutput):
     context.log.info(f"Testing the staging layer")
-    context.resources.dbt.test(models=["staging.*"], schema=True, data=False)
+    context.resources.dbt.test(select=["staging,test_type:generic"])
 
 @op(required_resource_keys={"dbt"})
 def build_dw_integration_layer(context, test_dw_staging_layer_result) -> DbtCliOutput:
     context.log.info(f"Building the integration layer")
-    return context.resources.dbt.run(models=["integration.*"])
+    return context.resources.dbt.run(select=["integration"])
 
 @op(required_resource_keys={"dbt"})
 def test_dw_integration_layer(context, build_dw_integration_layer_result: DbtCliOutput):
     context.log.info(f"Testing the integration layer")
-    context.resources.dbt.test(models=["integration.*"], schema=True, data=False)
+    context.resources.dbt.test(select=["integration,test_type:generic"])
 
 @op(required_resource_keys={"dbt"})
 def build_dw_warehouse_layer(context, test_dw_integration_layer_result) -> DbtCliOutput:
     context.log.info(f"Building the warehouse layer")
-    return context.resources.dbt.run(models=["warehouse.*"])
+    return context.resources.dbt.run(select=["warehouse"])
 
 @op(required_resource_keys={"dbt"})
 def test_dw_warehouse_layer(context, build_dw_warehouse_layer_result: DbtCliOutput):
     context.log.info(f"Testing the warehouse layer")
-    context.resources.dbt.test(models=["warehouse.*"], schema=True, data=False)
+    context.resources.dbt.test(select=["warehouse,test_type:generic"])
 
 @op(required_resource_keys={"dbt"})
 def data_test_warehouse(context, test_dw_warehouse_layer_result):
     context.log.info(f"Data tests")
-    context.resources.dbt.test(schema=False, data=True)
+    context.resources.dbt.test(models=["test_type:singular"])
