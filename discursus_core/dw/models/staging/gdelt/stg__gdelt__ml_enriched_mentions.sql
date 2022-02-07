@@ -14,7 +14,7 @@ final as (
         lower(cast(page_title as string)) as page_title,
         lower(cast(page_description as string)) as page_description,
         lower(cast(keywords as string)) as keywords,
-        cast(is_relevant as boolean) as is_relevant
+        try_cast(is_relevant as boolean) as is_relevant
 
     from source
 
