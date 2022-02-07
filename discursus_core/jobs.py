@@ -83,7 +83,8 @@ def enrich_mined_data():
     resource_defs = {
         'snowflake': snowflake_resource,
         'novacene_client': my_novacene_client_client
-    }
+    },
+    config = snowflake_env_variables
 )
 def get_enriched_mined_data():
     df_ml_enrichment_files = get_ml_enrichment_files()
@@ -96,7 +97,8 @@ def get_enriched_mined_data():
     resource_defs = {
         'snowflake': snowflake_resource,
         'dbt': my_dbt_resource
-    }
+    },
+    config = snowflake_env_variables
 )
 def build_data_warehouse():
     seed_dw_staging_layer_result = seed_dw_staging_layer()
