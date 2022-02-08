@@ -1,40 +1,29 @@
-<!---
-Provide a short summary in the Title above. Examples of good PR titles:
-* "Feature: add so-and-so models"
-* "Fix: deduplicate such-and-such"
-* "Update: dbt version 0.13.0"
--->
+# Description
 
-## Description & motivation
-<!---
-Add a description of what that storie's goal is, or add a link to its associated Github ticket.
--->
+Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.
 
-## Changes to ERD
-<!---
-Based on the description above, what are the changes you're making in the data platform. Add a screenshot of the ERD you're changing and add description of main changes happening (e.g. new fact table added; adding new fields, etc.)
-Here are the commands to generate graph:
-- dbdocs build wh_docs/warehouse.dbml
-- Follow link
-- Go to dag
-- Screenshot
--->
+Fixes # (issue)
 
-## Changes to DAG
-<!---
-Show us the relevant dbt models that are being introduced or changed by inserting a screen shot of the DAG section that is impacted. 
-Here are the commands to generate graph:
-- dbt docs generate
-- dbt docs serve
-- Go to Relationship tab
-- Screenshot
--->
+## Type of change
 
-## Checklist:
-<!---
-This is for you as a developer. Have you done all the following tasks before submitting this PR?
--->
+Please select option that is relevant.
+
+- [ ] New feature (adds functionality)
+- [ ] Bug fix (fixes an issue)
+- [ ] Infrastructure (provides the necessary resources for platform to run)
+
+# How Has This Been Tested?
+
+Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration
+
+- [ ] Test A
+- [ ] Test B
+
+# Checklist:
+
 - [ ] My pull request represents one story (logical piece of work).
+- [ ] My code follows the [style guidelines](resources/style_guidelines.md) of this project
+- [ ] I have performed a self-review of my own code
+- [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I ran the Docker data platform in my development environment without error.
-- [ ] I ran the data jobs in my development environment without error.
-- [ ] I ran the sqlfluff linter in my development environment without error.
+- [ ] I ran the data pipelines in my development environment without error.
