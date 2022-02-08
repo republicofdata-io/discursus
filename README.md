@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://blog.discursus.io">
-    <img src="images/discursus_logo_white.png" width="90px" alt="discursus" />
+    <img src="resources/images/discursus_logo_white.png" width="90px" alt="discursus" />
   </a>
 </p>
 <p align="center">
@@ -34,18 +34,18 @@ __The discursus project is an open source data platform__ that mines, shapes and
 
 discursus Core is a data platform that creates data assets that are then exposed to end users.
 
-<img src='images/discursus_data_platform.png' width='750px' alt='discursus data platform' />
+<img src='resources/images/discursus_data_platform.png' width='750px' alt='discursus data platform' />
 
 The following entities are exposed as the final output of our architecture.
 
-<img src="images/discursus_core_erd.png" width="650px" alt="discursus" />
+<img src="resources/images/discursus_core_erd.png" width="650px" alt="discursus" />
 
 
 &nbsp;
 
 # Architecture
 
-<img src="images/discursus_core_architecture.png" width="750px" alt="discursus" />
+<img src="resources/images/discursus_core_architecture.png" width="750px" alt="discursus" />
 
 Here are the main components of the discursus core architecture:
 
