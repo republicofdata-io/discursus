@@ -49,9 +49,12 @@ The following entities are exposed as the final output of our architecture.
 
 Here are the main components of the discursus core architecture:
 
-- A miner that sources events from the GDELT project (https://www.gdeltproject.org/) and saves it to AWS S3.
+- A miner that sources events from the [GDELT project](https://www.gdeltproject.org/) and saves it to AWS S3.
+- An enhancement process that scrapes the article's metadata and saves it to AWS S3.
+- An ML enrichment process that classifies article's relevancy using a custom ML algorithm hosted on [Novacene.ai](https://novacene.ai/) and saves results to AWS S3.
+- A suite of snowpipes that loads S3 data to Snowflake.
 - A dbt project that creates a data warehouse which exposes protest events.
-- A Dagster orchestrator that schedules the mining and transformation jobs.
+- A Dagster app that orchestrates all data transformation jobs and the creation of assets.
 
 
 &nbsp;
@@ -63,6 +66,7 @@ For now, to spin up an instance of discursus Core, you will first need to have y
 - An AWS S3 bucket to hold the events, articles and enhancements.
 - An AWS ec2 instance to run discursus.
 - A Snowflake account to stage data from S3, perform transformations of data and expose entities.
+- A Novacene.ai account to perform ML enrichments.
 
 On Snowflake, you will need to create a few objects prior to running your instance:
 - Source tables to stage the mined events.
