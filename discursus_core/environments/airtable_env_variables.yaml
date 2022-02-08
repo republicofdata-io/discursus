@@ -1,0 +1,7 @@
+resources:
+  airtable_client:
+    config:
+      host: 
+        env: AIRTABLE_HOST
+      api_key: 
+        env: AIRTABLE_API_KEY
