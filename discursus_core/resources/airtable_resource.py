@@ -13,7 +13,7 @@ class AirtableAPIClient:
     
     # API methods
     ######################
-    def create_record(self):
+    def create_record(self, article_url, title, description, relevancy):
         """
         Upload a record.
         """
@@ -30,10 +30,10 @@ class AirtableAPIClient:
             "records": [
                 {
                     "fields": {
-                        "Article URL": "1",
-                        "Title": "2",
-                        "Description": "3",
-                        "Relevant": True
+                        "Article URL": article_url,
+                        "Title": title,
+                        "Description": description,
+                        "Relevant": relevancy
                     }
                 }
             ]

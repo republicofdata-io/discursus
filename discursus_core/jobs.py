@@ -22,7 +22,7 @@ from ops.dw_ops import (
 )
 from ops.gdelt_mining_ops import enhance_articles, materialize_gdelt_mining_asset, materialize_enhanced_articles_asset
 from ops.ml_enrichment_ops import classify_protest_relevancy, get_ml_enrichment_files, store_ml_enrichment_files
-from ops.ml_trainer_engine_ops import create_records
+from ops.ml_trainer_engine_ops import get_latest_ml_enrichments, create_records
 from resources.novacene_ml_resource import novacene_ml_api_client
 from resources.airtable_resource import airtable_api_client
 
@@ -99,6 +99,16 @@ def get_enriched_mined_data():
 
 @job(
     resource_defs = {
+        'airtable_client': my_airtable_client
+    }
+)
+def feed_ml_trainer_engine():
+    df_latest_enriched_events_sample = get_latest_ml_enrichments()
+    create_records_result = create_records(df_latest_enriched_events_sample)
+
+
+@job(
+    resource_defs = {
         'snowflake': snowflake_resource,
         'dbt': my_dbt_resource
     },
@@ -113,12 +123,3 @@ def build_data_warehouse():
     build_dw_warehouse_layer_result = build_dw_warehouse_layer(test_dw_integration_layer_result)
     test_dw_warehouse_layer_result = test_dw_warehouse_layer(build_dw_warehouse_layer_result)
     test_dw_staging_layer_result = data_test_warehouse(test_dw_warehouse_layer_result)
-
-
-@job(
-    resource_defs = {
-        'airtable_client': my_airtable_client
-    }
-)
-def feed_ml_trainer_engine():
-    create_records_result = create_records()
