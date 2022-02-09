@@ -39,7 +39,6 @@ def create_records(context, df_latest_enriched_events_sample):
             description = row['page_description'], 
             relevancy = bool(row['predict_relevantTECLM3.sav'])
         )
-        context.log.info(response_json)
         time.sleep(0.25)
 
     return None
