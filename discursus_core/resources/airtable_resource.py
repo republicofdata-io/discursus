@@ -1,4 +1,5 @@
 import requests
+import json
 from dagster import resource, StringSource, IntSource
 from dagster.builtins import String
 import pandas as pd
@@ -9,63 +10,37 @@ class AirtableAPIClient:
         self._conn_host = host
         self._conn_api_key = api_key
 
-        self._session = None
-        self._base_url = None
-    
-
-    def get_conn(self):
-        """
-        Returns the connection used by the resource for querying data.
-        Should in principle not be used directly.
-        """
-
-        if self._session is None:
-            self._base_url = self._conn_host
-
-            # Build our session instance, which we will use for any
-            # requests to the API.
-            self._session = requests.Session()
-
-            self._session.auth = (self._conn_login, self._conn_password)
-
-        return self._session, self._base_url
-
-
-    def close(self):
-        """Closes any active session."""
-        if self._session:
-            self._session.close()
-        self._session = None
-        self._base_url = None
-
     
     # API methods
     ######################
-    def create_record(self, filename, df_gdelt_articles):
+    def create_record(self):
         """
-        Upload a dataset.
+        Upload a record.
         """
         
-        endpoint = "/dataset/"
-        
-        session, base_url = self.get_conn()
-        url = base_url + endpoint
-        
-        payload = {
-            "name": filename,
-            "set_type": "file",
-            "file_type": "csv"
+        endpoint = self._conn_host + '/Articles'
+
+        #Headers
+        headers= {
+            "Authorization": "Bearer " + self._conn_api_key,
+            "Content-Type":"application/json"
+            }
+        #Dataframe to json data conversion 
+        new_data = {
+            "records": [
+                {
+                    "fields": {
+                        "Article URL": "1",
+                        "Title": "2",
+                        "Description": "3",
+                        "Relevant": True
+                    }
+                }
+            ]
         }
 
-        files = [
-            ('path',(filename, df_gdelt_articles.to_csv(), 'csv'))
-        ]
-        
-        response = session.post(
-            url, data = payload, files = files
-        )
-        
-        response.raise_for_status()
+        #post request
+        response = requests.request("POST", endpoint, headers=headers, data=json.dumps(new_data))
         response_json = response.json()
         
         return(response_json)

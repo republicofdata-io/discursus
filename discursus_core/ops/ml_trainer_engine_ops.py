@@ -10,6 +10,7 @@ import pandas as pd
     required_resource_keys = {"airtable_client"}
 )
 def create_records(context): 
-    context.log.info("Hello")
+    response_json = context.resources.airtable_client.create_record()
+    context.log.info(response_json)
 
     return None
