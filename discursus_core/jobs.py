@@ -22,7 +22,9 @@ from ops.dw_ops import (
 )
 from ops.gdelt_mining_ops import enhance_articles, materialize_gdelt_mining_asset, materialize_enhanced_articles_asset
 from ops.ml_enrichment_ops import classify_protest_relevancy, get_ml_enrichment_files, store_ml_enrichment_files
+from ops.ml_trainer_engine_ops import get_latest_ml_enrichments, create_records
 from resources.novacene_ml_resource import novacene_ml_api_client
+from resources.airtable_resource import airtable_api_client
 
 
 # Resources
@@ -32,12 +34,14 @@ DBT_PROJECT_DIR = file_relative_path(__file__, "./dw")
 
 snowflake_env_variables = config_from_files(['environments/snowflake_env_variables.yaml'])
 novacene_env_variables = config_from_files(['environments/novacene_env_variables.yaml'])
+airtable_env_variables = config_from_files(['environments/airtable_env_variables.yaml'])
 
 my_dbt_resource = dbt_cli_resource.configured({
     "profiles_dir": DBT_PROFILES_DIR, 
     "project_dir": DBT_PROJECT_DIR})
 
-my_novacene_client_client = novacene_ml_api_client.configured(novacene_env_variables)
+my_novacene_client = novacene_ml_api_client.configured(novacene_env_variables)
+my_airtable_client = airtable_api_client.configured(airtable_env_variables)
 
 
 #Jobs
@@ -71,7 +75,7 @@ def mine_gdelt_data():
 
 @job(
     resource_defs = {
-        'novacene_client': my_novacene_client_client
+        'novacene_client': my_novacene_client
     }
 )
 def enrich_mined_data():
@@ -82,7 +86,7 @@ def enrich_mined_data():
 @job(
     resource_defs = {
         'snowflake': snowflake_resource,
-        'novacene_client': my_novacene_client_client
+        'novacene_client': my_novacene_client
     },
     config = snowflake_env_variables
 )
@@ -91,6 +95,16 @@ def get_enriched_mined_data():
     store_ml_enrichment_files_result = store_ml_enrichment_files(df_ml_enrichment_files)
     
     launch_ml_enriched_articles_snowpipe_result = launch_ml_enriched_articles_snowpipe(store_ml_enrichment_files_result)
+
+
+@job(
+    resource_defs = {
+        'airtable_client': my_airtable_client
+    }
+)
+def feed_ml_trainer_engine():
+    df_latest_enriched_events_sample = get_latest_ml_enrichments()
+    create_records_result = create_records(df_latest_enriched_events_sample)
 
 
 @job(
