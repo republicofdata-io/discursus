@@ -22,8 +22,8 @@ def get_latest_ml_enrichments(context):
     obj = s3_resource.Object('discursus-io', latest['Key'])
     df_latest_enriched_events = pd.read_csv(StringIO(obj.get()['Body'].read().decode('utf-8')))
 
-    # Sample 20 rows from dataframe, equally distributed between relevant and irrelevant classifications
-    df_latest_enriched_events_sample = df_latest_enriched_events.groupby("predict_relevantTECLM3.sav").sample(n=5, random_state=1)
+    # Sample rows from dataframe, equally distributed between relevant and irrelevant classifications
+    df_latest_enriched_events_sample = df_latest_enriched_events.groupby("predict_relevantTECLM3.sav").sample(n=3, random_state=1)
 
     return df_latest_enriched_events_sample
 
