@@ -42,17 +42,10 @@ class ContentAuditor:
         """
         for line in self.filehandle.splitlines():
             line_url = line.split("\t")[60].strip()
-            if int(line.split("\t")[28]) == 14:
-                continue
-            if line.split("\t")[12].strip() != '':
-                continue
-            if line.split("\t")[12].strip() != '':
-                continue
-            if line.split("\t")[12].strip() != line.split("\t")[12].strip():
-                continue
 
-            if line_url != '': 
+            if int(line.split("\t")[28]) == 14:
                 self.article_urls.append(line_url)
+            
             self.article_urls = list(set(self.article_urls))
 
 
