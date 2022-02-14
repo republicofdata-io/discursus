@@ -4,6 +4,7 @@ import boto3
 from io import StringIO
 import pandas as pd
 import time
+from datetime import datetime
 
 @op(
     required_resource_keys = {"airtable_client"}
@@ -14,18 +15,25 @@ def get_latest_ml_enrichments(context):
     s3_resource = boto3.resource('s3')
    
     # Get latest file of ML enrichments
-    response = s3_client.list_objects_v2(Bucket='discursus-io', Prefix='sources/ml')
-    all = response['Contents']        
-    latest = max(all, key=lambda x: x['LastModified'])
+    todays_date = datetime.today().strftime('%Y%m%d')
+    
+    try:
+        response = s3_client.list_objects_v2(Bucket='discursus-io', Prefix='sources/ml/' + todays_date)
+        all = response['Contents']        
+        latest = max(all, key=lambda x: x['LastModified'])
 
-    # Download and convert latest file to dataframe
-    obj = s3_resource.Object('discursus-io', latest['Key'])
-    df_latest_enriched_events = pd.read_csv(StringIO(obj.get()['Body'].read().decode('utf-8')))
+        context.log.info("Pulling latest ML enriched file from S3 to feed ML training engine: " + str(latest))
 
-    # Sample rows from dataframe, equally distributed between relevant and irrelevant classifications
-    df_latest_enriched_events_sample = df_latest_enriched_events.groupby("predict_relevantTECLM3.sav").sample(n=3, random_state=1)
+        # Download and convert latest file to dataframe
+        obj = s3_resource.Object('discursus-io', latest['Key'])
+        df_latest_enriched_events = pd.read_csv(StringIO(obj.get()['Body'].read().decode('utf-8')))
 
-    return df_latest_enriched_events_sample
+        # Sample rows from dataframe, equally distributed between relevant and irrelevant classifications
+        df_latest_enriched_events_sample = df_latest_enriched_events.groupby("predict_relevantTECLM3.sav").sample(n=3, random_state=1)
+
+        return df_latest_enriched_events_sample
+    except:
+        return None
 
 
 @op(
