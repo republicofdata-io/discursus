@@ -30,26 +30,27 @@ __The discursus project is an open source data platform__ that mines, shapes and
 
 &nbsp;
 
-# Semantic Layer
+# Phenomenon Abstraction
 
-The first image is the abstraction that represents the domain we're trying to map with discursus. The top layer is the protest movement phenomenon itself, whereas the bottom layer is how that phenomenon is being reported. 
+The first image is the abstraction that would roughly represent the domain we're trying to map with discursus. The top layer is the protest movement phenomenon itself, whereas the bottom layer is how that phenomenon is being reported. 
 
-<img src="resources/images/discursus_semantic_layer_protest_abstraction.png" width="650px" alt="discursus Semantic Layer - Protest Abstraction" />
+<img src="resources/images/discursus_semantic_layer_protest_abstraction.png" width="650px" alt="discursus.io data platform" />
 
-The second image is what the data warehouse entities look like and how they relate to each other. 
 
-<img src="resources/images/discursus_semantic_layer_erd.png" width="650px" alt="discursus Semantic Layer - ERD" />
+# Data Platform
+
+discursus builds multiple data products which ultimately exposes data assets that are either consumed directly by end users, or becomes sources for other data products.
+
+<img src='resources/images/discursus_data_platform.png' width='750px' alt='discursus data platform' />
+
+The following entities are exposed as the final output of our architecture.
+
+<img src="resources/images/discursus_core_erd.png" width="650px" alt="discursus" />
 
 
 &nbsp;
 
-# Data Assets and Architecture
-
-discursus Core is a data platform that creates data assets that are then exposed to end users.
-
-<img src='resources/images/discursus_data_platform.png' width='750px' alt='discursus data platform' />
-
-And this is the architecture that supports the creation of those assets.
+# Architecture
 
 <img src="resources/images/discursus_core_architecture.png" width="750px" alt="discursus" />
 
