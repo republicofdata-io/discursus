@@ -11,8 +11,11 @@ table actors_dim {
     actor_pk varchar [pk]
 
     actor_name varchar
-    actor_type varchar
-    actor_country varchar
+    actor_code varchar
+    actor_geo_country_code varchar
+    actor_type_group varchar
+    actor_type_code varchar
+    actor_type_name varchar
 
 }
 
@@ -65,7 +68,10 @@ table protests_dim {
     protest_pk varchar [pk]
 
     protest_name varchar
-    criteria_json varchar
+    published_date_start date
+    published_date_end date
+    countries varchar
+    page_description varchar
 
 }
 

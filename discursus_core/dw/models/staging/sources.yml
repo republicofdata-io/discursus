@@ -13,3 +13,11 @@ sources:
       - name: gdelt_events
       - name: gdelt_enhanced_mentions
       - name: gdelt_ml_enriched_mentions
+
+  - name: stitch
+    database: discursus_sources_stitch
+    schema: public
+
+    tables:
+      - name: protest_groupings
+        identifier: sheet1
