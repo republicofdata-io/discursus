@@ -16,7 +16,7 @@ sources:
 
   - name: stitch
     database: discursus_sources_stitch
-    schema: public
+    schema: protest_groupings
 
     tables:
       - name: protest_groupings
