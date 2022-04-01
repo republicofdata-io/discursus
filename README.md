@@ -30,9 +30,16 @@ __The discursus project is an open source data platform__ that mines, shapes and
 
 &nbsp;
 
-# Data Assets
+# Phenomenon Abstraction
 
-discursus Core is a data platform that creates data assets that are then exposed to end users.
+The first image is the abstraction that would roughly represent the domain we're trying to map with discursus. The top layer is the protest movement phenomenon itself, whereas the bottom layer is how that phenomenon is being reported. 
+
+<img src="resources/images/discursus_semantic_layer_protest_abstraction.png" width="650px" alt="discursus.io data platform" />
+
+
+# Data Platform
+
+discursus builds multiple data products which ultimately exposes data assets that are either consumed directly by end users, or becomes sources for other data products.
 
 <img src='resources/images/discursus_data_platform.png' width='750px' alt='discursus data platform' />
 

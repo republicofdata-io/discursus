@@ -1,3 +1,9 @@
+{{ 
+  config(
+    unique_key='actor_pk'
+  )
+}}
+
 with s_actors as (
 
   select * from {{ ref('int__actors') }}

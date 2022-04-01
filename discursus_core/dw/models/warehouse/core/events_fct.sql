@@ -10,50 +10,59 @@ with s_events as (
 
 ),
 
-add_actor_type_combo as (
+s_observations as (
+
+  select * from {{ ref('observations_fct') }}
+
+),
+
+s_protests as (
+
+  select * from {{ ref('protests_dim') }}
+
+),
+
+associate_observations as (
 
   select
-    *,
-    case
-      when actor1_code < actor2_code then actor1_code || ' - ' || actor2_code
-      else actor2_code || ' - ' || actor1_code
-    end as actor_type_combo
-
+    s_events.*,
+    s_observations.*
   
   from s_events
+  left join s_observations on {{ dbt_utils.surrogate_key(['s_events.gdelt_event_natural_key']) }} = s_observations.event_fk
+
+),
+
+associate_protests as (
+
+  select
+    associate_observations.*,
+    s_protests.protest_pk
+  
+  from associate_observations
+  left join s_protests on
+    array_contains(associate_observations.action_geo_country_code::variant, split(s_protests.countries, ','))
+    and associate_observations.published_date >= s_protests.published_date_start
+    and associate_observations.published_date <= coalesce(s_protests.published_date_end, current_date())
+    and(
+      associate_observations.observation_page_description regexp s_protests.page_description_regex
+      or associate_observations.observation_page_title regexp s_protests.page_description_regex
+    )
 
 ),
 
 final as (
 
-  select
+  select distinct
     {{ dbt_utils.surrogate_key(['gdelt_event_natural_key']) }} as event_pk,
-    {{ dbt_utils.surrogate_key([
-      'action_geo_country_code',
-      'action_geo_adm1_code',
-      'actor_type_combo',
-      'event_type'
-    ]) }} as protest_sk,
-    case 
-      when action_geo_country_code is null then null
-      else {{ dbt_utils.surrogate_key(['action_geo_country_code']) }} 
-    end as country_fk,
-    {{ dbt_utils.surrogate_key([
-      'actor1_name',
-      'actor1_code',
-      'actor1_geo_country_code'
-    ]) }} as actor1_fk,
-    {{ dbt_utils.surrogate_key([
-      'actor2_name',
-      'actor2_code',
-      'actor2_geo_country_code'
-    ]) }} as actor2_fk,
+    protest_pk as protest_fk,
 
     gdelt_event_natural_key, 
 
-    published_date, 
     creation_ts, 
 
+    action_geo_country_code,
+    action_geo_country_name,
     action_geo_full_name,  
     action_geo_adm1_code, 
     action_geo_latitude, 
@@ -66,7 +75,7 @@ final as (
     num_articles, 
     avg_tone
 
-  from add_actor_type_combo
+  from associate_protests
 
 )
 
