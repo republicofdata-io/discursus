@@ -12,26 +12,6 @@ models:
           - unique
           - not_null
 
-  - name: articles_fct
-    description: Table of articles
-    columns:
-      - name: article_pk
-        description: >
-          Unique identifier for articles
-        tests:
-          - unique
-          - not_null
-
-  - name: countries_dim
-    description: Table of countries
-    columns:
-      - name: country_pk
-        description: >
-          Unique identifier for countries
-        tests:
-          - unique
-          - not_null
-
   - name: events_fct
     description: Table of events
     columns:
@@ -41,19 +21,68 @@ models:
         tests:
           - unique
           - not_null
-      - name: country_fk
+      - name: protest_fk
         tests:
           - relationships:
-              to: ref('countries_dim')
-              field: country_pk
-              severity: warn
-      - name: actor1_fk
+              to: ref('protests_dim')
+              field: protest_pk
+
+  - name: narratives_fct
+    description: Table of narratives
+    columns:
+      - name: narrative_pk
+        description: >
+          Unique identifier for narratives
+        tests:
+          - unique
+          - not_null
+      - name: event_fk
+        tests:
+          - relationships:
+              to: ref('events_fct')
+              field: event_pk
+      - name: actor_fk
         tests:
           - relationships:
               to: ref('actors_dim')
               field: actor_pk
-      - name: actor2_fk
+
+  - name: observations_fct
+    description: Table of observations
+    columns:
+      - name: observation_pk
+        description: >
+          Unique identifier for observations
+        tests:
+          - unique
+          - not_null
+      - name: event_fk
         tests:
           - relationships:
-              to: ref('actors_dim')
-              field: actor_pk
+              to: ref('events_fct')
+              field: event_pk
+      - name: observer_fk
+        tests:
+          - relationships:
+              to: ref('observers_dim')
+              field: observer_pk
+  
+  - name: observers_dim
+    description: Table of observers
+    columns:
+      - name: observer_pk
+        description: >
+          Unique identifier for observers
+        tests:
+          - unique
+          - not_null
+
+  - name: protests_dim
+    description: Table of protests
+    columns:
+      - name: protest_pk
+        description: >
+          Unique identifier for protests
+        tests:
+          - unique
+          - not_null
