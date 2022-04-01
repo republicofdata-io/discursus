@@ -11,7 +11,7 @@ base as (
         cast(published_date_start as date) as published_date_start,
         cast(published_date_end as date) as published_date_end,
         cast(countries as varchar) as countries,
-        cast(page_description as varchar) as page_description
+        cast(page_description as varchar) as page_description_regex
     
     from source
 

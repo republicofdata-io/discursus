@@ -1,3 +1,9 @@
+{{ 
+  config(
+    unique_key='protest_pk'
+  )
+}}
+
 with s_protests as (
 
   select * from {{ ref('int__protests') }}
@@ -14,7 +20,7 @@ final as (
     published_date_start,
     published_date_end,
     countries,
-    page_description
+    page_description_regex
 
   from s_protests
 
