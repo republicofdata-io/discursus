@@ -62,7 +62,7 @@ def classify_protest_relevancy(context):
 
     # Materialize asset
     yield AssetMaterialization(
-        asset_key="ml_enrichment_jobs",
+        asset_key=["sources", "ml_enrichment_jobs"],
         description="List of ml enrichment jobs",
         metadata={
             "job id": protest_classification_job['id'],
@@ -122,5 +122,15 @@ def store_ml_enrichment_files(context, df_ml_enrichment_files):
         csv_buffer = StringIO()
         df_ml_enrichment_file.to_csv(csv_buffer, index = False)
         s3.Object('discursus-io', 'sources/ml/' + file_date + '/ml_enriched_' + row['name']).put(Body=csv_buffer.getvalue())
+
+        # Materialize and yield asset
+        yield AssetMaterialization(
+        asset_key=["sources", "ml_enrichment_files"],
+        description="List of ml enrichment files",
+        metadata={
+            "path": "s3://discursus-io/" + 'sources/ml/' + file_date + '/ml_enriched_' + row['name'],
+            "rows": df_ml_enrichment_file['mention_identifier'].size
+        }
+    )
     
-    return None
+    yield Output(1)
