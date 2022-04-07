@@ -1,8 +1,10 @@
 from dagster import (
     op, 
-    file_relative_path
+    file_relative_path,
+    Output
 )
 from dagster_dbt import DbtCliOutput
+from dagster_dbt.utils import generate_materializations
 
 DBT_PROFILES_DIR = file_relative_path(__file__, "./dw")
 DBT_PROJECT_DIR = file_relative_path(__file__, "../dw")
@@ -26,39 +28,49 @@ def launch_ml_enriched_articles_snowpipe(context, store_ml_enrichment_files_resu
 @op(required_resource_keys={"dbt"})
 def seed_dw_staging_layer(context) -> DbtCliOutput:
     context.log.info(f"Seeding the data warehouse")
-    return context.resources.dbt.seed()
+    dbt_result = context.resources.dbt.seed()
+    return dbt_result
 
 @op(required_resource_keys={"dbt"})
 def build_dw_staging_layer(context, seed_dw_staging_layer_result: DbtCliOutput) -> DbtCliOutput:
     context.log.info(f"Building the staging layer")
-    return context.resources.dbt.run(select=["staging"])
+    dbt_result = context.resources.dbt.run(select=["staging"])
+    return dbt_result
 
 @op(required_resource_keys={"dbt"})
 def test_dw_staging_layer(context, build_dw_staging_layer_result: DbtCliOutput):
     context.log.info(f"Testing the staging layer")
-    context.resources.dbt.test(select=["staging,test_type:generic"])
+    dbt_result = context.resources.dbt.test(select=["staging,test_type:generic"])
+    return dbt_result
 
 @op(required_resource_keys={"dbt"})
 def build_dw_integration_layer(context, test_dw_staging_layer_result) -> DbtCliOutput:
     context.log.info(f"Building the integration layer")
-    return context.resources.dbt.run(select=["integration"])
+    dbt_result = context.resources.dbt.run(select=["integration"])
+    return dbt_result
 
 @op(required_resource_keys={"dbt"})
 def test_dw_integration_layer(context, build_dw_integration_layer_result: DbtCliOutput):
     context.log.info(f"Testing the integration layer")
-    context.resources.dbt.test(select=["integration,test_type:generic"])
+    dbt_result = context.resources.dbt.test(select=["integration,test_type:generic"])
+    return dbt_result
 
 @op(required_resource_keys={"dbt"})
 def build_dw_warehouse_layer(context, test_dw_integration_layer_result) -> DbtCliOutput:
     context.log.info(f"Building the warehouse layer")
-    return context.resources.dbt.run(select=["warehouse"])
+    dbt_result = context.resources.dbt.run(select=["warehouse"])
+    for materialization in generate_materializations(dbt_result, asset_key_prefix = ["protest_movement_core_entities"]):
+        yield materialization
+    yield Output(dbt_result)
 
 @op(required_resource_keys={"dbt"})
 def test_dw_warehouse_layer(context, build_dw_warehouse_layer_result: DbtCliOutput):
     context.log.info(f"Testing the warehouse layer")
-    context.resources.dbt.test(select=["warehouse,test_type:generic"])
+    dbt_result = context.resources.dbt.test(select=["warehouse,test_type:generic"])
+    return dbt_result
 
 @op(required_resource_keys={"dbt"})
 def data_test_warehouse(context, test_dw_warehouse_layer_result):
     context.log.info(f"Data tests")
-    context.resources.dbt.test(models=["test_type:singular"])
+    dbt_result = context.resources.dbt.test(models=["test_type:singular"])
+    return dbt_result

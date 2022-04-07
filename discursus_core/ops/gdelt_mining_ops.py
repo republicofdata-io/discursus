@@ -158,7 +158,7 @@ def materialize_gdelt_mining_asset(context, gdelt_mined_events_filename):
     
     # Materialize asset
     yield AssetMaterialization(
-        asset_key = "gdelt_events",
+        asset_key = ["sources", "gdelt_events"],
         description = "List of events mined on GDELT",
         metadata={
             "path": "s3://discursus-io/" + filename,
@@ -199,7 +199,7 @@ def materialize_enhanced_articles_asset(context, df_gdelt_enhanced_articles, gde
 
     # Materialize asset
     yield AssetMaterialization(
-        asset_key="gdelt_articles",
+        asset_key=["sources", "gdelt_articles"],
         description="List of enhanced articles mined from GDELT",
         metadata={
             "path": "s3://discursus-io/" + filename.split(".")[0] + "." + filename.split(".")[1] + ".enhanced.csv",
