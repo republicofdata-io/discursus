@@ -1,9 +1,3 @@
-{{ 
-  config(
-    unique_key='observer_pk'
-  )
-}}
-
 with s_articles as (
 
   select * from {{ ref('int__articles') }}

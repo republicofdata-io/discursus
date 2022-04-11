@@ -1,6 +1,15 @@
+{{
+    config(
+        materialized = 'incremental'
+    )
+}}
+
 with source as (
 
     select * from {{ source('gdelt', 'gdelt_events') }}
+    {% if is_incremental() %}
+        where to_timestamp(cast(date_added as string), 'YYYYMMDDHH24MISS') > (select max(creation_ts) from {{ this }})
+    {% endif %}
 
 ),
 
@@ -115,6 +124,5 @@ classify_actors as (
 
 select * from classify_actors
 
-where
-    creation_ts >= dateadd(week, -52, current_date)
-    and event_root_code = '14'
+where creation_ts >= dateadd(week, -26, current_date)
+and event_root_code = '14'
