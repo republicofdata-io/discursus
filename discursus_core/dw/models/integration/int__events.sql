@@ -18,7 +18,8 @@ s_event_types as (
 
 s_gdelt_ml_enriched_mentions as (
 
-    select * from {{ ref('stg__gdelt__ml_enriched_mentions') }}
+    select *
+    from {{ ref('stg__gdelt__ml_enriched_mentions') }}
     where mention_url is not null
     and is_relevant
 
