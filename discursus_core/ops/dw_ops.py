@@ -34,7 +34,7 @@ def seed_dw_staging_layer(context) -> DbtCliOutput:
 @op(required_resource_keys={"dbt"})
 def build_dw_staging_layer(context, seed_dw_staging_layer_result: DbtCliOutput) -> DbtCliOutput:
     context.log.info(f"Building the staging layer")
-    dbt_result = context.resources.dbt.run(select=["staging"])
+    dbt_result = context.resources.dbt.run(select=["staging"], full_refresh=context.op_config["full_refresh_flag"])
     return dbt_result
 
 @op(required_resource_keys={"dbt"})
@@ -46,7 +46,7 @@ def test_dw_staging_layer(context, build_dw_staging_layer_result: DbtCliOutput):
 @op(required_resource_keys={"dbt"})
 def build_dw_integration_layer(context, test_dw_staging_layer_result) -> DbtCliOutput:
     context.log.info(f"Building the integration layer")
-    dbt_result = context.resources.dbt.run(select=["integration"])
+    dbt_result = context.resources.dbt.run(select=["integration"], full_refresh=context.op_config["full_refresh_flag"])
     return dbt_result
 
 @op(required_resource_keys={"dbt"})
@@ -58,7 +58,7 @@ def test_dw_integration_layer(context, build_dw_integration_layer_result: DbtCli
 @op(required_resource_keys={"dbt"})
 def build_dw_warehouse_layer(context, test_dw_integration_layer_result) -> DbtCliOutput:
     context.log.info(f"Building the warehouse layer")
-    dbt_result = context.resources.dbt.run(select=["warehouse"])
+    dbt_result = context.resources.dbt.run(select=["warehouse"], full_refresh=context.op_config["full_refresh_flag"])
     for materialization in generate_materializations(dbt_result, asset_key_prefix = ["protest_movement_core_entities"]):
         yield materialization
     yield Output(dbt_result)
