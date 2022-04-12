@@ -74,3 +74,9 @@ def data_test_warehouse(context, test_dw_warehouse_layer_result):
     context.log.info(f"Data tests")
     dbt_result = context.resources.dbt.test(models=["test_type:singular"])
     return dbt_result
+
+@op(required_resource_keys={"dbt"})
+def drop_old_relations(context, test_dw_warehouse_layer_result):
+    context.log.info(f"Droping old relations")
+    dbt_result = context.resources.dbt.run_operation(macro="drop_old_relations")
+    return dbt_result

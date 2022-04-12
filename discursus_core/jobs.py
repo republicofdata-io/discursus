@@ -18,7 +18,8 @@ from ops.dw_ops import (
     test_dw_integration_layer,
     build_dw_warehouse_layer,
     test_dw_warehouse_layer,
-    data_test_warehouse
+    data_test_warehouse,
+    drop_old_relations
 )
 from ops.gdelt_mining_ops import enhance_articles, materialize_gdelt_mining_asset, materialize_enhanced_articles_asset
 from ops.ml_enrichment_ops import classify_protest_relevancy, get_ml_enrichment_files, store_ml_enrichment_files
@@ -123,3 +124,4 @@ def build_data_warehouse():
     build_dw_warehouse_layer_result = build_dw_warehouse_layer(test_dw_integration_layer_result)
     test_dw_warehouse_layer_result = test_dw_warehouse_layer(build_dw_warehouse_layer_result)
     test_dw_staging_layer_result = data_test_warehouse(test_dw_warehouse_layer_result)
+    drop_old_relations_result = drop_old_relations(test_dw_staging_layer_result)
