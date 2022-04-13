@@ -11,8 +11,10 @@ def build_data_warehouse_schedule(context: ScheduleEvaluationContext):
     return RunRequest(
         run_key=None,
         run_config={
-            "ops": {"build_dw_staging_layer": {"config": {"full_refresh_flag": False}}},
-            "ops": {"build_dw_integration_layer": {"config": {"full_refresh_flag": False}}},
-            "ops": {"build_dw_warehouse_layer": {"config": {"full_refresh_flag": False}}}
+            "ops": {
+                "build_dw_staging_layer": {"config": {"full_refresh_flag": False}},
+                "build_dw_integration_layer": {"config": {"full_refresh_flag": False}},
+                "build_dw_warehouse_layer": {"config": {"full_refresh_flag": False}}
+            }
         }
     )
