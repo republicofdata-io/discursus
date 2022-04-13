@@ -1,6 +1,6 @@
 with s_protests as (
 
-    select * from {{ ref('stg__stitch__protest_groupings') }}
+    select * from {{ ref('stg__airbyte__protest_groupings') }}
 
 )
 
