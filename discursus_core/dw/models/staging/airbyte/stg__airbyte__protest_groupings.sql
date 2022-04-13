@@ -1,6 +1,6 @@
 with source as (
 
-    select * from {{ source('stitch', 'protest_groupings') }}
+    select * from {{ source('airbyte', 'protest_groupings') }}
 
 ),
 
