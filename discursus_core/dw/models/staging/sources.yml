@@ -14,10 +14,10 @@ sources:
       - name: gdelt_enhanced_mentions
       - name: gdelt_ml_enriched_mentions
 
-  - name: stitch
-    database: discursus_sources_stitch
-    schema: protest_groupings
+  - name: airbyte
+    database: discursus_sources_airbyte
+    schema: airbyte_schema
 
     tables:
       - name: protest_groupings
-        identifier: sheet1
+        identifier: protest_groupings
