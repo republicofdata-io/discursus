@@ -52,7 +52,8 @@ RUN pip3 install \
     bs4 \
     optparse-pretty \
     boto3 \
-    fsspec
+    fsspec \
+    droughty==0.3.0
 
 
 # Copy resources for Dagster

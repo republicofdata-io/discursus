@@ -1,0 +1,7 @@
+profile: kaplan_poc
+profile_path: example/path
+profile_name: example.yml
+
+dimensional_inference: enabled
+
+field_description_path: warehouse_docs
