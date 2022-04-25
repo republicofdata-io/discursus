@@ -25,11 +25,20 @@ s_protests as (
 associate_observations as (
 
     select
-        s_events.*,
-        s_observations.*
+        s_events.event_sk,
+        s_events.action_geo_country_code,
+        s_events.action_geo_country_name,
+        s_events.action_geo_full_name,  
+        s_events.action_geo_adm1_code, 
+        s_events.action_geo_latitude, 
+        s_events.action_geo_longitude, 
+        s_events.event_type,
+        s_observations.published_date,
+        s_observations.observation_page_title,
+        s_observations.observation_page_description
 
     from s_events
-    left join s_observations on {{ dbt_utils.surrogate_key(['s_events.gdelt_event_natural_key']) }} = s_observations.event_fk
+    left join s_observations on s_events.event_sk = s_observations.event_fk
 
 ),
 
@@ -54,12 +63,10 @@ associate_protests as (
 final as (
 
     select distinct
-        {{ dbt_utils.surrogate_key(['gdelt_event_natural_key']) }} as event_pk,
+        event_sk as event_pk, 
         protest_pk as protest_fk,
 
-        gdelt_event_natural_key, 
-
-        creation_ts, 
+        published_date as event_ts, 
 
         action_geo_country_code,
         action_geo_country_name,
@@ -67,13 +74,7 @@ final as (
         action_geo_adm1_code, 
         action_geo_latitude, 
         action_geo_longitude, 
-        event_type, 
-
-        goldstein_scale, 
-        num_mentions, 
-        num_sources, 
-        num_articles, 
-        avg_tone
+        event_type
 
     from associate_protests
 

@@ -26,7 +26,7 @@ table events_fct {
 
     gdelt_event_natural_key int
 
-    creation_ts timestamp
+    event_ts timestamp
 
     action_geo_country_code varchar
     action_geo_full_name varchar
@@ -34,12 +34,6 @@ table events_fct {
     action_geo_latitude decimal
     action_geo_longitude decimal
     event_type varchar
-
-    goldstein_scale decimal
-    num_mentions integer
-    num_sources integer
-    num_articles integer
-    avg_tone decimal
 
 }
 
