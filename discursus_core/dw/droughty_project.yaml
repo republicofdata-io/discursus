@@ -1,7 +1,10 @@
-profile: kaplan_poc
-profile_path: example/path
-profile_name: example.yml
+profile: discursus
+profile_path: ./
+profile_name: profiles.yml
 
 dimensional_inference: enabled
 
 field_description_path: warehouse_docs
+
+connection:
+  snowflake_database: "{{ env_var('SNOWFLAKE_DW_DATABASE') }}"
