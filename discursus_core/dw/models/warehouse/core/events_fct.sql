@@ -28,11 +28,9 @@ associate_observations as (
         s_events.event_sk,
         s_events.action_geo_country_code,
         s_events.action_geo_country_name,
-        s_events.action_geo_full_name,  
-        s_events.action_geo_adm1_code, 
+        s_events.action_geo_full_name, 
         s_events.action_geo_latitude, 
         s_events.action_geo_longitude, 
-        s_events.event_type,
         s_observations.published_date,
         s_observations.observation_page_title,
         s_observations.observation_page_description
@@ -46,7 +44,7 @@ associate_protests as (
 
     select
         associate_observations.*,
-        s_protests.protest_pk
+        last_value(s_protests.protest_pk) over (partition by event_sk order by s_protests.published_date_start) as protest_pk
 
     from associate_observations
     left join s_protests on
@@ -70,11 +68,9 @@ final as (
 
         action_geo_country_code,
         action_geo_country_name,
-        action_geo_full_name,  
-        action_geo_adm1_code, 
+        action_geo_full_name,
         action_geo_latitude, 
-        action_geo_longitude, 
-        event_type
+        action_geo_longitude
 
     from associate_protests
 

@@ -10,12 +10,6 @@ s_actor_types as (
 
 ),
 
-s_event_types as (
-
-    select * from {{ ref('stg__seed__event_types') }}
-
-),
-
 s_gdelt_ml_enriched_mentions as (
 
     select *
@@ -47,17 +41,14 @@ final as (
         first_value(s_gdelt_events.action_geo_full_name) over (partition by {{ partition_window }} order by s_gdelt_events.action_geo_full_name) as action_geo_full_name,
         s_gdelt_events.action_geo_country_code,
         s_countries.country_name as action_geo_country_name,
-        s_gdelt_events.action_geo_adm1_code,
         s_gdelt_events.action_geo_latitude,
-        s_gdelt_events.action_geo_longitude,
-        s_event_types.event_type
+        s_gdelt_events.action_geo_longitude
 
     from s_gdelt_events
     left join s_actor_types as s_actor_types1
         on s_gdelt_events.actor1_type1_code = s_actor_types1.actor_type_code
     left join s_actor_types as s_actor_types2
         on s_gdelt_events.actor2_type1_code = s_actor_types2.actor_type_code
-    left join s_event_types using (event_code)
     inner join s_gdelt_ml_enriched_mentions using (mention_url)
     left join s_countries on s_gdelt_events.action_geo_country_code = s_countries.country_code
 

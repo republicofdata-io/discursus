@@ -30,10 +30,8 @@ table events_fct {
 
     action_geo_country_code varchar
     action_geo_full_name varchar
-    action_geo_adm1_code varchar
     action_geo_latitude decimal
     action_geo_longitude decimal
-    event_type varchar
 
 }
 

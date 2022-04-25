@@ -126,3 +126,5 @@ select * from classify_actors
 
 where creation_ts >= dateadd(week, -26, current_date)
 and event_root_code = '14'
+and action_geo_latitude is not null
+and action_geo_longitude is not null
