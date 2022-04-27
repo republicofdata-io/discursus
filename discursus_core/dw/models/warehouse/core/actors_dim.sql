@@ -23,7 +23,6 @@ final as (
     actor_name,
     actor_code,
     actor_geo_country_code,
-    actor_type_group,
     actor_type_code,
     actor_type_name
 
