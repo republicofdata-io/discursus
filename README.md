@@ -1,10 +1,10 @@
 <p align="center">
-  <a href="https://blog.discursus.io">
-    <img src="resources/images/discursus_logo_white.png" width="90px" alt="discursus" />
+  <a href="https://discursus.substack.com/">
+    <img src="resources/images/discursus_logo_white.png" width="150px" alt="discursus" />
   </a>
 </p>
 <p align="center">
-    <a href="https://blog.discursus.io/">Blog</a> |
+    <a href="https://discursus.substack.com/">Newsletter</a> |
     <a href="https://twitter.com/discursus_io">Twitter</a>
     <br /><br />
     <a href="https://github.com/discursus-io/discursus_core/releases">
@@ -26,7 +26,7 @@ Protest events are important to understand, as they confronts us as a society an
 
 __The discursus project is an open source data platform__ that mines, shapes and exposes the digital artifacts of protests, their discourses and the actors that influence social reforms.
 
-[For a full introduction, read here](https://www.olivierdupuis.com/introducing-discursus-io/)
+[For a full introduction, read here](https://discursus.substack.com/p/introducing-the-discursus-project-b98ac9388621?s=w)
 
 &nbsp;
 
@@ -34,12 +34,12 @@ __The discursus project is an open source data platform__ that mines, shapes and
 
 The first image is the abstraction that would roughly represent the domain we're trying to map with discursus. The top layer is the protest movement phenomenon itself, whereas the bottom layer is how that phenomenon is being reported. 
 
-<img src="resources/images/discursus_semantic_layer_protest_abstraction.png" width="650px" alt="discursus.io data platform" />
+<img src="resources/images/discursus_semantic_layer_protest_abstraction.png" width="750px" alt="discursus.io data platform" />
 
 
 # Data Platform
 
-discursus builds multiple data products which ultimately exposes data assets that are either consumed directly by end users, or becomes sources for other data products.
+discursus builds a few data products which ultimately exposes data assets that are either consumed directly by end users, or becomes sources for other data products.
 
 <img src='resources/images/discursus_data_platform.png' width='750px' alt='discursus data platform' />
 
@@ -89,13 +89,15 @@ Only thing left is to configure your instance:
 - To run the Docker stack locally: `docker compose -p "discursus-data-platform" --file docker-compose.yml up --build`
 - Visit Dagster's app: `http://127.0.0.1:3000/`
 
+Of course [reach out directly to me](mailto:olivier@discursus.io) if you need any help implementing your own instance of discursus core.
+
 &nbsp;
 
 # Contributing
 
 There are many ways you can contribute and help discursus core. Here a few ones:
 
-* Star this repo, subscribe to our [blog](https://blog.discursus.io/) and follow us on [Twitter](https://twitter.com/discursus_io).
+* Star this repo, subscribe to our [newsletter](https://discursus.substack.com/) and follow us on [Twitter](https://twitter.com/discursus_io).
 * Fork this repo and run an instance yourself and please 🙏 help us out with documentation.
 * Take ownership of some of the [issues we already documented](https://github.com/discursus-io/discursus_core/issues), and send over some PRs
 * Create issues every time you feel something is missing or goes wrong.
