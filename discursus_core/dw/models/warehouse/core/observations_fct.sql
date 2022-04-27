@@ -16,7 +16,15 @@ with s_articles as (
 
 s_events as (
 
-    select * from {{ ref('int__events') }}
+    select
+        {{ dbt_utils.surrogate_key([
+            'published_date',
+            'action_geo_latitude',
+            'action_geo_longitude'
+        ]) }} as event_sk,
+        * 
+    
+    from {{ ref('int__events') }}
 
 ),
 
@@ -26,7 +34,7 @@ filter_observations as (
         s_articles.*
 
     from s_articles
-    inner join s_events using (gdelt_event_natural_key)
+    inner join s_events using (event_sk)
 
 ),
 
@@ -34,10 +42,10 @@ final as (
 
     select distinct
         {{ dbt_utils.surrogate_key([
-            'gdelt_event_natural_key', 
+            'event_sk',
             'article_url'
         ]) }} as observation_pk, 
-        {{ dbt_utils.surrogate_key(['gdelt_event_natural_key']) }} as event_fk,
+        event_sk as event_fk,
         {{ dbt_utils.surrogate_key(['observer_domain']) }} as observer_fk,
 
         published_date,

@@ -1,6 +1,14 @@
 with s_gdelt_events as (
 
-    select * from {{ ref('stg__gdelt__events') }}
+    select
+        {{ dbt_utils.surrogate_key([
+            'published_date',
+            'action_geo_latitude',
+            'action_geo_longitude'
+        ]) }} as event_sk,
+        *
+
+    from {{ ref('stg__gdelt__events') }}
     where mention_url is not null
 
 ),
@@ -23,11 +31,9 @@ s_gdelt_ml_enriched_mentions as (
 final as (
 
     select distinct
-        s_gdelt_events.gdelt_event_natural_key,
+        event_sk,
         s_gdelt_enhanced_articles.mention_url as article_url,
-
         s_gdelt_events.published_date,
-        s_gdelt_events.creation_ts,
 
         'media article' as observation_type,
         s_gdelt_enhanced_articles.page_name as article_page_name,
