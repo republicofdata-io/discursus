@@ -1,30 +1,37 @@
 with s_events as (
 
-  select * from {{ ref('int__events') }}
+    select {{ dbt_utils.surrogate_key([
+            'published_date',
+            'action_geo_latitude',
+            'action_geo_longitude'
+        ]) }} as event_sk,
+        * 
+    
+    from {{ ref('stg__gdelt__events') }}
 
 ),
 
 first_actors as (
 
-  select
-    gdelt_event_natural_key,
-    actor1_name as actor_name,
-    actor1_code as actor_code,
-    actor1_geo_country_code as actor_geo_country_code
+    select
+        event_sk,
+        actor1_name as actor_name,
+        actor1_code as actor_code,
+        actor1_geo_country_code as actor_geo_country_code
 
-  from s_events
+    from s_events
 
 ),
 
 second_actors as (
 
-  select
-    gdelt_event_natural_key,
-    actor2_name as actor_name,
-    actor2_code as actor_code,
-    actor2_geo_country_code as actor_geo_country_code
+    select
+        event_sk,
+        actor2_name as actor_name,
+        actor2_code as actor_code,
+        actor2_geo_country_code as actor_geo_country_code
 
-  from s_events
+    from s_events
 
 ),
 
@@ -38,14 +45,14 @@ merge_actors as (
 
 final as (
 
-  select distinct
-    gdelt_event_natural_key,
-    actor_name,
-    actor_code,
-    actor_geo_country_code,
-    null as narrative
+    select distinct
+        event_sk,
+        actor_name,
+        actor_code,
+        actor_geo_country_code,
+        null as narrative
 
-  from merge_actors
+    from merge_actors
 
 )
 
