@@ -13,7 +13,6 @@ table actors_dim {
     actor_name varchar
     actor_code varchar
     actor_geo_country_code varchar
-    actor_type_group varchar
     actor_type_code varchar
     actor_type_name varchar
 
