@@ -105,11 +105,7 @@ base as (
 
 select * from base
 
-where (
-    actor1_type1_code in ('ins', 'cvl', 'ngm')
-    or actor2_type1_code in ('ins', 'cvl', 'ngm')
-) 
-and creation_ts >= dateadd(week, -26, current_date)
+where creation_ts >= dateadd(week, -26, current_date)
 and event_root_code = '14'
 and action_geo_latitude is not null
 and action_geo_longitude is not null
