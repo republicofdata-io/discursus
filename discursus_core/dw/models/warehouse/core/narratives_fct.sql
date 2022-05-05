@@ -22,7 +22,7 @@ filter_narratives as (
         s_narratives.*
 
     from s_narratives
-    inner join s_events using (gdelt_event_natural_key)
+    inner join s_events using (event_sk)
 
 ),
 
@@ -30,12 +30,12 @@ final as (
 
     select distinct
         {{ dbt_utils.surrogate_key([
-        'gdelt_event_natural_key',
+        'event_sk',
         'actor_name',
         'actor_code',
         'actor_geo_country_code'
         ]) }} as narrative_pk,
-        {{ dbt_utils.surrogate_key(['gdelt_event_natural_key']) }} as event_fk,
+        event_sk as event_fk,
         {{ dbt_utils.surrogate_key([
         'actor_name',
         'actor_code',

@@ -101,28 +101,11 @@ base as (
 
     from source
 
-),
-
-classify_actors as (
-
-    select
-        *,
-        case
-            when actor1_type1_code in ('cvl', 'edu', 'env', 'hlh', 'hri', 'lab', 'ngo', 'ref') then 'civic'
-            when actor1_type1_code in ('opp', 'gov', 'igo', 'cop', 'leg', 'jud') then 'governmental'
-            else null
-        end as actor1_type1_group,
-        case
-            when actor2_type1_code in ('cvl', 'edu', 'env', 'hlh', 'hri', 'lab', 'ngo', 'ref') then 'civic'
-            when actor2_type1_code in ('opp', 'gov', 'igo', 'cop', 'leg', 'jud') then 'governmental'
-            else null
-        end as actor2_type1_group
-    
-    from base
-
 )
 
-select * from classify_actors
+select * from base
 
 where creation_ts >= dateadd(week, -26, current_date)
 and event_root_code = '14'
+and action_geo_latitude is not null
+and action_geo_longitude is not null

@@ -13,7 +13,6 @@ table actors_dim {
     actor_name varchar
     actor_code varchar
     actor_geo_country_code varchar
-    actor_type_group varchar
     actor_type_code varchar
     actor_type_name varchar
 
@@ -26,20 +25,12 @@ table events_fct {
 
     gdelt_event_natural_key int
 
-    creation_ts timestamp
+    event_ts timestamp
 
     action_geo_country_code varchar
     action_geo_full_name varchar
-    action_geo_adm1_code varchar
     action_geo_latitude decimal
     action_geo_longitude decimal
-    event_type varchar
-
-    goldstein_scale decimal
-    num_mentions integer
-    num_sources integer
-    num_articles integer
-    avg_tone decimal
 
 }
 
