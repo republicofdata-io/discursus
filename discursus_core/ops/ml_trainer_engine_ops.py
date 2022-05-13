@@ -29,7 +29,7 @@ def get_latest_ml_enrichments(context):
         df_latest_enriched_events = pd.read_csv(StringIO(obj.get()['Body'].read().decode('utf-8')))
 
         # Sample rows from dataframe, equally distributed between relevant and irrelevant classifications
-        df_latest_enriched_events_sample = df_latest_enriched_events[df_latest_enriched_events["predict_relevantTECLM3.sav"] == 1].sample(frac = 0.5, random_state = 1)
+        df_latest_enriched_events_sample = df_latest_enriched_events[df_latest_enriched_events["predict_relevantTECLM3_v2.sav"] == 1].sample(frac = 0.5, random_state = 1)
         
         return df_latest_enriched_events_sample
     except:
@@ -45,7 +45,7 @@ def create_records(context, df_latest_enriched_events_sample):
             article_url= row['mention_identifier'], 
             title = row['page_title'], 
             description = row['page_description'], 
-            relevancy = bool(row['predict_relevantTECLM3.sav'])
+            relevancy = bool(row['predict_relevantTECLM3_v2.sav'])
         )
         time.sleep(0.25)
 
