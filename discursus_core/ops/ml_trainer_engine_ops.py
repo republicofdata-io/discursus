@@ -29,9 +29,9 @@ def get_latest_ml_enrichments(context):
         df_latest_enriched_events = pd.read_csv(StringIO(obj.get()['Body'].read().decode('utf-8')))
 
         # Sample rows from dataframe, equally distributed between relevant and irrelevant classifications
-        df_latest_enriched_events_sample = df_latest_enriched_events[df_latest_enriched_events["predict_relevantTECLM3_v2.sav"] == 1].sample(frac = 0.5, random_state = 1)
+        # df_latest_enriched_events_sample = df_latest_enriched_events[df_latest_enriched_events["predict_relevantTECLM3_v2.sav"] == 1].sample(frac = 0.5, random_state = 1)
         
-        return df_latest_enriched_events_sample
+        return df_latest_enriched_events
     except:
         return None
 
