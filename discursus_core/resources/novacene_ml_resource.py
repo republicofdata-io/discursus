@@ -5,11 +5,11 @@ import pandas as pd
 from io import StringIO
 
 class NovaceneAPIClient:
-    def __init__(self, host, login, password, enrichment_model_id):
+    def __init__(self, host, login, password, ml_relevancy_classification_model_id):
         self._conn_host = host
         self._conn_login = login
         self._conn_password = password
-        self._enrichment_model_id = enrichment_model_id
+        self._ml_relevancy_classification_model_id = ml_relevancy_classification_model_id
 
         self._session = None
         self._base_url = None
@@ -85,7 +85,7 @@ class NovaceneAPIClient:
         
         payload = {
             "datasetId": int(dataset_id),
-            "methodIdx": int(self._enrichment_model_id),
+            "methodIdx": int(self._ml_relevancy_classification_model_id),
             "colIdx": 5
         }
 
@@ -140,7 +140,7 @@ class NovaceneAPIClient:
                     "host": StringSource,
                     "login": StringSource,
                     "password": StringSource,
-                    "enrichment_model_id": IntSource
+                    "ml_relevancy_classification_model_id": IntSource
                 }
             }
         }
@@ -152,5 +152,5 @@ def novacene_ml_api_client(context):
         host = context.resource_config["resources"]["novacene_client"]["config"]["host"],
         login = context.resource_config["resources"]["novacene_client"]["config"]["login"],
         password = context.resource_config["resources"]["novacene_client"]["config"]["password"],
-        enrichment_model_id = context.resource_config["resources"]["novacene_client"]["config"]["enrichment_model_id"]
+        ml_relevancy_classification_model_id = context.resource_config["resources"]["novacene_client"]["config"]["ml_relevancy_classification_model_id"]
     )
