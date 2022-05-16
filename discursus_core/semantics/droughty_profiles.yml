@@ -1,0 +1,9 @@
+discursus:
+  warehouse_name: "snowflake"
+  account: $SNOWFLAKE_ACCOUNT
+  user: $SNOWFLAKE_USER
+  password: $SNOWFLAKE_PASSWORD
+  role:  $SNOWFLAKE_ROLE
+  database: $SNOWFLAKE_DW_DATABASE
+  warehouse: $SNOWFLAKE_DW_WAREHOUSE
+  schema_name: $SNOWFLAKE_DW_SCHEMA

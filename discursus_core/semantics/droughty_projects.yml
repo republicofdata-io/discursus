@@ -1,0 +1,21 @@
+profile: discursus
+
+dimensional_inference: enabled
+
+field_description_path: discursus_core/semantics
+field_description_file_name: field_descriptions.md
+
+test_schemas:
+    - analytics_qa
+
+dbml_schemas:
+    - analytics_qa
+
+explores:
+
+  parent_table: 
+    - actors_dim
+  dimensions: 
+    - events_fct
+  facts:
+    - narratives_fct
