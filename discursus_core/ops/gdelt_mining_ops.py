@@ -43,8 +43,11 @@ class ContentAuditor:
         for line in self.filehandle.splitlines():
             line_url = line.split("\t")[60].strip()
 
+            # Only keep protest events
             if int(line.split("\t")[28]) == 14:
-                self.article_urls.append(line_url)
+                # Only keep North American events
+                if str(line.split("\t")[53]) in ['CA', 'US']:
+                    self.article_urls.append(line_url)
             
             self.article_urls = list(set(self.article_urls))
 
