@@ -18,7 +18,16 @@ s_observations as (
 
 s_protests as (
 
-    select * from {{ ref('protests_dim') }}
+    select 
+        protests_dim.protest_pk,
+        protests_dim.protest_name,
+        protests_dim.published_date_start,
+        protests_dim.published_date_end,
+        protests_dim.countries,
+        a.value as page_description_regex
+        
+    from {{ ref('protests_dim') }},
+    lateral split_to_table(protests_dim.page_description_regex, ', ') a
 
 ),
 
