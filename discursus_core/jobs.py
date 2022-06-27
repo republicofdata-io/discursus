@@ -7,6 +7,8 @@ from dagster_snowflake import snowflake_resource
 from dagster_shell import create_shell_command_op
 from dagster_dbt import dbt_cli_resource
 
+from discursus_gdelt import gdelt_mining_ops
+
 from ops.dw_ops import (
     launch_gdelt_events_snowpipe,
     launch_enhanced_articles_snowpipe,
@@ -21,7 +23,6 @@ from ops.dw_ops import (
     data_test_warehouse,
     drop_old_relations
 )
-from ops.gdelt_mining_ops import enhance_articles, materialize_gdelt_mining_asset, materialize_enhanced_articles_asset
 from ops.ml_enrichment_ops import classify_protest_relevancy, get_ml_enrichment_files, store_ml_enrichment_files
 from resources.novacene_ml_resource import novacene_ml_api_client
 
@@ -57,13 +58,13 @@ def mine_gdelt_data():
     gdelt_mined_events_filename = gdelt_events_miner()
 
     # Materialize gdelt mining asset
-    materialize_gdelt_mining_asset(gdelt_mined_events_filename)
+    gdelt_mining_ops.materialize_gdelt_mining_asset(gdelt_mined_events_filename)
 
     # Enhance article urls with their metadata
-    df_gdelt_enhanced_articles = enhance_articles(gdelt_mined_events_filename)
+    df_gdelt_enhanced_articles = gdelt_mining_ops.enhance_articles(gdelt_mined_events_filename)
 
     # Materialize enhanced articles asset
-    materialize_enhanced_articles_asset_result = materialize_enhanced_articles_asset(df_gdelt_enhanced_articles, gdelt_mined_events_filename)
+    materialize_enhanced_articles_asset_result = gdelt_mining_ops.materialize_enhanced_articles_asset(df_gdelt_enhanced_articles, gdelt_mined_events_filename)
 
     # Load to Snowflake
     launch_gdelt_events_snowpipe_result = launch_gdelt_events_snowpipe(materialize_enhanced_articles_asset_result)

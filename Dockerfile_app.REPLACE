@@ -55,6 +55,10 @@ RUN pip3 install \
     fsspec
 
 
+# Copy discursus packages
+RUN pip3 install git+https://github.com/discursus-io/discursus_gdelt@1_package_existing_mining_jobs
+
+
 # Copy resources for Dagster
 COPY discursus_core/dagster.yaml $DAGSTER_HOME
 
