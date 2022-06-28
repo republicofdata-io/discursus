@@ -4,7 +4,6 @@ from dagster import (
     config_from_files
 )
 from dagster_snowflake import snowflake_resource
-from dagster_shell import create_shell_command_op
 from dagster_dbt import dbt_cli_resource
 
 from discursus_gdelt import gdelt_mining_ops
@@ -52,10 +51,8 @@ my_novacene_client_client = novacene_ml_api_client.configured(novacene_env_varia
 )
 def mine_gdelt_data():
     # Mine data from GDELT
-    gdelt_events_miner = create_shell_command_op(
-        "zsh < $DISCURSUS_MINER_GDELT_HOME/gdelt_events_miner.zsh", 
-        name = "gdelt_events_miner_op") 
-    gdelt_mined_events_filename = gdelt_events_miner()
+    gdelt_events_miner_op = gdelt_mining_ops.mine_gdelt_events()
+    gdelt_mined_events_filename = gdelt_events_miner_op()
 
     # Materialize gdelt mining asset
     gdelt_mining_ops.materialize_gdelt_mining_asset(gdelt_mined_events_filename)
