@@ -56,11 +56,15 @@ RUN pip3 install \
 
 
 # Install discursus packages
-RUN pip3 install git+https://github.com/discursus-io/discursus_gdelt@1_package_existing_mining_jobs
+RUN pip3 install git+https://github.com/discursus-io/discursus_gdelt@dev/0.1
 
 
 # Copy resources for Dagster
 COPY discursus_core/dagster.yaml $DAGSTER_HOME
+
+
+# Create tmp repostiory for local temporary job files to be copied to
+RUN mkdir -p $DAGSTER_HOME/tmp
 
 
 # Copy and install discursus_core package
