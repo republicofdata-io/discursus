@@ -4,8 +4,9 @@ from dagster import (
     config_from_files
 )
 from dagster_snowflake import snowflake_resource
-from dagster_shell import create_shell_command_op
 from dagster_dbt import dbt_cli_resource
+
+from discursus_gdelt import gdelt_mining_ops
 
 from ops.dw_ops import (
     launch_gdelt_events_snowpipe,
@@ -21,7 +22,6 @@ from ops.dw_ops import (
     data_test_warehouse,
     drop_old_relations
 )
-from ops.gdelt_mining_ops import enhance_articles, materialize_gdelt_mining_asset, materialize_enhanced_articles_asset
 from ops.ml_enrichment_ops import classify_protest_relevancy, get_ml_enrichment_files, store_ml_enrichment_files
 from ops.ml_trainer_engine_ops import get_latest_ml_enrichments, create_records
 from resources.novacene_ml_resource import novacene_ml_api_client
@@ -55,19 +55,17 @@ my_airtable_client = airtable_api_client.configured(airtable_env_variables)
 )
 def mine_gdelt_data():
     # Mine data from GDELT
-    gdelt_events_miner = create_shell_command_op(
-        "zsh < $DISCURSUS_MINER_GDELT_HOME/gdelt_events_miner.zsh", 
-        name = "gdelt_events_miner_op") 
-    gdelt_mined_events_filename = gdelt_events_miner()
+    gdelt_events_miner_op = gdelt_mining_ops.mine_gdelt_events()
+    gdelt_mined_events_filename = gdelt_events_miner_op()
 
     # Materialize gdelt mining asset
-    materialize_gdelt_mining_asset(gdelt_mined_events_filename)
+    gdelt_mining_ops.materialize_gdelt_mining_asset(gdelt_mined_events_filename)
 
     # Enhance article urls with their metadata
-    df_gdelt_enhanced_articles = enhance_articles(gdelt_mined_events_filename)
+    df_gdelt_enhanced_articles = gdelt_mining_ops.enhance_articles(gdelt_mined_events_filename)
 
     # Materialize enhanced articles asset
-    materialize_enhanced_articles_asset_result = materialize_enhanced_articles_asset(df_gdelt_enhanced_articles, gdelt_mined_events_filename)
+    materialize_enhanced_articles_asset_result = gdelt_mining_ops.materialize_enhanced_articles_asset(df_gdelt_enhanced_articles, gdelt_mined_events_filename)
 
     # Load to Snowflake
     launch_gdelt_events_snowpipe_result = launch_gdelt_events_snowpipe(materialize_enhanced_articles_asset_result)
