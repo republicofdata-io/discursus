@@ -38,7 +38,7 @@ snowflake_configs = config_from_files(['configs/snowflake_configs.yaml'])
 novacene_configs = config_from_files(['configs/novacene_configs.yaml'])
 aws_configs = config_from_files(['configs/aws_configs.yaml'])
 gdelt_configs = config_from_files(['configs/gdelt_configs.yaml'])
-airtable_configs = config_from_files(['environments/airtable_configs.yaml'])
+airtable_configs = config_from_files(['configs/airtable_configs.yaml'])
 
 my_dbt_resource = dbt_cli_resource.configured({
     "profiles_dir": DBT_PROFILES_DIR, 
