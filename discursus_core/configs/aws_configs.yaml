@@ -1,0 +1,4 @@
+resources:
+  s3:
+    config:
+      bucket_name: discursus-io
