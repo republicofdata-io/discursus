@@ -57,21 +57,21 @@ my_gdelt_client = gdelt_resources.gdelt_client.configured(gdelt_configs)
     config = snowflake_configs
 )
 def mine_gdelt_data():
-    # Mine data from GDELT
-    latest_gdelt_events_s3_location = gdelt_mining_ops.mine_gdelt_events()
+    # Mine, filter, save and materialize latest GDELT events
+    latest_events_url = gdelt_mining_ops.get_latest_events_url()
+    df_latest_events = gdelt_mining_ops.mine_latest_events(latest_events_url)
+    save_gdelt_events_result = gdelt_mining_ops.save_gdelt_events(df_latest_events, latest_events_url)
+    # gdelt_mining_ops.materialize_gdelt_mining_asset(df_latest_events)
 
-    # Materialize gdelt mining asset
-    gdelt_mining_ops.materialize_gdelt_mining_asset(latest_gdelt_events_s3_location)
+    # Mine, filter, save and materialize latest GDELT articles
 
-    # Enhance article urls with their metadata
-    df_gdelt_enhanced_articles = gdelt_mining_ops.enhance_articles(latest_gdelt_events_s3_location)
-
-    # Materialize enhanced articles asset
-    materialize_enhanced_articles_asset_result = gdelt_mining_ops.materialize_enhanced_articles_asset(df_gdelt_enhanced_articles, latest_gdelt_events_s3_location)
+    # Enhance, save and materialize article urls with their metadata
+    # df_gdelt_enhanced_articles = gdelt_mining_ops.enhance_articles(latest_gdelt_events_s3_location)
+    # materialize_enhanced_articles_asset_result = gdelt_mining_ops.materialize_enhanced_articles_asset(df_gdelt_enhanced_articles, latest_gdelt_events_s3_location)
 
     # Load to Snowflake
-    launch_gdelt_events_snowpipe_result = launch_gdelt_events_snowpipe(materialize_enhanced_articles_asset_result)
-    launch_enhanced_articles_snowpipe_result = launch_enhanced_articles_snowpipe(launch_gdelt_events_snowpipe_result)
+    # launch_gdelt_events_snowpipe_result = launch_gdelt_events_snowpipe(materialize_enhanced_articles_asset_result)
+    # launch_enhanced_articles_snowpipe_result = launch_enhanced_articles_snowpipe(launch_gdelt_events_snowpipe_result)
 
 
 @job(
