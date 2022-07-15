@@ -60,8 +60,9 @@ def mine_gdelt_data():
     # Mine, filter, save and materialize latest GDELT events
     latest_events_url = gdelt_mining_ops.get_latest_events_url()
     df_latest_events = gdelt_mining_ops.mine_latest_events(latest_events_url)
-    save_gdelt_events_result = gdelt_mining_ops.save_gdelt_events(df_latest_events, latest_events_url)
-    # gdelt_mining_ops.materialize_gdelt_mining_asset(df_latest_events)
+    df_latest_events_filtered = gdelt_mining_ops.filter_latest_events(df_latest_events)
+    latest_events_s3_object_location = gdelt_mining_ops.save_gdelt_events(df_latest_events_filtered, latest_events_url)
+    materialize_gdelt_mining_asset_result = gdelt_mining_ops.materialize_gdelt_mining_asset(latest_events_s3_object_location, df_latest_events_filtered)
 
     # Mine, filter, save and materialize latest GDELT articles
 
