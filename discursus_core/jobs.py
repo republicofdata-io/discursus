@@ -62,9 +62,18 @@ def mine_gdelt_data():
     df_latest_events = gdelt_mining_ops.mine_latest_events(latest_events_url)
     df_latest_events_filtered = gdelt_mining_ops.filter_latest_events(df_latest_events)
     latest_events_s3_object_location = gdelt_mining_ops.save_gdelt_events(df_latest_events_filtered, latest_events_url)
-    materialize_gdelt_mining_asset_result = gdelt_mining_ops.materialize_gdelt_mining_asset(latest_events_s3_object_location, df_latest_events_filtered)
+    gdelt_mining_ops.materialize_gdelt_events_asset(latest_events_s3_object_location, df_latest_events_filtered)
 
     # Mine, filter, save and materialize latest GDELT articles
+    latest_mentions_url = gdelt_mining_ops.get_latest_mentions_url()
+    df_latest_mentions = gdelt_mining_ops.mine_latest_mentions(latest_mentions_url)
+    df_latest_mentions_filtered = gdelt_mining_ops.filter_latest_mentions(df_latest_mentions, df_latest_events_filtered)
+    latest_mentions_s3_object_location = gdelt_mining_ops.save_gdelt_mentions(df_latest_mentions_filtered, latest_mentions_url)
+    gdelt_mining_ops.materialize_gdelt_mentions_asset(latest_mentions_s3_object_location, df_latest_mentions_filtered)
+
+    # Mine, filter, save and materialize latest GDELT GKG
+
+
 
     # Enhance, save and materialize article urls with their metadata
     # df_gdelt_enhanced_articles = gdelt_mining_ops.enhance_articles(latest_gdelt_events_s3_location)
