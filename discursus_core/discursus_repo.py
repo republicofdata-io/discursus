@@ -1,25 +1,48 @@
 from dagster import repository
 
-from jobs import mine_gdelt_data, enrich_mined_data, build_data_warehouse, get_enriched_mined_data
-from sensors import gdelt_enhanced_articles_sensor
-from schedules import mine_gdelt_data_schedule, get_enriched_mined_data_schedule, build_data_warehouse_schedule
+from jobs import (
+    mine_gdelt_events, 
+    mine_gdelt_mentions, 
+    load_gdelt_assets_to_snowflake, 
+    classify_gdelt_mentions_relevancy, 
+    get_relevancy_classification_of_gdelt_mentions,
+    load_classified_gdelt_mentions_to_snowflake,
+    build_data_warehouse
+)
+from sensors import (
+    mining_gdelt_mentions_sensor,
+    load_gdelt_assets_to_snowflake_sensor,
+    classify_gdelt_mentions_relevancy_sensor,
+    load_classified_gdelt_mentions_to_snowflake_sensor
+)
+from schedules import (
+    mine_gdelt_events_schedule, 
+    get_relevancy_classification_of_gdelt_mentions_schedule, 
+    build_data_warehouse_schedule
+)
 
 
 @repository
 def discursus_repository():
     jobs = [
-        mine_gdelt_data,
-        enrich_mined_data,
-        build_data_warehouse,
-        get_enriched_mined_data
+        mine_gdelt_events, 
+        mine_gdelt_mentions, 
+        load_gdelt_assets_to_snowflake, 
+        classify_gdelt_mentions_relevancy, 
+        get_relevancy_classification_of_gdelt_mentions,
+        load_classified_gdelt_mentions_to_snowflake,
+        build_data_warehouse
     ]
     sensors = [
-        gdelt_enhanced_articles_sensor
+        mining_gdelt_mentions_sensor,
+        load_gdelt_assets_to_snowflake_sensor,
+        classify_gdelt_mentions_relevancy_sensor,
+        load_classified_gdelt_mentions_to_snowflake_sensor
     ]
     schedules = [
-        mine_gdelt_data_schedule, 
-        get_enriched_mined_data_schedule,
-        build_data_warehouse_schedule,
+        mine_gdelt_events_schedule, 
+        get_relevancy_classification_of_gdelt_mentions_schedule, 
+        build_data_warehouse_schedule
     ]
 
     return jobs + sensors + schedules

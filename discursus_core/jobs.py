@@ -7,6 +7,7 @@ from dagster_snowflake import snowflake_resource
 from dagster_dbt import dbt_cli_resource
 
 from discursus_gdelt import gdelt_mining_ops, gdelt_resources
+from discursus_utils import persistance_ops
 
 from ops.dw_ops import (
     launch_gdelt_events_snowpipe,
@@ -46,68 +47,115 @@ my_aws_client = aws_client.configured(aws_configs)
 my_gdelt_client = gdelt_resources.gdelt_client.configured(gdelt_configs)
 
 
-#Jobs
 ################
+# Job to mine GDELT events
 @job(
     resource_defs = {
-        'snowflake': snowflake_resource,
         'aws_client': my_aws_client,
         'gdelt_client': my_gdelt_client
     },
-    config = snowflake_configs
+    config = {
+        "ops": {
+            "get_url_to_latest_asset": {
+                "config": {
+                    "gdelt_asset": "events"
+                }
+            }
+        }
+    }
 )
-def mine_gdelt_data():
-    # Mine, filter, save and materialize latest GDELT events
-    latest_events_url = gdelt_mining_ops.get_latest_events_url()
-    df_latest_events = gdelt_mining_ops.mine_latest_events(latest_events_url)
+def mine_gdelt_events():
+    latest_events_url = gdelt_mining_ops.get_url_to_latest_asset()
+    latest_events_source_path = gdelt_mining_ops.build_file_path(latest_events_url)
+    df_latest_events = gdelt_mining_ops.mine_latest_asset(latest_events_url)
     df_latest_events_filtered = gdelt_mining_ops.filter_latest_events(df_latest_events)
-    latest_events_s3_object_location = gdelt_mining_ops.save_gdelt_events(df_latest_events_filtered, latest_events_url)
-    gdelt_mining_ops.materialize_gdelt_events_asset(latest_events_s3_object_location, df_latest_events_filtered)
+    persistance_ops.save_data_asset(df_latest_events_filtered, latest_events_source_path)
+    persistance_ops.materialize_data_asset(df_latest_events_filtered, latest_events_source_path, "sources", "gdelt_events", "List of events mined on GDELT")
 
-    # Mine, filter, save and materialize latest GDELT articles
-    latest_mentions_url = gdelt_mining_ops.get_latest_mentions_url()
-    df_latest_mentions = gdelt_mining_ops.mine_latest_mentions(latest_mentions_url)
+
+################
+# Job to mine GDELT mentions
+@job(
+    resource_defs = {
+        'aws_client': my_aws_client,
+        'gdelt_client': my_gdelt_client
+    },
+    config = {
+        "ops": {
+            "get_url_to_latest_asset": {
+                "config": {
+                    "gdelt_asset": "mentions"
+                }
+            }
+        }
+    }
+)
+def mine_gdelt_mentions():
+    df_latest_events = gdelt_mining_ops.get_saved_data_asset()
+    latest_mentions_url = gdelt_mining_ops.get_url_to_latest_asset()
+    latest_mentions_source_path = gdelt_mining_ops.build_file_path(latest_mentions_url)
+    df_latest_mentions = gdelt_mining_ops.mine_latest_asset(latest_mentions_url)
     df_latest_mentions_filtered = gdelt_mining_ops.filter_latest_mentions(df_latest_mentions, df_latest_events_filtered)
-    latest_mentions_s3_object_location = gdelt_mining_ops.save_gdelt_mentions(df_latest_mentions_filtered, latest_mentions_url)
-    gdelt_mining_ops.materialize_gdelt_mentions_asset(latest_mentions_s3_object_location, df_latest_mentions_filtered)
-
-    # Mine, filter, save and materialize latest GDELT GKG
-
-
+    gdelt_mining_ops.save_data_asset(df_latest_mentions_filtered, latest_mentions_source_path)
+    persistance_ops.materialize_data_asset(df_latest_mentions_filtered, latest_mentions_source_path, "sources", "gdelt_mentions", "List of enhanced articles mined from GDELT")
 
     # Enhance, save and materialize article urls with their metadata
     # df_gdelt_enhanced_articles = gdelt_mining_ops.enhance_articles(latest_gdelt_events_s3_location)
     # materialize_enhanced_articles_asset_result = gdelt_mining_ops.materialize_enhanced_articles_asset(df_gdelt_enhanced_articles, latest_gdelt_events_s3_location)
 
-    # Load to Snowflake
-    # launch_gdelt_events_snowpipe_result = launch_gdelt_events_snowpipe(materialize_enhanced_articles_asset_result)
-    # launch_enhanced_articles_snowpipe_result = launch_enhanced_articles_snowpipe(launch_gdelt_events_snowpipe_result)
+
+################
+# Job to load GDELT assets to Snowflake
+@job(
+    resource_defs = {
+        'snowflake': snowflake_resource
+    },
+    config = snowflake_configs
+)
+def load_gdelt_assets_to_snowflake():
+    launch_gdelt_events_snowpipe_result = launch_gdelt_events_snowpipe()
+    launch_enhanced_articles_snowpipe(launch_gdelt_events_snowpipe_result)
 
 
+################
+# Job to classify relevancy of GDELT mentions
 @job(
     resource_defs = {
         'novacene_client': my_novacene_client_client
     }
 )
-def enrich_mined_data():
+def classify_gdelt_mentions_relevancy():
     # Classify articles that are relevant protest events
-    classify_protest_relevancy_result = classify_protest_relevancy()
+    #df_latest_events = gdelt_mining_ops.get_saved_data_asset()
+    classify_protest_relevancy_result = classify_mentions_relevancy()
 
 
+################
+# Job to get classification results of GDELT mentions
 @job(
     resource_defs = {
-        'snowflake': snowflake_resource,
         'novacene_client': my_novacene_client_client
+    }
+)
+def get_relevancy_classification_of_gdelt_mentions():
+    df_ml_enrichment_files = get_ml_enrichment_files()
+    store_ml_enrichment_files(df_ml_enrichment_files)
+
+
+################
+# Job to load classified GDELT mentions to Snowflake
+@job(
+    resource_defs = {
+        'snowflake': snowflake_resource
     },
     config = snowflake_configs
 )
-def get_enriched_mined_data():
-    df_ml_enrichment_files = get_ml_enrichment_files()
-    store_ml_enrichment_files_result = store_ml_enrichment_files(df_ml_enrichment_files)
-    
-    launch_ml_enriched_articles_snowpipe_result = launch_ml_enriched_articles_snowpipe(store_ml_enrichment_files_result)
+def load_classified_gdelt_mentions_to_snowflake():
+    launch_ml_enriched_articles_snowpipe()
 
 
+################
+# Job to build Snowflake data warehouse
 @job(
     resource_defs = {
         'snowflake': snowflake_resource,
