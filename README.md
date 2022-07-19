@@ -18,7 +18,7 @@
     </a>
 </p>
 
-# What is the discursus core platform?
+# What is the discursus core framework?
 
 Protest movements are powerful dynamics between citzens and institutions. Behind the physical manifestation of protests are discourses that morphes. They are incubators of ideas. Like viruses that mutate, spread and can change our collective ethos.
 
@@ -90,6 +90,28 @@ Only thing left is to configure your instance:
 - Visit Dagster's app: `http://127.0.0.1:3000/`
 
 Of course [reach out directly to me](mailto:olivier@discursus.io) if you need any help implementing your own instance of discursus core.
+
+&nbsp;
+
+# Using libraries
+Libraries are groups of ops to be used within your own instance of the framework. An op might require a [resource](https://docs.dagster.io/concepts/resources) and/or [configurations](https://docs.dagster.io/concepts/configuration/config-schema#run-configuration) or nothing.
+
+### Passing a resource
+When you call an op from the library, you will need to pass the resources you configured.
+
+```
+gdelt_configs = config_from_files(['configs/gdelt_configs.yaml'])
+my_gdelt_client = gdelt_resources.gdelt_client.configured(gdelt_configs)
+
+@job(
+    resource_defs = {
+        'aws_client': my_aws_client,
+        'gdelt_client': my_gdelt_client
+    }
+)
+def mine_gdelt_data():
+    latest_gdelt_events_s3_location = gdelt_mining_ops.mine_gdelt_events()
+```
 
 &nbsp;
 

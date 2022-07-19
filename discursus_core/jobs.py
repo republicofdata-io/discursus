@@ -23,7 +23,7 @@ from ops.dw_ops import (
     data_test_warehouse,
     drop_old_relations
 )
-from ops.ml_enrichment_ops import classify_protest_relevancy, get_ml_enrichment_files, store_ml_enrichment_files
+from ops.ml_enrichment_ops import classify_mentions_relevancy, get_ml_enrichment_files, store_ml_enrichment_files
 from resources.novacene_ml_resource import novacene_ml_api_client
 from resources.aws_resource import aws_client
 
@@ -60,6 +60,13 @@ my_gdelt_client = gdelt_resources.gdelt_client.configured(gdelt_configs)
                 "config": {
                     "gdelt_asset": "events"
                 }
+            },
+            "materialize_data_asset": {
+                "config": {
+                    "asset_key_parent": "sources",
+                    "asset_key_child": "gdelt_events",
+                    "asset_description": "List of events mined on GDELT"
+                }
             }
         }
     }
@@ -70,7 +77,7 @@ def mine_gdelt_events():
     df_latest_events = gdelt_mining_ops.mine_latest_asset(latest_events_url)
     df_latest_events_filtered = gdelt_mining_ops.filter_latest_events(df_latest_events)
     persistance_ops.save_data_asset(df_latest_events_filtered, latest_events_source_path)
-    persistance_ops.materialize_data_asset(df_latest_events_filtered, latest_events_source_path, "sources", "gdelt_events", "List of events mined on GDELT")
+    persistance_ops.materialize_data_asset(df_latest_events_filtered, latest_events_source_path)
 
 
 ################
@@ -79,25 +86,16 @@ def mine_gdelt_events():
     resource_defs = {
         'aws_client': my_aws_client,
         'gdelt_client': my_gdelt_client
-    },
-    config = {
-        "ops": {
-            "get_url_to_latest_asset": {
-                "config": {
-                    "gdelt_asset": "mentions"
-                }
-            }
-        }
     }
 )
 def mine_gdelt_mentions():
-    df_latest_events = gdelt_mining_ops.get_saved_data_asset()
+    df_latest_events_filtered = persistance_ops.get_saved_data_asset()
     latest_mentions_url = gdelt_mining_ops.get_url_to_latest_asset()
     latest_mentions_source_path = gdelt_mining_ops.build_file_path(latest_mentions_url)
     df_latest_mentions = gdelt_mining_ops.mine_latest_asset(latest_mentions_url)
     df_latest_mentions_filtered = gdelt_mining_ops.filter_latest_mentions(df_latest_mentions, df_latest_events_filtered)
-    gdelt_mining_ops.save_data_asset(df_latest_mentions_filtered, latest_mentions_source_path)
-    persistance_ops.materialize_data_asset(df_latest_mentions_filtered, latest_mentions_source_path, "sources", "gdelt_mentions", "List of enhanced articles mined from GDELT")
+    persistance_ops.save_data_asset(df_latest_mentions_filtered, latest_mentions_source_path)
+    persistance_ops.materialize_data_asset(df_latest_mentions_filtered, latest_mentions_source_path)
 
     # Enhance, save and materialize article urls with their metadata
     # df_gdelt_enhanced_articles = gdelt_mining_ops.enhance_articles(latest_gdelt_events_s3_location)
@@ -126,8 +124,7 @@ def load_gdelt_assets_to_snowflake():
 )
 def classify_gdelt_mentions_relevancy():
     # Classify articles that are relevant protest events
-    #df_latest_events = gdelt_mining_ops.get_saved_data_asset()
-    classify_protest_relevancy_result = classify_mentions_relevancy()
+    classify_mentions_relevancy()
 
 
 ################
