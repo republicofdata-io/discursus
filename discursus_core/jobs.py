@@ -11,7 +11,8 @@ from discursus_utils import persistance_ops, scraping_ops
 
 from ops.dw_ops import (
     launch_gdelt_events_snowpipe,
-    launch_enhanced_articles_snowpipe,
+    launch_gdelt_mentions_snowpipe,
+    launch_gdelt_enhanced_mentions_snowpipe,
     launch_ml_enriched_articles_snowpipe,
     seed_dw_staging_layer,
     build_dw_staging_layer,
@@ -138,7 +139,8 @@ def enhance_gdelt_mentions():
 )
 def load_gdelt_assets_to_snowflake():
     launch_gdelt_events_snowpipe_result = launch_gdelt_events_snowpipe()
-    launch_enhanced_articles_snowpipe(launch_gdelt_events_snowpipe_result)
+    launch_gdelt_mentions_snowpipe_result = launch_gdelt_mentions_snowpipe(launch_gdelt_events_snowpipe_result)
+    launch_gdelt_enhanced_mentions_snowpipe(launch_gdelt_mentions_snowpipe_result)
 
 
 ################
