@@ -18,7 +18,7 @@
     </a>
 </p>
 
-# What is the discursus core platform?
+# What is the discursus core framework?
 
 Protest movements are powerful dynamics between citzens and institutions. Behind the physical manifestation of protests are discourses that morphes. They are incubators of ideas. Like viruses that mutate, spread and can change our collective ethos.
 
@@ -90,6 +90,81 @@ Only thing left is to configure your instance:
 - Visit Dagster's app: `http://127.0.0.1:3000/`
 
 Of course [reach out directly to me](mailto:olivier@discursus.io) if you need any help implementing your own instance of discursus core.
+
+&nbsp;
+
+# Using libraries
+Libraries are groups of ops to be used within your own instance of the framework. An op might require a [resource](https://docs.dagster.io/concepts/resources) and/or [configurations](https://docs.dagster.io/concepts/configuration/config-schema#run-configuration) or nothing.
+
+## Installation
+We assume you are running a Docker file such as the one we have in the [Core repo](https://github.com/discursus-io/discursus_core/blob/release/0.1/Dockerfile_app.REPLACE).
+
+The only thing you need to add is this line that will load the GDELT library to your instance of the social analytics framework.
+
+`RUN pip3 install git+https://github.com/discursus-io/discursus_gdelt@release/0.1`
+
+## Passing a resource
+When you call an op from the library, you might need to pass a resource which is needed to run the ops.
+
+```
+from discursus_utils import persistance_ops
+
+aws_configs = config_from_files(['configs/aws_configs.yaml'])
+my_aws_client = gdelt_resources.gdelt_client.configured(aws_configs)
+
+@job(
+    resource_defs = {
+        'aws_client': my_aws_client
+    }
+)
+def my_job():
+     persistance_ops.save_data_asset()
+```
+
+## Configuring ops
+Some ops require you pass configurations that will shape how that op will run. Passing configuations is as simple as adding those to the job decorator. For example:
+
+```
+from discursus_gdelt import gdelt_mining_ops
+
+@job(
+    resource_defs = {
+        'aws_client': my_aws_client
+    },
+    config = {
+        "ops": {
+            "get_url_to_latest_asset": {
+                "config": {
+                    "gdelt_asset": "events"
+                }
+            },
+            "materialize_data_asset": {
+                "config": {
+                    "asset_key_parent": "sources",
+                    "asset_key_child": "gdelt_events",
+                    "asset_description": "List of events mined on GDELT"
+                }
+            },
+            "filter_latest_events": {
+                "config": {
+                    "filter_event_code": 14,
+                    "filter_countries": {
+                        "US",
+                        "CA"
+                    }
+                }
+            }
+        }
+    }
+)
+def mine_gdelt_events():
+    latest_events_url = gdelt_mining_ops.get_url_to_latest_asset()
+    latest_events_source_path = gdelt_mining_ops.build_file_path(latest_events_url)
+    df_latest_events = gdelt_mining_ops.mine_latest_asset(latest_events_url)
+    df_latest_events_filtered = gdelt_mining_ops.filter_latest_events(df_latest_events)
+    persistance_ops.save_data_asset(df_latest_events_filtered, latest_events_source_path)
+    persistance_ops.materialize_data_asset(df_latest_events_filtered, latest_events_source_path)
+```
 
 &nbsp;
 
