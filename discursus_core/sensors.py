@@ -36,12 +36,6 @@ def mining_gdelt_mentions_sensor(context, asset_event):
         }
     )
 
-@asset_sensor(asset_key = AssetKey(["sources", "gdelt_events"]), job = load_gdelt_assets_to_snowflake)
-def load_gdelt_assets_to_snowflake_sensor(context, asset_event):
-    yield RunRequest(
-        run_key = asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text
-    )
-
 @asset_sensor(asset_key = AssetKey(["sources", "gdelt_mentions"]), job = enhance_gdelt_mentions)
 def enhance_gdelt_mentions_sensor(context, asset_event):
     yield RunRequest(
@@ -74,6 +68,12 @@ def enhance_gdelt_mentions_sensor(context, asset_event):
                 }
             }
         }
+    )
+
+@asset_sensor(asset_key = AssetKey(["sources", "gdelt_enhanced_mentions"]), job = load_gdelt_assets_to_snowflake)
+def load_gdelt_assets_to_snowflake_sensor(context, asset_event):
+    yield RunRequest(
+        run_key = asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text
     )
 
 @asset_sensor(asset_key = AssetKey(["sources", "gdelt_enhanced_mentions"]), job = classify_gdelt_mentions_relevancy)
