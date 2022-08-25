@@ -6,8 +6,8 @@ from dagster import (
 from dagster_snowflake import snowflake_resource
 from dagster_dbt import dbt_cli_resource
 
-from discursus_gdelt import gdelt_mining_ops
-from discursus_utils import persistance_ops, scraping_ops
+from dpf_gdelt import gdelt_mining_ops
+from dpf_utils import persistance_ops, scraping_ops
 
 from ops.dw_ops import (
     launch_gdelt_events_snowpipe,

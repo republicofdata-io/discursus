@@ -25,7 +25,7 @@ from schedules import (
 
 
 @repository
-def discursus_repository():
+def dpf_repository():
     jobs = [
         mine_gdelt_events, 
         mine_gdelt_mentions,

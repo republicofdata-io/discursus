@@ -17,6 +17,6 @@ RUN pip install \
 # Copy dagster instance and workspace YAML
 RUN mkdir -p $DAGSTER_HOME
 
-COPY discursus_core/dagster.yaml discursus_core/workspace.yaml $DAGSTER_HOME
+COPY dpf_core/dagster.yaml dpf_core/workspace.yaml $DAGSTER_HOME
 
 WORKDIR $DAGSTER_HOME
