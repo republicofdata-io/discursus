@@ -1,105 +1,158 @@
 <p align="center">
-  <a href="https://discursus.substack.com/">
-    <img src="resources/images/discursus_logo_white.png" width="150px" alt="discursus" />
+  <a href="https://www.lantrns.co/">
+    <img src="resources/images/lantrns_analytics_logo_white.png" width="200px" alt="Lantrns Analytics" />
   </a>
 </p>
 <p align="center">
-    <a href="https://discursus.substack.com/">Newsletter</a> |
-    <a href="https://twitter.com/discursus_io">Twitter</a>
+    <a href="https://www.lantrns.co/">Website</a> |
+    <a href="https://twitter.com/lantrns_co">Twitter</a> |
+    <a href="https://www.linkedin.com/company/lantrns-co/">LinkedIn</a>
     <br /><br />
-    <a href="https://github.com/discursus-io/discursus_core/releases">
-        <img src="https://img.shields.io/github/release/discursus-io/discursus_core" alt="Latest release" />
+    <a href="https://github.com/lantrns-analytics/dpf_core/releases">
+        <img src="https://img.shields.io/github/release/lantrns-analytics/dpf_core" alt="Latest release" />
     </a>
-    <a href="https://github.com/discursus-io/discursus_core/issues">
-        <img src="https://img.shields.io/github/issues/discursus-io/discursus_core" alt="Open issues" />
+    <a href="https://github.com/lantrns-analytics/dpf_core/issues">
+        <img src="https://img.shields.io/github/issues/lantrns-analytics/dpf_core" alt="Open issues" />
     </a>
-    <a href="https://github.com/discursus-io/discursus_core/contributors/">
-        <img src="https://img.shields.io/github/contributors/discursus-io/discursus_core" alt="Contributors" />
+    <a href="https://github.com/lantrns-analytics/dpf_core/contributors/">
+        <img src="https://img.shields.io/github/contributors/lantrns-analytics/dpf_core" alt="Contributors" />
     </a>
 </p>
 
-# What is the discursus core platform?
+# The Lantrns Analytics Open-Source Data Product Framework
 
-Protest movements are powerful dynamics between citzens and institutions. Behind the physical manifestation of protests are discourses that morphes. They are incubators of ideas. Like viruses that mutate, spread and can change our collective ethos.
+The __Lantrns Analytics open-source data product framework__ provides an architecture and suite of librairies to quickly start sourcing, transforming and delivering high quality data assets to your users.
 
-Protest events are important to understand, as they confronts us as a society and leads to healthier and more vibrant democracies. The problem is that they are hard to observe, study and analyse.
-
-__The discursus project is an open source data platform__ that mines, shapes and exposes the digital artifacts of protests, their discourses and the actors that influence social reforms.
-
-[For a full introduction, read here](https://discursus.substack.com/p/introducing-the-discursus-project-b98ac9388621?s=w)
+<img src='resources/images/lantrns_analytics_data_product_framework.png' width='750px' alt='Lantrns Analytics open-source data product framework' />
 
 &nbsp;
 
-# Phenomenon Abstraction
+## Implementations
 
-The first image is the abstraction that would roughly represent the domain we're trying to map with discursus. The top layer is the protest movement phenomenon itself, whereas the bottom layer is how that phenomenon is being reported. 
-
-<img src="resources/images/discursus_semantic_layer_protest_abstraction.png" width="750px" alt="discursus.io data platform" />
-
-
-# Data Platform
-
-discursus builds a few data products which ultimately exposes data assets that are either consumed directly by end users, or becomes sources for other data products.
+We use this framework for our very own [discursus data product](https://www.discursus.io). Below is an overview of what a typical flow of data asset transformations looks like.
 
 <img src='resources/images/discursus_data_platform.png' width='750px' alt='discursus data platform' />
 
-The following entities are exposed as the final output of our architecture.
-
-<img src="resources/images/discursus_core_erd.png" width="650px" alt="discursus" />
-
-
 &nbsp;
 
-# Architecture
+## Architecture
+
+In the case above, we rely on the following architecture to support our instance.
 
 <img src="resources/images/discursus_core_architecture.png" width="750px" alt="discursus" />
 
-Here are the main components of the discursus core architecture:
+Here are the components of this implementation:
 
-- A miner that sources events from the [GDELT project](https://www.gdeltproject.org/) and saves it to AWS S3.
+- A miner that sources events from the GDELT project and saves it to AWS S3.
 - An enhancement process that scrapes the article's metadata and saves it to AWS S3.
-- An ML enrichment process that classifies article's relevancy using a custom ML algorithm hosted on [Novacene.ai](https://novacene.ai/) and saves results to AWS S3.
+- An ML enrichment process that classifies article's relevancy using a custom ML algorithm hosted on Novacene.ai and saves results to AWS S3.
 - A suite of snowpipes that loads S3 data to Snowflake.
 - A dbt project that creates a data warehouse which exposes protest events.
 - A Dagster app that orchestrates all data transformation jobs and the creation of assets.
 
-
 &nbsp;
 
-# Installation
-Spinning up your own discursus instance still isn't a breeze. But we know how important it is and are working on making our architecture and documentation more robust to that effect.
+## Installation
+To spin up an instance of the __Lantrns Analytics open-source data product framework__, you will need the following external service accounts in place:
+- An AWS S3 bucket to store raw and enhanced data assets.
+- An AWS ec2 instance (or similar) to run your own instance.
 
-For now, to spin up an instance of discursus Core, you will first need to have your own external service accounts in place:
-- An AWS S3 bucket to hold the events, articles and enhancements.
-- An AWS ec2 instance to run discursus.
-- A Snowflake account to stage data from S3, perform transformations of data and expose entities.
-- A Novacene.ai account to perform ML enrichments.
+In addition to those 2 foundational components, you might need the following:
+- A Snowflake account (or similar) to stage data, perform transformations of data and expose entities.
+- A Novacene.ai account (or similar) to perform ML enrichments.
 
-On Snowflake, you will need to create a few objects prior to running your instance:
-- Source tables to stage the mined events.
-- Snowpipes to move data from S3 to your source tables.
-- File formats for Snowflake to read the source S3 csv files properly.
-
-Once you have all those in place, you can fork the discursus Core repo.
+Once you have all those in place, you can fork the this repo.
 
 Only thing left is to configure your instance:
 - Rename the `Dockerfile_app.REPLACE` file to `Dockerfile_app`.
 - Change the values of environment variables within the `Dockerfile_app` file.
 - Make any necessary changes to `docker-compose`
-- To run the Docker stack locally: `docker compose -p "discursus-data-platform" --file docker-compose.yml up --build`
+- To run the Docker stack locally: `docker compose -p "dpf-core" --file docker-compose.yml up --build`
 - Visit Dagster's app: `http://127.0.0.1:3000/`
 
-Of course [reach out directly to me](mailto:olivier@discursus.io) if you need any help implementing your own instance of discursus core.
+&nbsp;
+
+# Libraries
+Libraries are groups of ops to be used within your own instance of the framework. An op might require a [resource](https://docs.dagster.io/concepts/resources) and/or [configurations](https://docs.dagster.io/concepts/configuration/config-schema#run-configuration) or nothing.
+
+## Installation
+We assume you are running a Docker file such as the one we have in the [Core repo](https://github.com/lantrns-analytics/dpf_core/blob/release/0.1/Dockerfile_app.REPLACE). Let's say we wanted to add the GDELT library, the only thing you need to add is the following.
+
+`RUN pip3 install git+https://github.com/lantrns-analytics/dpf_gdelt@release/0.1.1`
+
+## Passing a resource
+When you call an op from the library, you might need to pass a resource which is needed to run the ops.
+
+```
+from dpf_utils import persistance_ops
+
+aws_configs = config_from_files(['configs/aws_configs.yaml'])
+my_aws_client = gdelt_resources.gdelt_client.configured(aws_configs)
+
+@job(
+    resource_defs = {
+        'aws_client': my_aws_client
+    }
+)
+def my_job():
+     persistance_ops.save_data_asset()
+```
+
+## Configuring ops
+Some ops require you pass configurations that will shape how that op will run. Passing configuations is as simple as adding those to the job decorator. For example:
+
+```
+from dpf_gdelt import gdelt_mining_ops
+
+@job(
+    resource_defs = {
+        'aws_client': my_aws_client
+    },
+    config = {
+        "ops": {
+            "get_url_to_latest_asset": {
+                "config": {
+                    "gdelt_asset": "events"
+                }
+            },
+            "materialize_data_asset": {
+                "config": {
+                    "asset_key_parent": "sources",
+                    "asset_key_child": "gdelt_events",
+                    "asset_description": "List of events mined on GDELT"
+                }
+            },
+            "filter_latest_events": {
+                "config": {
+                    "filter_event_code": 14,
+                    "filter_countries": {
+                        "US",
+                        "CA"
+                    }
+                }
+            }
+        }
+    }
+)
+def mine_gdelt_events():
+    latest_events_url = gdelt_mining_ops.get_url_to_latest_asset()
+    latest_events_source_path = gdelt_mining_ops.build_file_path(latest_events_url)
+    df_latest_events = gdelt_mining_ops.mine_latest_asset(latest_events_url)
+    df_latest_events_filtered = gdelt_mining_ops.filter_latest_events(df_latest_events)
+    persistance_ops.save_data_asset(df_latest_events_filtered, latest_events_source_path)
+    persistance_ops.materialize_data_asset(df_latest_events_filtered, latest_events_source_path)
+```
 
 &nbsp;
 
 # Contributing
 
-There are many ways you can contribute and help discursus core. Here a few ones:
+There are many ways you can contribute and help evolve the __Lantrns Analytics open-source data product framework__. Here a few ones:
 
-* Star this repo, subscribe to our [newsletter](https://discursus.substack.com/) and follow us on [Twitter](https://twitter.com/discursus_io).
+* Star this repo, visit our [website](https://www.lantrns.co/) and follow us on [Twitter](https://twitter.com/lantrns_co).
 * Fork this repo and run an instance yourself and please 🙏 help us out with documentation.
-* Take ownership of some of the [issues we already documented](https://github.com/discursus-io/discursus_core/issues), and send over some PRs
+* Take ownership of some of the [issues we already documented](https://github.com/lantrns-analytics/dpf_core/issues), and send over some PRs.
+* Contribute to the libraries.
 * Create issues every time you feel something is missing or goes wrong.
 
 All sort of contributions are **welcome and extremely helpful** 🙌 
@@ -108,4 +161,4 @@ All sort of contributions are **welcome and extremely helpful** 🙌
 
 # License
 
-discursus core is [MIT licensed](./LICENSE.md).
+The __Lantrns Analytics open-source data product framework__ is [MIT licensed](./LICENSE.md).

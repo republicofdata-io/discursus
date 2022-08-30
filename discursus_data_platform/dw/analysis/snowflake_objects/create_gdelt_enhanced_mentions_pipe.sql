@@ -3,7 +3,6 @@ create pipe gdelt_enhanced_mentions_pipe as
 copy into gdelt_enhanced_mentions(
 
   mention_identifier,
-  page_name,
   file_name,
   page_title,
   page_description,
@@ -20,13 +19,12 @@ from (
     t.$3,
     t.$4,
     t.$5,
-    t.$6,
     metadata$filename
 
   from @s3_dio_sources/gdelt (
 
     file_format => csv,
-    pattern => '.*.export.enhanced.csv'
+    pattern => '.*.mentions.enhanced.csv'
 
   ) t
 );
