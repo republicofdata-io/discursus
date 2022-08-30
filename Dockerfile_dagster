@@ -8,11 +8,11 @@ ENV DAGSTER_HOME=/opt/dagster/dagster_home/
 
 
 RUN pip install \
-    dagster==1.0.6 \
-    dagster-graphql==1.0.6 \
-    dagit==1.0.6 \
-    dagster-postgres==1.0.6 \
-    dagster-docker==1.0.6
+    dagster==0.15.8 \
+    dagster-graphql==0.15.8 \
+    dagit==0.15.8 \
+    dagster-postgres==0.15.8 \
+    dagster-docker==0.15.8
 
 # Copy dagster instance and workspace YAML
 RUN mkdir -p $DAGSTER_HOME
