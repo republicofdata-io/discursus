@@ -1,8 +1,7 @@
-FROM ubuntu:21.10
+FROM ubuntu:22.04
 
 # Environment variables
 ENV DAGSTER_HOME=/opt/dagster/dagster_home/
-ENV DPF_MINER_GDELT_HOME=/opt/dagster/dpf_core/miners/gdelt
 ENV AWS_ACCESS_KEY_ID=REPLACE_VALUE
 ENV AWS_SECRET_ACCESS_KEY=REPLACE_VALUE
 ENV SNOWFLAKE_ACCOUNT=REPLACE_VALUE
@@ -56,8 +55,8 @@ RUN pip3 install \
 
 
 # Install framework packages
-RUN pip3 install git+https://github.com/lantrns-analytics/dpf_utils@release/0.1
-RUN pip3 install git+https://github.com/lantrns-analytics/dpf_gdelt@release/0.1
+RUN pip3 install git+https://github.com/lantrns-analytics/dpf_utils@release/0.1.1
+RUN pip3 install git+https://github.com/lantrns-analytics/dpf_gdelt@release/0.1.1
 
 
 # Copy resources for Dagster
