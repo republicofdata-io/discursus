@@ -1,22 +1,12 @@
 <p align="center">
-  <a href="https://www.lantrns.co/">
-    <img src="resources/images/lantrns_analytics_logo_white.png" width="200px" alt="Lantrns Analytics" />
+  <a href="https://www.discursus.io/">
+    <img src="resources/images/discursus_logo_white.png" width="150px" alt="discursus.io" />
   </a>
 </p>
 <p align="center">
-    <a href="https://www.lantrns.co/">Website</a> |
-    <a href="https://twitter.com/lantrns_co">Twitter</a> |
-    <a href="https://www.linkedin.com/company/lantrns-co/">LinkedIn</a>
-    <br /><br />
-    <a href="https://github.com/lantrns-analytics/dpf_core/releases">
-        <img src="https://img.shields.io/github/release/lantrns-analytics/dpf_core" alt="Latest release" />
-    </a>
-    <a href="https://github.com/lantrns-analytics/dpf_core/issues">
-        <img src="https://img.shields.io/github/issues/lantrns-analytics/dpf_core" alt="Open issues" />
-    </a>
-    <a href="https://github.com/lantrns-analytics/dpf_core/contributors/">
-        <img src="https://img.shields.io/github/contributors/lantrns-analytics/dpf_core" alt="Contributors" />
-    </a>
+    <a href="https://www.discursus.io/">Website</a> |
+    <a href="https://twitter.com/discursus_io">Twitter</a> |
+    <a href="https://www.linkedin.com/company/discursus-data-platform/">LinkedIn</a>
 </p>
 
 # The Lantrns Analytics Open-Source Data Product Framework

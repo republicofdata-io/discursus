@@ -20,13 +20,14 @@ from sensors import (
 )
 from schedules import (
     mine_gdelt_events_schedule, 
-    get_relevancy_classification_of_gdelt_mentions_schedule, 
+    get_relevancy_classification_of_gdelt_mentions_schedule,
+    feed_ml_trainer_engine_schedule,
     build_data_warehouse_schedule
 )
 
 
 @repository
-def dpf_repository():
+def discursus_repo():
     jobs = [
         mine_gdelt_events, 
         mine_gdelt_mentions,

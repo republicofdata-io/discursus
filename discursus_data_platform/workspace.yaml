@@ -1,5 +1,5 @@
 load_from:
   - grpc_server:
-      host: dpf_app
+      host: discursus_app
       port: 4000
-      location_name: "dpf_app"
+      location_name: "discursus_app"

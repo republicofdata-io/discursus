@@ -1,9 +1,9 @@
 version: "3.7"
 
 services:
-  dpf_postgresql:
+  discursus_postgresql:
     image: postgres:11
-    container_name: dpf_postgresql
+    container_name: discursus_postgresql
     ports:
       - "5432:5432"
     environment:
@@ -11,29 +11,29 @@ services:
       POSTGRES_PASSWORD: "postgres_password"
       POSTGRES_DB: "postgres_db"
     networks:
-      - dpf_network
+      - discursus_network
   
-  dpf_app:
+  discursus_app:
     build:
       context: .
       dockerfile: ./Dockerfile_app
-    image: odupuis/dpf_app:latest
-    container_name: dpf_app
+    image: odupuis/discursus_app:latest
+    container_name: discursus_app
     ports:
       - "4000:4000"
     environment:
       DAGSTER_POSTGRES_USER: "postgres_user"
       DAGSTER_POSTGRES_PASSWORD: "postgres_password"
       DAGSTER_POSTGRES_DB: "postgres_db"
-      DAGSTER_CURRENT_IMAGE: "odupuis/dpf_app"
+      DAGSTER_CURRENT_IMAGE: "odupuis/discursus_app"
     networks:
-      - dpf_network
+      - discursus_network
 
-  dpf_dagit:
+  discursus_dagit:
     build:
       context: .
       dockerfile: ./Dockerfile_dagster
-    image: odupuis/dpf_dagit:latest
+    image: odupuis/discursus_dagit:latest
     entrypoint:
       - dagit
       - -h
@@ -42,7 +42,7 @@ services:
       - "3000"
       - -w
       - workspace.yaml
-    container_name: dpf_dagit
+    container_name: discursus_dagit
     expose:
       - "3000"
     ports:
@@ -52,20 +52,20 @@ services:
       DAGSTER_POSTGRES_PASSWORD: "postgres_password"
       DAGSTER_POSTGRES_DB: "postgres_db"
     networks:
-      - dpf_network
+      - discursus_network
     depends_on:
-      - dpf_postgresql
-      - dpf_app
+      - discursus_postgresql
+      - discursus_app
 
-  dpf_daemon:
+  discursus_daemon:
     build:
       context: .
       dockerfile: ./Dockerfile_dagster
-    image: odupuis/dpf_daemon:latest
+    image: odupuis/discursus_daemon:latest
     entrypoint:
       - dagster-daemon
       - run
-    container_name: dpf_daemon
+    container_name: discursus_daemon
     restart: on-failure
     environment:
       DAGSTER_POSTGRES_USER: "postgres_user"
@@ -74,12 +74,12 @@ services:
     volumes: # Make docker client accessible so we can launch containers using host docker
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - dpf_network
+      - discursus_network
     depends_on:
-      - dpf_postgresql
-      - dpf_app
+      - discursus_postgresql
+      - discursus_app
 
 networks:
-  dpf_network:
+  discursus_network:
     driver: bridge
-    name: dpf_network
+    name: discursus_network
