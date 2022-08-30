@@ -41,7 +41,7 @@ class MLEnrichmentJobTracker:
         "asset_materialization_path": str
     }
 )
-def classify_protest_relevancy(context): 
+def classify_mentions_relevancy(context): 
     # Create instance of ml enrichment tracker
     my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
     
@@ -129,7 +129,7 @@ def store_ml_enrichment_files(context, df_ml_enrichment_files):
         description="List of ml enrichment files",
         metadata={
             "path": "s3://discursus-io/" + 'sources/ml/' + file_date + '/ml_enriched_' + row['name'],
-            "rows": df_ml_enrichment_file['mention_identifier'].size
+            "rows": df_ml_enrichment_file.index.size
         }
     )
     

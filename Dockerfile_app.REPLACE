@@ -2,7 +2,7 @@ FROM ubuntu:21.10
 
 # Environment variables
 ENV DAGSTER_HOME=/opt/dagster/dagster_home/
-ENV DISCURSUS_MINER_GDELT_HOME=/opt/dagster/discursus_core/miners/gdelt
+ENV DPF_MINER_GDELT_HOME=/opt/dagster/dpf_core/miners/gdelt
 ENV AWS_ACCESS_KEY_ID=REPLACE_VALUE
 ENV AWS_SECRET_ACCESS_KEY=REPLACE_VALUE
 ENV SNOWFLAKE_ACCOUNT=REPLACE_VALUE
@@ -39,39 +39,40 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
 
 RUN pip3 install \
     awscli \
-    dagster==0.15.3 \
-    dagster-graphql==0.15.3 \
-    dagit==0.15.3 \
-    dagster-postgres==0.15.3 \
-    dagster-docker==0.15.3 \
-    dagster_shell==0.15.3 \
-    dagster_snowflake==0.15.3 \
-    dagster_dbt==0.15.3 \
-    dbt-core==1.1.1 \
-    dbt-snowflake==1.1.0 \
+    dagster==0.15.8 \
+    dagster-graphql==0.15.8 \
+    dagit==0.15.8 \
+    dagster-postgres==0.15.8 \
+    dagster-docker==0.15.8 \
+    dagster_shell==0.15.8 \
+    dagster_snowflake==0.15.8 \
+    dagster_dbt==0.15.8 \
+    dbt-core==1.2.1 \
+    dbt-snowflake==1.2.0 \
     bs4 \
     optparse-pretty \
     boto3 \
     fsspec
 
 
-# Install discursus packages
-RUN pip3 install git+https://github.com/discursus-io/discursus_gdelt@dev/0.1
+# Install framework packages
+RUN pip3 install git+https://github.com/lantrns-analytics/dpf_utils@release/0.1
+RUN pip3 install git+https://github.com/lantrns-analytics/dpf_gdelt@release/0.1
 
 
 # Copy resources for Dagster
-COPY discursus_core/dagster.yaml $DAGSTER_HOME
+COPY dpf_core/dagster.yaml $DAGSTER_HOME
 
 
 # Create tmp repostiory for local temporary job files to be copied to
 RUN mkdir -p $DAGSTER_HOME/tmp
 
 
-# Copy and install discursus_core package
-COPY discursus_core/ /opt/dagster/discursus_core/
-RUN (cd /opt/dagster/discursus_core/dw/; dbt deps --profiles-dir ./)
+# Copy and install dpf_core package
+COPY dpf_core/ /opt/dagster/dpf_core/
+RUN (cd /opt/dagster/dpf_core/dw/; dbt deps --profiles-dir ./)
 
-WORKDIR /opt/dagster/discursus_core/
+WORKDIR /opt/dagster/dpf_core/
 
 
 # Run dagster gRPC server on port 4000
