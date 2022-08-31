@@ -92,7 +92,7 @@ def classify_gdelt_mentions_relevancy_sensor(context, asset_event):
         }
     )
 
-@asset_sensor(asset_key = AssetKey(["sources", "ml_enrichment_files"]), job = load_classified_gdelt_mentions_to_snowflake)
+@asset_sensor(asset_key = AssetKey(["sources", "gdelt_ml_enriched_mentions"]), job = load_classified_gdelt_mentions_to_snowflake)
 def load_classified_gdelt_mentions_to_snowflake_sensor(context, asset_event):
     yield RunRequest(
         run_key = asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text

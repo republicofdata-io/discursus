@@ -24,7 +24,7 @@ from ops.dw_ops import (
     data_test_warehouse,
     drop_old_relations
 )
-from ops.ml_enrichment_ops import classify_mentions_relevancy, get_ml_enrichment_files, store_ml_enrichment_files
+from ops.ml_enrichment_ops import classify_mentions_relevancy, get_relevancy_classifications, store_relevancy_classifications
 from ops.ml_trainer_engine_ops import get_latest_ml_enrichments, create_records
 from ops.utils_ops import get_enhanced_mentions_source_path
 from resources.novacene_ml_resource import novacene_ml_api_client
@@ -167,8 +167,8 @@ def classify_gdelt_mentions_relevancy():
     }
 )
 def get_relevancy_classification_of_gdelt_mentions():
-    df_ml_enrichment_files = get_ml_enrichment_files()
-    store_ml_enrichment_files(df_ml_enrichment_files)
+    df_relevancy_classifications = get_relevancy_classifications()
+    store_relevancy_classifications(df_relevancy_classifications)
 
 
 ################
