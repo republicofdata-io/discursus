@@ -51,26 +51,27 @@ def classify_mentions_relevancy(context):
     df_gdelt_articles = pd.read_csv(StringIO(obj.get()['Body'].read().decode('utf-8')))
 
     # Sending latest batch of articles to Novacene for relevancy classification
-    context.log.info("Sending " + str(df_gdelt_articles.index.size) + " articles for relevancy classification")
+    if df_gdelt_articles.index.size > 0:
+        context.log.info("Sending " + str(df_gdelt_articles.index.size) + " articles for relevancy classification")
 
-    protest_classification_dataset_id = context.resources.novacene_client.create_dataset("protest_events_" + filename.split("/")[3], df_gdelt_articles)
-    protest_classification_job = context.resources.novacene_client.enrich_dataset(protest_classification_dataset_id['id'])
+        protest_classification_dataset_id = context.resources.novacene_client.create_dataset("protest_events_" + filename.split("/")[3], df_gdelt_articles)
+        protest_classification_job = context.resources.novacene_client.enrich_dataset(protest_classification_dataset_id['id'])
 
-    # Update log of enrichment jobs
-    my_ml_enrichment_jobs_tracker.add_new_job(protest_classification_job['id'], 'processing')
-    my_ml_enrichment_jobs_tracker.upload_job_log()
+        # Update log of enrichment jobs
+        my_ml_enrichment_jobs_tracker.add_new_job(protest_classification_job['id'], 'processing')
+        my_ml_enrichment_jobs_tracker.upload_job_log()
 
-    # Materialize asset
-    yield AssetMaterialization(
-        asset_key=["sources", "ml_enrichment_jobs"],
-        description="List of ml enrichment jobs",
-        metadata={
-            "job id": protest_classification_job['id'],
-            "dataset enriched": filename,
-            "dataset enrtries": df_gdelt_articles.index.size
-        }
-    )
-    yield Output(protest_classification_job)
+        # Materialize asset
+        yield AssetMaterialization(
+            asset_key=["sources", "ml_enrichment_jobs"],
+            description="List of ml enrichment jobs",
+            metadata={
+                "job id": protest_classification_job['id'],
+                "dataset enriched": filename,
+                "dataset enrtries": df_gdelt_articles.index.size
+            }
+        )
+        yield Output(protest_classification_job)
 
 
 @op(
