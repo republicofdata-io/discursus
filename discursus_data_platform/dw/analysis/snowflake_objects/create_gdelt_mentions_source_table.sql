@@ -15,6 +15,7 @@ create or replace table gdelt_mentions (
 	mention_doc_len number(38,0),
 	mention_doc_tone number(38,0),
 	mention_doc_translation_info varchar(16777216),
-	extras varchar(16777216)
+	extras varchar(16777216),
+    metadata_filename varchar
 
 )
