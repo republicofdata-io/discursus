@@ -63,7 +63,7 @@ def classify_mentions_relevancy(context):
 
         # Materialize asset
         yield AssetMaterialization(
-            asset_key=["sources", "ml_enrichment_jobs"],
+            asset_key=["logs", "ml_enrichment_jobs"],
             description="List of ml enrichment jobs",
             metadata={
                 "job id": protest_classification_job['id'],
@@ -77,7 +77,7 @@ def classify_mentions_relevancy(context):
 @op(
     required_resource_keys = {"novacene_client"}
 )
-def get_ml_enrichment_files(context):
+def get_relevancy_classifications(context):
     # Empty dataframe of files to fetch
     df_ml_enrichment_files = pd.DataFrame(None, columns = ['job_id', 'name', 'file_path'])
 
@@ -109,7 +109,7 @@ def get_ml_enrichment_files(context):
 @op(
     required_resource_keys = {"novacene_client"}
 )
-def store_ml_enrichment_files(context, df_ml_enrichment_files):
+def store_relevancy_classifications(context, df_ml_enrichment_files):
     s3 = boto3.resource('s3')
 
     for index, row in df_ml_enrichment_files.iterrows():
@@ -126,8 +126,8 @@ def store_ml_enrichment_files(context, df_ml_enrichment_files):
 
         # Materialize and yield asset
         yield AssetMaterialization(
-        asset_key=["sources", "ml_enrichment_files"],
-        description="List of ml enrichment files",
+        asset_key=["sources", "gdelt_ml_enriched_mentions"],
+        description="List of ML enriched mentions mined from GDELT",
         metadata={
             "path": "s3://discursus-io/" + 'sources/ml/' + file_date + '/ml_enriched_' + row['name'],
             "rows": df_ml_enrichment_file.index.size

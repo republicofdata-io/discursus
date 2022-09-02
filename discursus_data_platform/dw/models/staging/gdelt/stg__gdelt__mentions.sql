@@ -23,8 +23,8 @@ final as (
         cast(gdelt_id as bigint) as gdelt_event_natural_key,
 
         source_file_date,
-        cast(event_time_date as date) as event_time_date,
-        cast(mention_time_date as date) as mention_time_date,
+        to_date(left(event_time_date, 8), 'yyyymmdd') as event_time_date,
+        to_date(left(mention_time_date, 8), 'yyyymmdd') as mention_time_date,
         lower(cast(mention_type as string)) as mention_type,
         lower(cast(mention_source_name as string)) as mention_source_name,
         lower(cast(sentence_id as int)) as sentence_id,
@@ -35,7 +35,7 @@ final as (
         lower(cast(confidence as string)) as confidence,
         lower(cast(mention_doc_len as string)) as mention_doc_len,
         lower(cast(mention_doc_tone as float)) as mention_doc_tone,
-        lower(cast(mention_doc_translation_info as string) as mention_doc_translation_info)
+        lower(cast(mention_doc_translation_info as string)) as mention_doc_translation_info
 
     from source
 
