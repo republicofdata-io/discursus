@@ -8,7 +8,7 @@ with source as (
 
     select * from {{ source('gdelt', 'gdelt_events') }}
     {% if is_incremental() %}
-        where to_timestamp(cast(date_added as string), 'YYYYMMDDHH24MISS') > (select max(creation_ts) from {{ this }})
+        where to_timestamp(cast(date_added as string), 'YYYYMMDDHH24MISS') >= (select max(creation_ts) from {{ this }})
     {% endif %}
 
 ),
