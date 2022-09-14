@@ -86,7 +86,7 @@ class NovaceneAPIClient:
         payload = {
             "datasetId": int(dataset_id),
             "methodIdx": int(self._ml_relevancy_classification_model_id),
-            "colIdx": 5
+            "colIdx": 4
         }
 
         response = session.get(
