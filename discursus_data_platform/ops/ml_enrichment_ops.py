@@ -72,6 +72,8 @@ def classify_mentions_relevancy(context):
             }
         )
         yield Output(protest_classification_job)
+    else:
+        yield Output(1)
 
 
 @op(
@@ -126,11 +128,11 @@ def store_relevancy_classifications(context, df_ml_enrichment_files):
 
         # Materialize and yield asset
         yield AssetMaterialization(
-        asset_key=["sources", "gdelt_ml_enriched_mentions"],
-        description="List of ML enriched mentions mined from GDELT",
-        metadata={
-            "path": "s3://discursus-io/" + 'sources/ml/' + file_date + '/ml_enriched_' + row['name'],
-            "rows": df_ml_enrichment_file.index.size
+            asset_key=["sources", "gdelt_ml_enriched_mentions"],
+            description="List of ML enriched mentions mined from GDELT",
+            metadata={
+                "path": "s3://discursus-io/" + 'sources/ml/' + file_date + '/ml_enriched_' + row['name'],
+                "rows": df_ml_enrichment_file.index.size
         }
     )
     

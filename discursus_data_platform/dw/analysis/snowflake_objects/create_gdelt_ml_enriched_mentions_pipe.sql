@@ -8,8 +8,8 @@ copy into gdelt_ml_enriched_mentions(
   page_title,
   page_description,
   keywords,
-  is_relevant,
-  metadata_filename
+  metadata_filename,
+  is_relevant
 
 )
 
@@ -18,17 +18,17 @@ from (
   select 
     t.$2,
     t.$3,
+    t.$3,
     t.$4,
     t.$5,
     t.$6,
-    t.$7,
-    t.$8,
-    metadata$filename
+    metadata$filename,
+    t.$7
 
   from @s3_dio_sources/ml (
 
     file_format => csv,
-    pattern => '.*.export.enhanced.csv'
+    pattern => '.*.mentions.enhanced.csv'
 
   ) t
 );
