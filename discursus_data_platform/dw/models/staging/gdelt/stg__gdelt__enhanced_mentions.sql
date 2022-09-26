@@ -36,3 +36,8 @@ final as (
 
 select * from final
 where source_file_date >= dateadd(week, -26, current_date)
+and page_title not regexp 'opinion.*'
+and page_title not regexp 'op-ed.*'
+and page_title not regexp 'column.*'
+and page_title not regexp 'editorial.*'
+and page_title not regexp 'letter.*'
