@@ -24,10 +24,10 @@ s_protests as (
         protests_dim.published_date_start,
         protests_dim.published_date_end,
         protests_dim.countries,
-        a.value as page_description_regex
+        trim(a.value) as page_description_regex
         
     from {{ ref('protests_dim') }},
-    lateral split_to_table(protests_dim.page_description_regex, ', ') a
+    lateral split_to_table(protests_dim.page_description_regex, ',') a
 
 ),
 
@@ -53,7 +53,7 @@ associate_protests as (
 
     select
         associate_observations.*,
-        last_value(s_protests.protest_pk) over (partition by event_sk order by s_protests.published_date_start) as protest_pk
+        last_value(s_protests.protest_pk ignore nulls) over (partition by event_sk order by s_protests.published_date_start) as protest_pk
 
     from associate_observations
     left join s_protests on
