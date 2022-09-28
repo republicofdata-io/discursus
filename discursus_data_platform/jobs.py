@@ -8,6 +8,7 @@ from dagster_dbt import dbt_cli_resource
 
 from dpf_gdelt import gdelt_mining_ops
 from dpf_utils import persistance_ops, scraping_ops
+from saf_novacene import novacene_resource
 
 from ops.dw_ops import (
     launch_gdelt_events_snowpipe,
@@ -27,7 +28,6 @@ from ops.dw_ops import (
 from ops.ml_enrichment_ops import classify_mentions_relevancy, get_relevancy_classifications, store_relevancy_classifications
 from ops.ml_trainer_engine_ops import get_latest_ml_enrichments, create_records
 from ops.utils_ops import get_enhanced_mentions_source_path
-from resources.novacene_ml_resource import novacene_ml_api_client
 from resources.airtable_resource import airtable_api_client
 from resources.aws_resource import aws_client
 
@@ -46,7 +46,7 @@ my_dbt_resource = dbt_cli_resource.configured({
     "profiles_dir": DBT_PROFILES_DIR, 
     "project_dir": DBT_PROJECT_DIR})
 
-my_novacene_client_client = novacene_ml_api_client.configured(novacene_configs)
+my_novacene_client_client = novacene_resource.initiate_novacene_client.configured(novacene_configs)
 my_aws_client = aws_client.configured(aws_configs)
 my_airtable_client = airtable_api_client.configured(airtable_configs)
 

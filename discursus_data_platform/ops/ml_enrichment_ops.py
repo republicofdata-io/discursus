@@ -55,7 +55,7 @@ def classify_mentions_relevancy(context):
         context.log.info("Sending " + str(df_gdelt_articles.index.size) + " articles for relevancy classification")
 
         protest_classification_dataset_id = context.resources.novacene_client.create_dataset("protest_events_" + filename.split("/")[3], df_gdelt_articles)
-        protest_classification_job = context.resources.novacene_client.enrich_dataset(protest_classification_dataset_id['id'])
+        protest_classification_job = context.resources.novacene_client.enrich_dataset(protest_classification_dataset_id['id'], 17, 4)
 
         # Update log of enrichment jobs
         my_ml_enrichment_jobs_tracker.add_new_job(protest_classification_job['id'], 'processing')
