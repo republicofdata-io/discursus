@@ -18,7 +18,6 @@ ENV SNOWFLAKE_DW_SCHEMA=REPLACE_VALUE
 ENV ML_HOST=REPLACE_VALUE
 ENV ML_LOGIN=REPLACE_VALUE
 ENV ML_PASSWORD=REPLACE_VALUE
-ENV ML_RELEVANCY_CLASSIFICATION_MODEL_ID=REPLACE_VALUE
 
 
 # Create environment
@@ -56,9 +55,9 @@ RUN pip3 install \
 
 
 # Install framework packages
-RUN pip3 install git+https://github.com/lantrns-analytics/dpf_utils@release/0.1
-RUN pip3 install git+https://github.com/lantrns-analytics/dpf_gdelt@release/0.1
-RUN pip3 install git+https://github.com/lantrns-analytics/dpf_novacene@release/1_initial_version
+RUN pip3 install git+https://github.com/lantrns-analytics/dpf_utils@release/0.1.1
+RUN pip3 install git+https://github.com/lantrns-analytics/dpf_gdelt@release/0.1.1
+RUN pip3 install git+https://github.com/lantrns-analytics/dpf_novacene@release/0.1
 
 
 # Copy resources for Dagster
