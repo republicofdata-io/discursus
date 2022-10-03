@@ -20,11 +20,6 @@ def mining_gdelt_mentions_sensor(context, asset_event):
                         "file_path": asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text
                     }
                 },
-                "get_url_to_latest_asset": {
-                    "config": {
-                        "gdelt_asset": "mentions"
-                    }
-                },
                 "materialize_data_asset": {
                     "config": {
                         "asset_key_parent": "sources",

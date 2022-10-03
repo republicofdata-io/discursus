@@ -6,10 +6,23 @@ from dagster import (
 from dagster_snowflake import snowflake_resource
 from dagster_dbt import dbt_cli_resource
 
-from dpf_gdelt import gdelt_mining_ops
 from dpf_utils import persistance_ops, scraping_ops
+from saf_gdelt import gdelt_resource
 from saf_novacene import novacene_resource
 
+from ops.gdelt_ops import (
+    get_url_to_latest_events,
+    get_url_to_latest_mentions,
+    build_file_path, 
+    mine_latest_asset,
+    filter_latest_events,
+    filter_latest_mentions
+)
+from ops.ml_enrichment_ops import (
+    classify_mentions_relevancy, 
+    get_relevancy_classifications, 
+    store_relevancy_classifications
+)
 from ops.dw_ops import (
     launch_gdelt_events_snowpipe,
     launch_gdelt_mentions_snowpipe,
@@ -25,9 +38,12 @@ from ops.dw_ops import (
     data_test_warehouse,
     drop_old_relations
 )
-from ops.ml_enrichment_ops import classify_mentions_relevancy, get_relevancy_classifications, store_relevancy_classifications
-from ops.ml_trainer_engine_ops import get_latest_ml_enrichments, create_records
+from ops.ml_trainer_engine_ops import (
+    get_latest_ml_enrichments, 
+    create_records
+)
 from ops.utils_ops import get_enhanced_mentions_source_path
+
 from resources.airtable_resource import airtable_api_client
 from resources.aws_resource import aws_client
 
@@ -42,52 +58,40 @@ novacene_configs = config_from_files(['configs/novacene_configs.yaml'])
 aws_configs = config_from_files(['configs/aws_configs.yaml'])
 airtable_configs = config_from_files(['configs/airtable_configs.yaml'])
 
-my_dbt_resource = dbt_cli_resource.configured({
-    "profiles_dir": DBT_PROFILES_DIR, 
-    "project_dir": DBT_PROJECT_DIR})
-
-my_novacene_client_client = novacene_resource.initiate_novacene_client.configured(novacene_configs)
+my_gdelt_resource = gdelt_resource.initiate_gdelt_resource.configured(None)
+my_novacene_resource = novacene_resource.initiate_novacene_resource.configured(novacene_configs)
 my_aws_client = aws_client.configured(aws_configs)
 my_airtable_client = airtable_api_client.configured(airtable_configs)
+
+my_dbt_client = dbt_cli_resource.configured({
+    "profiles_dir": DBT_PROFILES_DIR, 
+    "project_dir": DBT_PROJECT_DIR})
 
 
 ################
 # Job to mine GDELT events
 @job(
     resource_defs = {
-        'aws_client': my_aws_client
+        'aws_client': my_aws_client,
+        'gdelt_resource': my_gdelt_resource
     },
     config = {
         "ops": {
-            "get_url_to_latest_asset": {
-                "config": {
-                    "gdelt_asset": "events"
-                }
-            },
             "materialize_data_asset": {
                 "config": {
                     "asset_key_parent": "sources",
                     "asset_key_child": "gdelt_events",
                     "asset_description": "List of events mined on GDELT"
                 }
-            },
-            "filter_latest_events": {
-                "config": {
-                    "filter_event_code": 14,
-                    "filter_countries": {
-                        "US",
-                        "CA"
-                    }
-                }
             }
         }
     }
 )
 def mine_gdelt_events():
-    latest_events_url = gdelt_mining_ops.get_url_to_latest_asset()
-    latest_events_source_path = gdelt_mining_ops.build_file_path(latest_events_url)
-    df_latest_events = gdelt_mining_ops.mine_latest_asset(latest_events_url)
-    df_latest_events_filtered = gdelt_mining_ops.filter_latest_events(df_latest_events)
+    latest_events_url = get_url_to_latest_events()
+    latest_events_source_path = build_file_path(latest_events_url)
+    df_latest_events = mine_latest_asset(latest_events_url)
+    df_latest_events_filtered = filter_latest_events(df_latest_events)
     persistance_ops.save_data_asset(df_latest_events_filtered, latest_events_source_path)
     persistance_ops.materialize_data_asset(df_latest_events_filtered, latest_events_source_path)
 
@@ -96,15 +100,16 @@ def mine_gdelt_events():
 # Job to mine GDELT mentions
 @job(
     resource_defs = {
-        'aws_client': my_aws_client
+        'aws_client': my_aws_client,
+        'gdelt_resource': my_gdelt_resource
     }
 )
 def mine_gdelt_mentions():
     df_latest_events_filtered = persistance_ops.get_saved_data_asset()
-    latest_mentions_url = gdelt_mining_ops.get_url_to_latest_asset()
-    latest_mentions_source_path = gdelt_mining_ops.build_file_path(latest_mentions_url)
-    df_latest_mentions = gdelt_mining_ops.mine_latest_asset(latest_mentions_url)
-    df_latest_mentions_filtered = gdelt_mining_ops.filter_latest_mentions(df_latest_mentions, df_latest_events_filtered)
+    latest_mentions_url = get_url_to_latest_mentions()
+    latest_mentions_source_path = build_file_path(latest_mentions_url)
+    df_latest_mentions = mine_latest_asset(latest_mentions_url)
+    df_latest_mentions_filtered = filter_latest_mentions(df_latest_mentions, df_latest_events_filtered)
     persistance_ops.save_data_asset(df_latest_mentions_filtered, latest_mentions_source_path)
     persistance_ops.materialize_data_asset(df_latest_mentions_filtered, latest_mentions_source_path)
 
@@ -151,7 +156,7 @@ def load_gdelt_assets_to_snowflake():
 # Job to classify relevancy of GDELT mentions
 @job(
     resource_defs = {
-        'novacene_client': my_novacene_client_client
+        'novacene_resource': my_novacene_resource
     }
 )
 def classify_gdelt_mentions_relevancy():
@@ -163,7 +168,7 @@ def classify_gdelt_mentions_relevancy():
 # Job to get classification results of GDELT mentions
 @job(
     resource_defs = {
-        'novacene_client': my_novacene_client_client
+        'novacene_resource': my_novacene_resource
     }
 )
 def get_relevancy_classification_of_gdelt_mentions():
@@ -201,7 +206,7 @@ def feed_ml_trainer_engine():
 @job(
     resource_defs = {
         'snowflake': snowflake_resource,
-        'dbt': my_dbt_resource
+        'dbt': my_dbt_client
     },
     config = snowflake_configs
 )
