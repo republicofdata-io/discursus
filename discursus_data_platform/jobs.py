@@ -6,10 +6,15 @@ from dagster import (
 from dagster_snowflake import snowflake_resource
 from dagster_dbt import dbt_cli_resource
 
-from dpf_utils import persistance_ops, scraping_ops
+from saf_aws import aws_resource
 from saf_gdelt import gdelt_resource
 from saf_novacene import novacene_resource
+from dpf_utils import scraping_ops
 
+from ops.aws_ops import (
+    s3_put,
+    s3_get
+)
 from ops.gdelt_ops import (
     get_url_to_latest_events,
     get_url_to_latest_mentions,
@@ -42,10 +47,12 @@ from ops.ml_trainer_engine_ops import (
     get_latest_ml_enrichments, 
     create_records
 )
-from ops.utils_ops import get_enhanced_mentions_source_path
+from ops.utils_ops import (
+    get_enhanced_mentions_source_path,
+    materialize_data_asset
+)
 
 from resources.airtable_resource import airtable_api_client
-from resources.aws_resource import aws_client
 
 
 # Resources
@@ -55,12 +62,11 @@ DBT_PROJECT_DIR = file_relative_path(__file__, "./dw")
 
 snowflake_configs = config_from_files(['configs/snowflake_configs.yaml'])
 novacene_configs = config_from_files(['configs/novacene_configs.yaml'])
-aws_configs = config_from_files(['configs/aws_configs.yaml'])
 airtable_configs = config_from_files(['configs/airtable_configs.yaml'])
 
 my_gdelt_resource = gdelt_resource.initiate_gdelt_resource.configured(None)
 my_novacene_resource = novacene_resource.initiate_novacene_resource.configured(novacene_configs)
-my_aws_client = aws_client.configured(aws_configs)
+my_aws_resource = aws_resource.initiate_aws_resource.configured(None)
 my_airtable_client = airtable_api_client.configured(airtable_configs)
 
 my_dbt_client = dbt_cli_resource.configured({
@@ -72,7 +78,7 @@ my_dbt_client = dbt_cli_resource.configured({
 # Job to mine GDELT events
 @job(
     resource_defs = {
-        'aws_client': my_aws_client,
+        'aws_resource': my_aws_resource,
         'gdelt_resource': my_gdelt_resource
     },
     config = {
@@ -92,33 +98,33 @@ def mine_gdelt_events():
     latest_events_source_path = build_file_path(latest_events_url)
     df_latest_events = mine_latest_asset(latest_events_url)
     df_latest_events_filtered = filter_latest_events(df_latest_events)
-    persistance_ops.save_data_asset(df_latest_events_filtered, latest_events_source_path)
-    persistance_ops.materialize_data_asset(df_latest_events_filtered, latest_events_source_path)
+    s3_put(df_latest_events_filtered, latest_events_source_path)
+    materialize_data_asset(df_latest_events_filtered, latest_events_source_path)
 
 
 ################
 # Job to mine GDELT mentions
 @job(
     resource_defs = {
-        'aws_client': my_aws_client,
+        'aws_resource': my_aws_resource,
         'gdelt_resource': my_gdelt_resource
     }
 )
 def mine_gdelt_mentions():
-    df_latest_events_filtered = persistance_ops.get_saved_data_asset()
+    df_latest_events_filtered = s3_get()
     latest_mentions_url = get_url_to_latest_mentions()
     latest_mentions_source_path = build_file_path(latest_mentions_url)
     df_latest_mentions = mine_latest_asset(latest_mentions_url)
     df_latest_mentions_filtered = filter_latest_mentions(df_latest_mentions, df_latest_events_filtered)
-    persistance_ops.save_data_asset(df_latest_mentions_filtered, latest_mentions_source_path)
-    persistance_ops.materialize_data_asset(df_latest_mentions_filtered, latest_mentions_source_path)
+    s3_put(df_latest_mentions_filtered, latest_mentions_source_path)
+    materialize_data_asset(df_latest_mentions_filtered, latest_mentions_source_path)
 
 
 ################
 # Job to get meta data of GDELT mentions
 @job(
     resource_defs = {
-        'aws_client': my_aws_client
+        'aws_resource': my_aws_resource
     },
     config = {
         "ops": {
@@ -131,11 +137,11 @@ def mine_gdelt_mentions():
     }
 )
 def enhance_gdelt_mentions():
-    df_latest_mentions_filtered = persistance_ops.get_saved_data_asset()
+    df_latest_mentions_filtered = s3_get()
     df_gdelt_enhanced_mentions = scraping_ops.get_meta_data(df_latest_mentions_filtered)
     enhanced_mentions_source_path = get_enhanced_mentions_source_path(df_gdelt_enhanced_mentions)
-    persistance_ops.save_data_asset(df_gdelt_enhanced_mentions, enhanced_mentions_source_path)
-    persistance_ops.materialize_data_asset(df_gdelt_enhanced_mentions, enhanced_mentions_source_path)
+    s3_put(df_gdelt_enhanced_mentions, enhanced_mentions_source_path)
+    materialize_data_asset(df_gdelt_enhanced_mentions, enhanced_mentions_source_path)
 
 
 ################

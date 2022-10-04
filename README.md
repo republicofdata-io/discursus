@@ -77,11 +77,11 @@ When you call an op from the library, you might need to pass a resource which is
 from dpf_utils import persistance_ops
 
 aws_configs = config_from_files(['configs/aws_configs.yaml'])
-my_aws_client = gdelt_resources.gdelt_client.configured(aws_configs)
+my_gdelt_resource = gdelt_resources.gdelt_resource.configured(aws_configs)
 
 @job(
     resource_defs = {
-        'aws_client': my_aws_client
+        'gdelt_resource': my_gdelt_resource
     }
 )
 def my_job():
@@ -96,7 +96,7 @@ from dpf_gdelt import gdelt_mining_ops
 
 @job(
     resource_defs = {
-        'aws_client': my_aws_client
+        'gdelt_resource': my_gdelt_resource
     },
     config = {
         "ops": {

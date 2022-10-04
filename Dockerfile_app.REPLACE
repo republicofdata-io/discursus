@@ -56,6 +56,7 @@ RUN pip3 install \
 
 # Install framework packages
 RUN pip3 install git+https://github.com/lantrns-analytics/saf_utils@release/0.2
+RUN pip3 install git+https://github.com/lantrns-analytics/saf_aws@release/0.2
 RUN pip3 install git+https://github.com/lantrns-analytics/saf_gdelt@release/0.2
 RUN pip3 install git+https://github.com/lantrns-analytics/saf_novacene@release/0.2
 

@@ -14,9 +14,8 @@ def mining_gdelt_mentions_sensor(context, asset_event):
         run_key = asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text,
         run_config={
             "ops": {
-                "get_saved_data_asset": {
+                "s3_get": {
                     "config": {
-                        "asset_key": asset_event.dagster_event.asset_key.path,
                         "file_path": asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text
                     }
                 },
@@ -37,15 +36,13 @@ def enhance_gdelt_mentions_sensor(context, asset_event):
         run_key = asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text,
         run_config={
             "ops": {
-                "get_saved_data_asset": {
+                "s3_get": {
                     "config": {
-                        "asset_key": asset_event.dagster_event.asset_key.path,
                         "file_path": asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text
                     }
                 },
                 "get_enhanced_mentions_source_path": {
                     "config": {
-                        "asset_key": asset_event.dagster_event.asset_key.path,
                         "asset_materialization_path": asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text
                     }
                 },
@@ -79,7 +76,6 @@ def classify_gdelt_mentions_relevancy_sensor(context, asset_event):
             "ops": {
                 "classify_mentions_relevancy": {
                     "config": {
-                        "asset_key": asset_event.dagster_event.asset_key.path,
                         "asset_materialization_path": asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text
                     }
                 }
