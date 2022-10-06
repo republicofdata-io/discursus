@@ -9,7 +9,7 @@ from dagster_dbt import dbt_cli_resource
 from saf_aws import aws_resource
 from saf_gdelt import gdelt_resource
 from saf_novacene import novacene_resource
-from dpf_utils import scraping_ops
+from saf_web_scraper import web_scraper_resource
 
 from ops.aws_ops import (
     s3_put,
@@ -23,16 +23,18 @@ from ops.gdelt_ops import (
     filter_latest_events,
     filter_latest_mentions
 )
-from ops.ml_enrichment_ops import (
+from ops.novacene_ops import (
     classify_mentions_relevancy, 
     get_relevancy_classifications, 
     store_relevancy_classifications
 )
-from ops.dw_ops import (
+from ops.snowflake_ops import (
     launch_gdelt_events_snowpipe,
     launch_gdelt_mentions_snowpipe,
     launch_gdelt_enhanced_mentions_snowpipe,
-    launch_ml_enriched_articles_snowpipe,
+    launch_ml_enriched_articles_snowpipe
+)
+from ops.dbt_ops import (
     seed_dw_staging_layer,
     build_dw_staging_layer,
     test_dw_staging_layer,
@@ -43,13 +45,16 @@ from ops.dw_ops import (
     data_test_warehouse,
     drop_old_relations
 )
-from ops.ml_trainer_engine_ops import (
+from ops.airtable_ops import (
     get_latest_ml_enrichments, 
     create_records
 )
 from ops.utils_ops import (
     get_enhanced_mentions_source_path,
     materialize_data_asset
+)
+from ops.web_scraper_ops import (
+    scrape_urls
 )
 
 from resources.airtable_resource import airtable_api_client
@@ -67,6 +72,7 @@ airtable_configs = config_from_files(['configs/airtable_configs.yaml'])
 my_gdelt_resource = gdelt_resource.initiate_gdelt_resource.configured(None)
 my_novacene_resource = novacene_resource.initiate_novacene_resource.configured(novacene_configs)
 my_aws_resource = aws_resource.initiate_aws_resource.configured(None)
+my_web_scraper_resource = web_scraper_resource.initiate_web_scraper_resource.configured(None)
 my_airtable_client = airtable_api_client.configured(airtable_configs)
 
 my_dbt_client = dbt_cli_resource.configured({
@@ -124,21 +130,13 @@ def mine_gdelt_mentions():
 # Job to get meta data of GDELT mentions
 @job(
     resource_defs = {
-        'aws_resource': my_aws_resource
-    },
-    config = {
-        "ops": {
-            "get_meta_data": {
-                "config": {
-                    "url_field_index": 5
-                }
-            }
-        }
+        'aws_resource': my_aws_resource,
+        'web_scraper_resource': my_web_scraper_resource
     }
 )
 def enhance_gdelt_mentions():
     df_latest_mentions_filtered = s3_get()
-    df_gdelt_enhanced_mentions = scraping_ops.get_meta_data(df_latest_mentions_filtered)
+    df_gdelt_enhanced_mentions = scrape_urls(df_latest_mentions_filtered)
     enhanced_mentions_source_path = get_enhanced_mentions_source_path(df_gdelt_enhanced_mentions)
     s3_put(df_gdelt_enhanced_mentions, enhanced_mentions_source_path)
     materialize_data_asset(df_gdelt_enhanced_mentions, enhanced_mentions_source_path)

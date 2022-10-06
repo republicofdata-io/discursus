@@ -46,11 +46,6 @@ def enhance_gdelt_mentions_sensor(context, asset_event):
                         "asset_materialization_path": asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text
                     }
                 },
-                "get_meta_data": {
-                    "config": {
-                        "url_field_index": 5
-                    }
-                },
                 "materialize_data_asset": {
                     "config": {
                         "asset_key_parent": "sources",
