@@ -22,16 +22,12 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
 
 RUN pip3 install \
     awscli \
-    dagster==0.15.8 \
-    dagster-graphql==0.15.8 \
-    dagit==0.15.8 \
-    dagster-postgres==0.15.8 \
-    dagster-docker==0.15.8 \
-    dagster_shell==0.15.8 \
-    dagster_snowflake==0.15.8 \
-    dagster_dbt==0.15.8 \
-    dbt-core==1.2.1 \
-    dbt-snowflake==1.2.0 \
+    dagster==1.0.12 \
+    dagit==1.0.12 \
+    dagster-graphql==1.0.12 \
+    dagster-postgres==0.16.12 \
+    dagster-docker==0.16.12 \
+    dagster_shell==0.16.12 \
     bs4 \
     optparse-pretty \
     boto3 \
