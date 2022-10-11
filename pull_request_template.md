@@ -22,8 +22,7 @@ Please describe the tests that you ran to verify your changes. Provide instructi
 # Checklist:
 
 - [ ] My pull request represents one story (logical piece of work).
-- [ ] My code follows the [style guidelines](resources/style_guidelines.md) of this project
 - [ ] I have performed a self-review of my own code
 - [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I ran the Docker data platform in my development environment without error.
+- [ ] I ran the data platform in my development environment without error.
 - [ ] I ran the data pipelines in my development environment without error.
