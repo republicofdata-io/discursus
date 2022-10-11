@@ -27,17 +27,17 @@
 
 # The Social Analytics Framework
 
-The OSS __Social Analytics Framework__ provides an architecture and suite of librairies to quickly start sourcing, transforming and delivering high quality public social signals to your users.
+The OSS __Social Analytics Framework__ provides an architecture and suite of librairies to source, transform and deliver high quality public social signals to your users.
 
-<img src='resources/images/lantrns_analytics_data_product_framework.png' width='750px' alt='Lantrns Analytics open-source data product framework' />
+<img src='resources/images/social_analytics_framework.png' width='750px' alt='Lantrns Analytics open-source data product framework' />
 
 &nbsp;
 
 ## Implementations
 
-We use this framework for [discursus](https://github.com/lantrns-analytics/discursus_data_platform), which is an open source social analytics data product that continuously deliver data on protest movements throughout North America.. 
+For a real-world implementation of this framework, please refer to the [open-source discursus project](https://github.com/lantrns-analytics/discursus_data_platform), which is a social analytics data product that continuously deliver data on protest movements throughout North America.. 
 
-Below is an overview of what this data product's flow of data asset transformations looks like.
+Below is an overview of what this data product's flow of data asset production looks like.
 
 <img src='resources/images/discursus_data_platform.png' width='750px' alt='discursus data platform' />
 
@@ -45,13 +45,13 @@ Below is an overview of what this data product's flow of data asset transformati
 
 ## Architecture
 
-For the discursus project above, we rely on the following architecture to support our instance.
+For the discursus project, we rely on the following architecture.
 
 <img src="resources/images/discursus_core_architecture.png" width="750px" alt="discursus" />
 
 Here are the components of this implementation:
 
-- A suite of miners that sources social public signals such as GDELT and Twitter.
+- A suite of Social Analytics Framework miners that sources social public signals such as GDELT and Twitter.
 - Cloud storage such as S3.
 - Data preparation libraries to repair and enhance data.
 - Data transfer capabilities such as Snowpipe, to move data between cloud storage and cloud data warehouses.
@@ -70,8 +70,12 @@ To use the __Social Analytics Framework__, you will need to:
     - Rename the `Dockerfile_app.REPLACE` file to `Dockerfile_app`.
     - Change the values of environment variables within the `Dockerfile_app` file.
     - Make any necessary changes to `docker-compose`
-- To run the Docker stack locally: `docker compose -p "dpf-core" --file docker-compose.yml up --build`
+- To run the Docker stack locally: `docker compose -p "saf-core" --file docker-compose.yml up --build`
 - Visit Dagster's app: `http://127.0.0.1:3000/`
+
+The `core` framework can be  run as is and will allow you to launch `my_job` which will kindly salute the world.
+
+<img src='resources/images/saf_hello_world.png' width='750px' alt='Framework salutes world' />
 
 &nbsp;
 

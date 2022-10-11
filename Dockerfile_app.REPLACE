@@ -52,7 +52,6 @@ RUN mkdir -p $DAGSTER_HOME/tmp
 
 # Copy and install saf_core package
 COPY saf_core/ /opt/dagster/saf_core/
-RUN (cd /opt/dagster/saf_core/dw/; dbt deps --profiles-dir ./)
 
 WORKDIR /opt/dagster/saf_core/
 
