@@ -14,14 +14,14 @@ run_launcher:
       - DAGSTER_POSTGRES_USER
       - DAGSTER_POSTGRES_PASSWORD
       - DAGSTER_POSTGRES_DB
-    network: dpf_network
+    network: saf_network
 
 run_storage:
   module: dagster_postgres.run_storage
   class: PostgresRunStorage
   config:
     postgres_db:
-      hostname: dpf_postgresql
+      hostname: saf_postgresql
       username:
         env: DAGSTER_POSTGRES_USER
       password:
@@ -35,7 +35,7 @@ schedule_storage:
   class: PostgresScheduleStorage
   config:
     postgres_db:
-      hostname: dpf_postgresql
+      hostname: saf_postgresql
       username:
         env: DAGSTER_POSTGRES_USER
       password:
@@ -49,7 +49,7 @@ event_log_storage:
   class: PostgresEventLogStorage
   config:
     postgres_db:
-      hostname: dpf_postgresql
+      hostname: saf_postgresql
       username:
         env: DAGSTER_POSTGRES_USER
       password:

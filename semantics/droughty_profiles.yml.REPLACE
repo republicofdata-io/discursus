@@ -1,9 +1,0 @@
-discursus:
-  warehouse_name: "snowflake"
-  account: REPLACE_VALUE
-  user: REPLACE_VALUE
-  password: REPLACE_VALUE
-  role:  REPLACE_VALUE
-  database: REPLACE_VALUE
-  warehouse: REPLACE_VALUE
-  schema_name: REPLACE_VALUE

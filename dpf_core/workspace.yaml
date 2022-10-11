@@ -1,5 +1,0 @@
-load_from:
-  - grpc_server:
-      host: dpf_app
-      port: 4000
-      location_name: "dpf_app"

@@ -8,7 +8,7 @@
     <a href="https://twitter.com/lantrns_co">Twitter</a> |
     <a href="https://www.linkedin.com/company/lantrns-co/">LinkedIn</a>
     <br /><br />
-    <a href="https://github.com/lantrns-analytics/dpf_core/releases">
+    <a href="https://github.com/lantrns-analytics/saf_core/releases">
         <img src="https://img.shields.io/github/release/lantrns-analytics/saf_core" alt="Latest release" />
     </a>
     <a href="https://github.com/lantrns-analytics/saf_core/network/members">
@@ -17,10 +17,10 @@
     <a href="https://github.com/lantrns-analytics/saf_core/stargazers">
         <img src="https://img.shields.io/github/stars/lantrns-analytics/saf_core" alt="Stars" />
     </a>
-    <a href="https://github.com/lantrns-analytics/dpf_core/issues">
+    <a href="https://github.com/lantrns-analytics/saf_core/issues">
         <img src="https://img.shields.io/github/issues/lantrns-analytics/saf_core" alt="Open issues" />
     </a>
-    <a href="https://github.com/lantrns-analytics/dpf_core/contributors/">
+    <a href="https://github.com/lantrns-analytics/saf_core/contributors/">
         <img src="https://img.shields.io/github/contributors/lantrns-analytics/saf_core" alt="Contributors" />
     </a>
 </p>
@@ -78,7 +78,7 @@ To use the __Social Analytics Framework__, you will need to:
 ## Libraries
 Libraries are [resources](https://docs.dagster.io/concepts/resources) used within your own instance of the framework. Resources usually require [configurations](https://docs.dagster.io/concepts/configuration/config-schema#run-configuration).
 
-We assume you are running a Docker file such as the one we have in the [Core repo](https://github.com/lantrns-analytics/dpf_core/blob/release/0.1/Dockerfile_app.REPLACE). Let's say we wanted to add the GDELT library, the only thing you need to add is the following.
+We assume you are running a Docker file such as the one we have in the [Core repo](https://github.com/lantrns-analytics/saf_core/blob/release/0.1/Dockerfile_app.REPLACE). Let's say we wanted to add the GDELT library, the only thing you need to add is the following.
 
 `RUN pip3 install git+https://github.com/lantrns-analytics/saf_gdelt@release/0.2`
 
@@ -96,7 +96,7 @@ There are many ways you can contribute and help evolve the __Lantrns Analytics o
 
 * Star this repo.
 * Fork this repo and run an instance yourself and please 🙏 help us out with documentation.
-* Take ownership of some of the [issues we already documented](https://github.com/lantrns-analytics/dpf_core/issues), and send over some PRs.
+* Take ownership of some of the [issues we already documented](https://github.com/lantrns-analytics/saf_core/issues), and send over some PRs.
 * Contribute to the libraries.
 * Create issues every time you feel something is missing or goes wrong.
 
