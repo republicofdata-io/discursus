@@ -1,4 +1,4 @@
-FROM ubuntu:21.10
+FROM ubuntu:22.04
 
 # Environment variables
 ENV DAGSTER_HOME=/opt/dagster/dagster_home/
@@ -62,18 +62,17 @@ RUN pip3 install git+https://github.com/lantrns-analytics/saf_web_scraper@releas
 
 
 # Copy resources for Dagster
-COPY dpf_core/dagster.yaml $DAGSTER_HOME
+COPY saf_core/dagster.yaml $DAGSTER_HOME
 
 
 # Create tmp repostiory for local temporary job files to be copied to
 RUN mkdir -p $DAGSTER_HOME/tmp
 
 
-# Copy and install dpf_core package
-COPY dpf_core/ /opt/dagster/dpf_core/
-RUN (cd /opt/dagster/dpf_core/dw/; dbt deps --profiles-dir ./)
+# Copy and install saf_core package
+COPY saf_core/ /opt/dagster/saf_core/
 
-WORKDIR /opt/dagster/dpf_core/
+WORKDIR /opt/dagster/saf_core/
 
 
 # Run dagster gRPC server on port 4000
