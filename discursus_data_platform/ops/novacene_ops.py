@@ -37,7 +37,6 @@ class MLEnrichmentJobTracker:
 @op(
     required_resource_keys = {"novacene_resource"},
     config_schema = {
-        "asset_key": list,
         "asset_materialization_path": str
     }
 )
