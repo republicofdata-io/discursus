@@ -1,15 +1,7 @@
-from dagster import (
-    job, 
-    file_relative_path,
-    config_from_files
-)
+from dagster import job
 from dagster_snowflake import snowflake_resource
-from dagster_dbt import dbt_cli_resource
 
-from saf_aws import aws_resource
-from saf_gdelt import gdelt_resource
-from saf_novacene import novacene_resource
-from saf_web_scraper import web_scraper_resource
+import resources.my_resources
 
 from ops.aws_ops import (
     s3_put,
@@ -57,63 +49,13 @@ from ops.web_scraper_ops import (
     scrape_urls
 )
 
-from resources.airtable_resource import airtable_api_client
-
-
-# Resources
-#################
-DBT_PROFILES_DIR = file_relative_path(__file__, "./dw")
-DBT_PROJECT_DIR = file_relative_path(__file__, "./dw")
-
-snowflake_configs = config_from_files(['configs/snowflake_configs.yaml'])
-novacene_configs = config_from_files(['configs/novacene_configs.yaml'])
-airtable_configs = config_from_files(['configs/airtable_configs.yaml'])
-
-my_gdelt_resource = gdelt_resource.initiate_gdelt_resource.configured(None)
-my_novacene_resource = novacene_resource.initiate_novacene_resource.configured(novacene_configs)
-my_aws_resource = aws_resource.initiate_aws_resource.configured(None)
-my_web_scraper_resource = web_scraper_resource.initiate_web_scraper_resource.configured(None)
-my_airtable_client = airtable_api_client.configured(airtable_configs)
-
-my_dbt_client = dbt_cli_resource.configured({
-    "profiles_dir": DBT_PROFILES_DIR, 
-    "project_dir": DBT_PROJECT_DIR})
-
-
-################
-# Job to mine GDELT events
-@job(
-    resource_defs = {
-        'aws_resource': my_aws_resource,
-        'gdelt_resource': my_gdelt_resource
-    },
-    config = {
-        "ops": {
-            "materialize_data_asset": {
-                "config": {
-                    "asset_key_parent": "sources",
-                    "asset_key_child": "gdelt_events",
-                    "asset_description": "List of events mined on GDELT"
-                }
-            }
-        }
-    }
-)
-def mine_gdelt_events():
-    latest_events_url = get_url_to_latest_events()
-    latest_events_source_path = build_file_path(latest_events_url)
-    df_latest_events = mine_latest_asset(latest_events_url)
-    df_latest_events_filtered = filter_latest_events(df_latest_events)
-    s3_put(df_latest_events_filtered, latest_events_source_path)
-    materialize_data_asset(df_latest_events_filtered, latest_events_source_path)
-
 
 ################
 # Job to mine GDELT mentions
 @job(
     resource_defs = {
-        'aws_resource': my_aws_resource,
-        'gdelt_resource': my_gdelt_resource
+        'aws_resource': resources.my_resources.my_aws_resource,
+        'gdelt_resource': resources.my_resources.my_gdelt_resource
     }
 )
 def mine_gdelt_mentions():
@@ -130,8 +72,8 @@ def mine_gdelt_mentions():
 # Job to get meta data of GDELT mentions
 @job(
     resource_defs = {
-        'aws_resource': my_aws_resource,
-        'web_scraper_resource': my_web_scraper_resource
+        'aws_resource': resources.my_resources.my_aws_resource,
+        'web_scraper_resource': resources.my_resources.my_web_scraper_resource
     }
 )
 def enhance_gdelt_mentions():
@@ -148,7 +90,7 @@ def enhance_gdelt_mentions():
     resource_defs = {
         'snowflake': snowflake_resource
     },
-    config = snowflake_configs
+    config = resources.my_resources.snowflake_configs
 )
 def load_gdelt_assets_to_snowflake():
     launch_gdelt_events_snowpipe_result = launch_gdelt_events_snowpipe()
@@ -160,7 +102,7 @@ def load_gdelt_assets_to_snowflake():
 # Job to classify relevancy of GDELT mentions
 @job(
     resource_defs = {
-        'novacene_resource': my_novacene_resource
+        'novacene_resource': resources.my_resources.my_novacene_resource
     }
 )
 def classify_gdelt_mentions_relevancy():
@@ -172,7 +114,7 @@ def classify_gdelt_mentions_relevancy():
 # Job to get classification results of GDELT mentions
 @job(
     resource_defs = {
-        'novacene_resource': my_novacene_resource
+        'novacene_resource': resources.my_resources.my_novacene_resource
     }
 )
 def get_relevancy_classification_of_gdelt_mentions():
@@ -186,7 +128,7 @@ def get_relevancy_classification_of_gdelt_mentions():
     resource_defs = {
         'snowflake': snowflake_resource
     },
-    config = snowflake_configs
+    config = resources.my_resources.snowflake_configs
 )
 def load_classified_gdelt_mentions_to_snowflake():
     launch_ml_enriched_articles_snowpipe()
@@ -196,7 +138,7 @@ def load_classified_gdelt_mentions_to_snowflake():
 # Job to feed our ML training engine
 @job(
     resource_defs = {
-        'airtable_client': my_airtable_client
+        'airtable_client': resources.my_resources.my_airtable_client
     }
 )
 def feed_ml_trainer_engine():
@@ -210,9 +152,9 @@ def feed_ml_trainer_engine():
 @job(
     resource_defs = {
         'snowflake': snowflake_resource,
-        'dbt': my_dbt_client
+        'dbt': resources.my_resources.my_dbt_client
     },
-    config = snowflake_configs
+    config = resources.my_resources.snowflake_configs
 )
 def build_data_warehouse():
     seed_dw_staging_layer_result = seed_dw_staging_layer()

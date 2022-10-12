@@ -1,5 +1,9 @@
 from dagster import repository
 
+from assets import (
+    gdelt_events
+)
+
 from jobs import (
     mine_gdelt_events, 
     mine_gdelt_mentions,
@@ -28,8 +32,10 @@ from schedules import (
 
 @repository
 def discursus_repo():
+    assets = [
+        gdelt_events
+    ]
     jobs = [
-        mine_gdelt_events, 
         mine_gdelt_mentions,
         enhance_gdelt_mentions,
         load_gdelt_assets_to_snowflake, 
