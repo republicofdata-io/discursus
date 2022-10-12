@@ -1,4 +1,4 @@
-FROM ubuntu:21.10
+FROM ubuntu:22.04
 
 # Environment variables
 ENV DAGSTER_HOME=/opt/dagster/dagster_home/
@@ -18,7 +18,6 @@ ENV SNOWFLAKE_DW_SCHEMA=REPLACE_VALUE
 ENV ML_HOST=REPLACE_VALUE
 ENV ML_LOGIN=REPLACE_VALUE
 ENV ML_PASSWORD=REPLACE_VALUE
-ENV ML_RELEVANCY_CLASSIFICATION_MODEL_ID=REPLACE_VALUE
 
 
 # Create environment
@@ -39,16 +38,12 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
 
 RUN pip3 install \
     awscli \
-    dagster==0.15.8 \
-    dagster-graphql==0.15.8 \
-    dagit==0.15.8 \
-    dagster-postgres==0.15.8 \
-    dagster-docker==0.15.8 \
-    dagster_shell==0.15.8 \
-    dagster_snowflake==0.15.8 \
-    dagster_dbt==0.15.8 \
-    dbt-core==1.2.1 \
-    dbt-snowflake==1.2.0 \
+    dagster==1.0.12 \
+    dagit==1.0.12 \
+    dagster-graphql==1.0.12 \
+    dagster-postgres==0.16.12 \
+    dagster-docker==0.16.12 \
+    dagster_shell==0.16.12 \
     bs4 \
     optparse-pretty \
     boto3 \
@@ -56,23 +51,24 @@ RUN pip3 install \
 
 
 # Install framework packages
-RUN pip3 install git+https://github.com/lantrns-analytics/dpf_utils@release/0.1
-RUN pip3 install git+https://github.com/lantrns-analytics/dpf_gdelt@release/0.1
+RUN pip3 install git+https://github.com/lantrns-analytics/saf_aws@release/0.2
+RUN pip3 install git+https://github.com/lantrns-analytics/saf_gdelt@release/0.2
+RUN pip3 install git+https://github.com/lantrns-analytics/saf_novacene@release/0.2
+RUN pip3 install git+https://github.com/lantrns-analytics/saf_web_scraper@release/0.2
 
 
 # Copy resources for Dagster
-COPY dpf_core/dagster.yaml $DAGSTER_HOME
+COPY saf_core/dagster.yaml $DAGSTER_HOME
 
 
 # Create tmp repostiory for local temporary job files to be copied to
 RUN mkdir -p $DAGSTER_HOME/tmp
 
 
-# Copy and install dpf_core package
-COPY dpf_core/ /opt/dagster/dpf_core/
-RUN (cd /opt/dagster/dpf_core/dw/; dbt deps --profiles-dir ./)
+# Copy and install saf_core package
+COPY saf_core/ /opt/dagster/saf_core/
 
-WORKDIR /opt/dagster/dpf_core/
+WORKDIR /opt/dagster/saf_core/
 
 
 # Run dagster gRPC server on port 4000

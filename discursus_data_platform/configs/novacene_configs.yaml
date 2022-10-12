@@ -1,5 +1,5 @@
 resources:
-  novacene_client:
+  novacene_resource:
     config:
       host: 
         env: ML_HOST
@@ -7,5 +7,3 @@ resources:
         env: ML_LOGIN
       password: 
         env: ML_PASSWORD
-      ml_relevancy_classification_model_id:
-        env: ML_RELEVANCY_CLASSIFICATION_MODEL_ID

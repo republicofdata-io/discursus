@@ -35,7 +35,7 @@ class MLEnrichmentJobTracker:
 
 
 @op(
-    required_resource_keys = {"novacene_client"},
+    required_resource_keys = {"novacene_resource"},
     config_schema = {
         "asset_key": list,
         "asset_materialization_path": str
@@ -54,8 +54,8 @@ def classify_mentions_relevancy(context):
     if df_gdelt_articles.index.size > 0:
         context.log.info("Sending " + str(df_gdelt_articles.index.size) + " articles for relevancy classification")
 
-        protest_classification_dataset_id = context.resources.novacene_client.create_dataset("protest_events_" + filename.split("/")[3], df_gdelt_articles)
-        protest_classification_job = context.resources.novacene_client.enrich_dataset(protest_classification_dataset_id['id'])
+        protest_classification_dataset_id = context.resources.novacene_resource.create_dataset("protest_events_" + filename.split("/")[3], df_gdelt_articles)
+        protest_classification_job = context.resources.novacene_resource.enrich_dataset(protest_classification_dataset_id['id'], 17, 4)
 
         # Update log of enrichment jobs
         my_ml_enrichment_jobs_tracker.add_new_job(protest_classification_job['id'], 'processing')
@@ -77,7 +77,7 @@ def classify_mentions_relevancy(context):
 
 
 @op(
-    required_resource_keys = {"novacene_client"}
+    required_resource_keys = {"novacene_resource"}
 )
 def get_relevancy_classifications(context):
     # Empty dataframe of files to fetch
@@ -90,7 +90,7 @@ def get_relevancy_classifications(context):
     my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
 
     for index, row in my_ml_enrichment_jobs_tracker.df_ml_enrichment_jobs.iterrows():
-        job_info = context.resources.novacene_client.job_info(row['job_id'])
+        job_info = context.resources.novacene_resource.job_info(row['job_id'])
 
         if job_info['status'] == 'Completed':
             # Append new job to existing list
@@ -109,14 +109,14 @@ def get_relevancy_classifications(context):
 
 
 @op(
-    required_resource_keys = {"novacene_client"}
+    required_resource_keys = {"novacene_resource"}
 )
 def store_relevancy_classifications(context, df_ml_enrichment_files):
     s3 = boto3.resource('s3')
 
     for index, row in df_ml_enrichment_files.iterrows():
         # Read csv as pandas
-        df_ml_enrichment_file = context.resources.novacene_client.get_file(row['file_path'])
+        df_ml_enrichment_file = context.resources.novacene_resource.get_file(row['file_path'])
 
         # Extract date from file name
         file_date = row['name'].split("_")[2].split(".")[0][0 : 8]

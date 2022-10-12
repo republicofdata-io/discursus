@@ -1,7 +1,0 @@
-resources:
-  gdelt:
-    config:
-      event_code: 14
-      countries:
-        - US
-        - CA
