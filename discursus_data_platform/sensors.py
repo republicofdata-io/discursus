@@ -8,7 +8,7 @@ from jobs import (
     load_classified_gdelt_mentions_to_snowflake
 )
 
-@asset_sensor(asset_key = AssetKey(["sources", "gdelt_events"]), job = mine_gdelt_mentions)
+@asset_sensor(asset_key = AssetKey(["gdelt_events"]), job = mine_gdelt_mentions)
 def mining_gdelt_mentions_sensor(context, asset_event):
     yield RunRequest(
         run_key = asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text,
