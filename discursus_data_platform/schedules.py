@@ -1,8 +1,7 @@
 from dagster import schedule, ScheduleDefinition, ScheduleEvaluationContext, RunRequest
-from jobs import mine_gdelt_events, get_relevancy_classification_of_gdelt_mentions, build_data_warehouse, feed_ml_trainer_engine
+from jobs import gdelt_events_job, get_relevancy_classification_of_gdelt_mentions, build_data_warehouse, feed_ml_trainer_engine
 
-mine_gdelt_events_schedule = ScheduleDefinition(job = mine_gdelt_events, cron_schedule = "2,17,32,47 * * * *")
-
+mine_gdelt_events_schedule = ScheduleDefinition(job = gdelt_events_job, cron_schedule = "2,17,32,47 * * * *")
 get_relevancy_classification_of_gdelt_mentions_schedule = ScheduleDefinition(job = get_relevancy_classification_of_gdelt_mentions, cron_schedule = "7,22,37,52 * * * *")
 feed_ml_trainer_engine_schedule = ScheduleDefinition(job = feed_ml_trainer_engine, cron_schedule = "13,28,43,58 * * * *")
 

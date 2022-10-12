@@ -5,7 +5,6 @@ from assets import (
 )
 
 from jobs import (
-    mine_gdelt_events, 
     mine_gdelt_mentions,
     enhance_gdelt_mentions,
     load_gdelt_assets_to_snowflake, 
@@ -59,4 +58,4 @@ def discursus_repo():
         build_data_warehouse_schedule
     ]
 
-    return jobs + sensors + schedules
+    return assets + jobs + sensors + schedules

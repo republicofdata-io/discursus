@@ -1,18 +1,20 @@
-from dagster import job
+from dagster import job, define_asset_job
 from dagster_snowflake import snowflake_resource
 
 import resources.my_resources
+
+from assets import (
+    gdelt_events
+)
 
 from ops.aws_ops import (
     s3_put,
     s3_get
 )
 from ops.gdelt_ops import (
-    get_url_to_latest_events,
     get_url_to_latest_mentions,
     build_file_path, 
     mine_latest_asset,
-    filter_latest_events,
     filter_latest_mentions
 )
 from ops.novacene_ops import (
@@ -48,6 +50,13 @@ from ops.utils_ops import (
 from ops.web_scraper_ops import (
     scrape_urls
 )
+
+
+gdelt_events_job = define_asset_job(
+    name="gdelt_events_job", 
+    selection="gdelt_events"
+)
+
 
 
 ################
