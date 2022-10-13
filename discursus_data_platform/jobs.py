@@ -1,10 +1,6 @@
 from dagster import job, define_asset_job
 from dagster_snowflake import snowflake_resource
 import resources.my_resources
-from ops.aws_ops import (
-    s3_put,
-    s3_get
-)
 from ops.novacene_ops import (
     classify_mentions_relevancy, 
     get_relevancy_classifications, 
@@ -31,46 +27,26 @@ from ops.airtable_ops import (
     get_latest_ml_enrichments, 
     create_records
 )
-from ops.utils_ops import (
-    get_enhanced_mentions_source_path,
-    materialize_data_asset
-)
-from ops.web_scraper_ops import (
-    scrape_urls
-)
 
 
 gdelt_events_job = define_asset_job(
-    name="gdelt_events_job", 
-    selection="gdelt_events"
+    name = "gdelt_events_job", 
+    selection = "gdelt_events"
 )
 
 gdelt_mentions_job = define_asset_job(
-    name="gdelt_mentions_job", 
-    selection="gdelt_mentions"
+    name = "gdelt_mentions_job", 
+    selection = "gdelt_mentions"
+)
+
+gdelt_enhanced_mentions_job = define_asset_job(
+    name = "gdelt_enhanced_mentions_job", 
+    selection = "gdelt_enhanced_mentions"
 )
 
 
-
-################
-# Job to get meta data of GDELT mentions
 @job(
-    resource_defs = {
-        'aws_resource': resources.my_resources.my_aws_resource,
-        'web_scraper_resource': resources.my_resources.my_web_scraper_resource
-    }
-)
-def enhance_gdelt_mentions():
-    df_latest_mentions_filtered = s3_get()
-    df_gdelt_enhanced_mentions = scrape_urls(df_latest_mentions_filtered)
-    enhanced_mentions_source_path = get_enhanced_mentions_source_path(df_gdelt_enhanced_mentions)
-    s3_put(df_gdelt_enhanced_mentions, enhanced_mentions_source_path)
-    materialize_data_asset(df_gdelt_enhanced_mentions, enhanced_mentions_source_path)
-
-
-################
-# Job to load GDELT assets to Snowflake
-@job(
+    description = "Load GDELT assets to Snowflake",
     resource_defs = {
         'snowflake': snowflake_resource
     },
@@ -82,9 +58,8 @@ def load_gdelt_assets_to_snowflake():
     launch_gdelt_enhanced_mentions_snowpipe(launch_gdelt_mentions_snowpipe_result)
 
 
-################
-# Job to classify relevancy of GDELT mentions
 @job(
+    description = "Classify relevancy of GDELT mentions",
     resource_defs = {
         'novacene_resource': resources.my_resources.my_novacene_resource
     }
@@ -94,9 +69,8 @@ def classify_gdelt_mentions_relevancy():
     classify_mentions_relevancy()
 
 
-################
-# Job to get classification results of GDELT mentions
 @job(
+    description = "Get classification results of GDELT mentions",
     resource_defs = {
         'novacene_resource': resources.my_resources.my_novacene_resource
     }
@@ -106,9 +80,8 @@ def get_relevancy_classification_of_gdelt_mentions():
     store_relevancy_classifications(df_relevancy_classifications)
 
 
-################
-# Job to load classified GDELT mentions to Snowflake
 @job(
+    description = "Load classified GDELT mentions to Snowflake",
     resource_defs = {
         'snowflake': snowflake_resource
     },
@@ -118,9 +91,8 @@ def load_classified_gdelt_mentions_to_snowflake():
     launch_ml_enriched_articles_snowpipe()
 
 
-################
-# Job to feed our ML training engine
 @job(
+    description = "Feed our ML training engine",
     resource_defs = {
         'airtable_client': resources.my_resources.my_airtable_client
     }
@@ -131,9 +103,8 @@ def feed_ml_trainer_engine():
 
 
 
-################
-# Job to build Snowflake data warehouse
 @job(
+    description = "Build Snowflake data warehouse",
     resource_defs = {
         'snowflake': snowflake_resource,
         'dbt': resources.my_resources.my_dbt_client

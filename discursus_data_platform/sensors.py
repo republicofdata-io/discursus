@@ -2,7 +2,7 @@ from dagster import AssetKey, asset_sensor, RunRequest
 from jobs import (
     gdelt_mentions_job, 
     load_gdelt_assets_to_snowflake,
-    enhance_gdelt_mentions, 
+    gdelt_enhanced_mentions_job, 
     classify_gdelt_mentions_relevancy,
     load_classified_gdelt_mentions_to_snowflake
 )
@@ -22,27 +22,16 @@ def gdelt_mentions_sensor(context, asset_event):
         }
     )
 
-@asset_sensor(asset_key = AssetKey(["gdelt_mentions"]), job = enhance_gdelt_mentions)
-def enhance_gdelt_mentions_sensor(context, asset_event):
+@asset_sensor(asset_key = AssetKey(["gdelt_mentions"]), job = gdelt_enhanced_mentions_job)
+def gdelt_enhanced_mentions_sensor(context, asset_event):
     yield RunRequest(
         run_key = asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text,
         run_config={
             "ops": {
-                "s3_get": {
+                "gdelt_enhanced_mentions": {
                     "config": {
-                        "file_path": asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text
-                    }
-                },
-                "get_enhanced_mentions_source_path": {
-                    "config": {
+                        "file_path": asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text,
                         "asset_materialization_path": asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text
-                    }
-                },
-                "materialize_data_asset": {
-                    "config": {
-                        "asset_key_parent": "sources",
-                        "asset_key_child": "gdelt_enhanced_mentions",
-                        "asset_description": "List of enhanced mentions mined from GDELT"
                     }
                 }
             }
