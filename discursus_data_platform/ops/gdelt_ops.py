@@ -1,15 +1,4 @@
-from dagster import op, AssetMaterialization, Output
-
-from io import StringIO
-import pandas as pd
-
-@op(
-    required_resource_keys = {"gdelt_resource"}
-)
-def get_url_to_latest_mentions(context): 
-    latest_mentions_url = context.resources.gdelt_resource.get_url_to_latest_asset("mentions")
-    return latest_mentions_url
-
+from dagster import op
 
 @op
 def build_file_path(gdelt_asset_url): 

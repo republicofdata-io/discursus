@@ -1,21 +1,9 @@
 from dagster import job, define_asset_job
 from dagster_snowflake import snowflake_resource
-
 import resources.my_resources
-
-from assets import (
-    gdelt_events
-)
-
 from ops.aws_ops import (
     s3_put,
     s3_get
-)
-from ops.gdelt_ops import (
-    get_url_to_latest_mentions,
-    build_file_path, 
-    mine_latest_asset,
-    filter_latest_mentions
 )
 from ops.novacene_ops import (
     classify_mentions_relevancy, 
@@ -57,24 +45,11 @@ gdelt_events_job = define_asset_job(
     selection="gdelt_events"
 )
 
-
-
-################
-# Job to mine GDELT mentions
-@job(
-    resource_defs = {
-        'aws_resource': resources.my_resources.my_aws_resource,
-        'gdelt_resource': resources.my_resources.my_gdelt_resource
-    }
+gdelt_mentions_job = define_asset_job(
+    name="gdelt_mentions_job", 
+    selection="gdelt_mentions"
 )
-def mine_gdelt_mentions():
-    df_latest_events_filtered = s3_get()
-    latest_mentions_url = get_url_to_latest_mentions()
-    latest_mentions_source_path = build_file_path(latest_mentions_url)
-    df_latest_mentions = mine_latest_asset(latest_mentions_url)
-    df_latest_mentions_filtered = filter_latest_mentions(df_latest_mentions, df_latest_events_filtered)
-    s3_put(df_latest_mentions_filtered, latest_mentions_source_path)
-    materialize_data_asset(df_latest_mentions_filtered, latest_mentions_source_path)
+
 
 
 ################

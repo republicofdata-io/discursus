@@ -1,36 +1,28 @@
 from dagster import AssetKey, asset_sensor, RunRequest
-
 from jobs import (
-    mine_gdelt_mentions, 
+    gdelt_mentions_job, 
     load_gdelt_assets_to_snowflake,
     enhance_gdelt_mentions, 
     classify_gdelt_mentions_relevancy,
     load_classified_gdelt_mentions_to_snowflake
 )
 
-@asset_sensor(asset_key = AssetKey(["gdelt_events"]), job = mine_gdelt_mentions)
-def mining_gdelt_mentions_sensor(context, asset_event):
+@asset_sensor(asset_key = AssetKey(["gdelt_events"]), job = gdelt_mentions_job)
+def gdelt_mentions_sensor(context, asset_event):
     yield RunRequest(
         run_key = asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text,
         run_config={
             "ops": {
-                "s3_get": {
+                "gdelt_mentions": {
                     "config": {
                         "file_path": asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text
-                    }
-                },
-                "materialize_data_asset": {
-                    "config": {
-                        "asset_key_parent": "sources",
-                        "asset_key_child": "gdelt_mentions",
-                        "asset_description": "List of mentions mined from GDELT"
                     }
                 }
             }
         }
     )
 
-@asset_sensor(asset_key = AssetKey(["sources", "gdelt_mentions"]), job = enhance_gdelt_mentions)
+@asset_sensor(asset_key = AssetKey(["gdelt_mentions"]), job = enhance_gdelt_mentions)
 def enhance_gdelt_mentions_sensor(context, asset_event):
     yield RunRequest(
         run_key = asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text,

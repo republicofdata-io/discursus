@@ -1,11 +1,9 @@
 from dagster import repository
-
 from assets import (
-    gdelt_events
+    gdelt_events,
+    gdelt_mentions
 )
-
 from jobs import (
-    mine_gdelt_mentions,
     enhance_gdelt_mentions,
     load_gdelt_assets_to_snowflake, 
     classify_gdelt_mentions_relevancy, 
@@ -15,7 +13,7 @@ from jobs import (
     feed_ml_trainer_engine
 )
 from sensors import (
-    mining_gdelt_mentions_sensor,
+    gdelt_mentions_sensor,
     load_gdelt_assets_to_snowflake_sensor,
     enhance_gdelt_mentions_sensor,
     classify_gdelt_mentions_relevancy_sensor,
@@ -32,10 +30,10 @@ from schedules import (
 @repository
 def discursus_repo():
     assets = [
-        gdelt_events
+        gdelt_events,
+        gdelt_mentions
     ]
     jobs = [
-        mine_gdelt_mentions,
         enhance_gdelt_mentions,
         load_gdelt_assets_to_snowflake, 
         classify_gdelt_mentions_relevancy, 
@@ -45,7 +43,7 @@ def discursus_repo():
         feed_ml_trainer_engine
     ]
     sensors = [
-        mining_gdelt_mentions_sensor,
+        gdelt_mentions_sensor,
         load_gdelt_assets_to_snowflake_sensor,
         enhance_gdelt_mentions_sensor,
         classify_gdelt_mentions_relevancy_sensor,
