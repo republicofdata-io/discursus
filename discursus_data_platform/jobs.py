@@ -1,15 +1,11 @@
 from dagster import job, define_asset_job
 from dagster_snowflake import snowflake_resource
 import resources.my_resources
-from ops.novacene_ops import (
-    classify_mentions_relevancy, 
-    get_relevancy_classifications, 
-    store_relevancy_classifications
-)
+from ops.novacene_ops import classify_mentions_relevancy
 from ops.snowflake_ops import (
     launch_gdelt_events_snowpipe,
     launch_gdelt_mentions_snowpipe,
-    launch_gdelt_enhanced_mentions_snowpipe,
+    launch_gdelt_mentions_enhanced_snowpipe,
     launch_ml_enriched_articles_snowpipe
 )
 from ops.dbt_ops import (
@@ -39,9 +35,14 @@ gdelt_mentions_job = define_asset_job(
     selection = "gdelt_mentions"
 )
 
-gdelt_enhanced_mentions_job = define_asset_job(
-    name = "gdelt_enhanced_mentions_job", 
-    selection = "gdelt_enhanced_mentions"
+gdelt_mentions_enhanced_job = define_asset_job(
+    name = "gdelt_mentions_enhanced_job", 
+    selection = "gdelt_mentions_enhanced"
+)
+
+gdelt_mentions_relevant_job = define_asset_job(
+    name = "gdelt_mentions_relevant_job", 
+    selection = "gdelt_mentions_relevant"
 )
 
 
@@ -55,7 +56,7 @@ gdelt_enhanced_mentions_job = define_asset_job(
 def load_gdelt_assets_to_snowflake():
     launch_gdelt_events_snowpipe_result = launch_gdelt_events_snowpipe()
     launch_gdelt_mentions_snowpipe_result = launch_gdelt_mentions_snowpipe(launch_gdelt_events_snowpipe_result)
-    launch_gdelt_enhanced_mentions_snowpipe(launch_gdelt_mentions_snowpipe_result)
+    launch_gdelt_mentions_enhanced_snowpipe(launch_gdelt_mentions_snowpipe_result)
 
 
 @job(
@@ -67,17 +68,6 @@ def load_gdelt_assets_to_snowflake():
 def classify_gdelt_mentions_relevancy():
     # Classify articles that are relevant protest events
     classify_mentions_relevancy()
-
-
-@job(
-    description = "Get classification results of GDELT mentions",
-    resource_defs = {
-        'novacene_resource': resources.my_resources.my_novacene_resource
-    }
-)
-def get_relevancy_classification_of_gdelt_mentions():
-    df_relevancy_classifications = get_relevancy_classifications()
-    store_relevancy_classifications(df_relevancy_classifications)
 
 
 @job(

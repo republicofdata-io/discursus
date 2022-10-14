@@ -1,8 +1,8 @@
 from dagster import AssetKey, asset_sensor, RunRequest
 from jobs import (
-    gdelt_mentions_job, 
+    gdelt_mentions_job,
     load_gdelt_assets_to_snowflake,
-    gdelt_enhanced_mentions_job, 
+    gdelt_mentions_enhanced_job, 
     classify_gdelt_mentions_relevancy,
     load_classified_gdelt_mentions_to_snowflake
 )
@@ -22,13 +22,13 @@ def gdelt_mentions_sensor(context, asset_event):
         }
     )
 
-@asset_sensor(asset_key = AssetKey(["gdelt_mentions"]), job = gdelt_enhanced_mentions_job)
-def gdelt_enhanced_mentions_sensor(context, asset_event):
+@asset_sensor(asset_key = AssetKey(["gdelt_mentions"]), job = gdelt_mentions_enhanced_job)
+def gdelt_mentions_enhanced_sensor(context, asset_event):
     yield RunRequest(
         run_key = asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text,
         run_config={
             "ops": {
-                "gdelt_enhanced_mentions": {
+                "gdelt_mentions_enhanced": {
                     "config": {
                         "file_path": asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text,
                         "asset_materialization_path": asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text
@@ -38,13 +38,13 @@ def gdelt_enhanced_mentions_sensor(context, asset_event):
         }
     )
 
-@asset_sensor(asset_key = AssetKey(["sources", "gdelt_enhanced_mentions"]), job = load_gdelt_assets_to_snowflake)
+@asset_sensor(asset_key = AssetKey(["gdelt_mentions_enhanced"]), job = load_gdelt_assets_to_snowflake)
 def load_gdelt_assets_to_snowflake_sensor(context, asset_event):
     yield RunRequest(
         run_key = asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text
     )
 
-@asset_sensor(asset_key = AssetKey(["sources", "gdelt_enhanced_mentions"]), job = classify_gdelt_mentions_relevancy)
+@asset_sensor(asset_key = AssetKey(["gdelt_mentions_enhanced"]), job = classify_gdelt_mentions_relevancy)
 def classify_gdelt_mentions_relevancy_sensor(context, asset_event):
     yield RunRequest(
         run_key = asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text,
@@ -59,7 +59,7 @@ def classify_gdelt_mentions_relevancy_sensor(context, asset_event):
         }
     )
 
-@asset_sensor(asset_key = AssetKey(["sources", "gdelt_ml_enriched_mentions"]), job = load_classified_gdelt_mentions_to_snowflake)
+@asset_sensor(asset_key = AssetKey(["gdelt_mentions_relevant"]), job = load_classified_gdelt_mentions_to_snowflake)
 def load_classified_gdelt_mentions_to_snowflake_sensor(context, asset_event):
     yield RunRequest(
         run_key = asset_event.dagster_event.event_specific_data.materialization.metadata_entries[0].entry_data.text

@@ -1,38 +1,7 @@
 from dagster import op, AssetMaterialization, Output
-
-import boto3
 from io import StringIO
 import pandas as pd
-
-class MLEnrichmentJobTracker:
-
-    def __init__(self):
-        self.s3 = boto3.resource('s3')
-
-        try:
-            obj = self.s3.Object('discursus-io', 'ops/ml_enrichment_jobs.csv')
-            df_ml_enrichment_jobs = pd.read_csv(StringIO(obj.get()['Body'].read().decode('utf-8')))
-        except:
-            df_ml_enrichment_jobs = pd.DataFrame(None, columns = ['job_id', 'status'])
-        
-        self.df_ml_enrichment_jobs = df_ml_enrichment_jobs
-    
-    def add_new_job(self, job_id, job_status):
-        # Append new job to existing list
-        data_ml_enrichment_jobs = [[job_id, job_status]]
-        df_new_ml_enrichment_job = pd.DataFrame(data_ml_enrichment_jobs, columns = ['job_id', 'status'])
-        self.df_ml_enrichment_jobs = self.df_ml_enrichment_jobs.append(df_new_ml_enrichment_job)
-    
-    def remove_completed_job(self, l_job_indexes):
-        # Append new job to existing list
-        self.df_ml_enrichment_jobs = self.df_ml_enrichment_jobs.drop(l_job_indexes)
-    
-    def upload_job_log(self):
-        csv_buffer = StringIO()
-        self.df_ml_enrichment_jobs.to_csv(csv_buffer, index = False)
-        self.s3.Object('discursus-io', 'ops/ml_enrichment_jobs.csv').put(Body=csv_buffer.getvalue())
-
-
+from resources.ml_enrichment_tracker import MLEnrichmentJobTracker
 
 @op(
     required_resource_keys = {"novacene_resource"},
@@ -73,66 +42,3 @@ def classify_mentions_relevancy(context):
         yield Output(protest_classification_job)
     else:
         yield Output(1)
-
-
-@op(
-    required_resource_keys = {"novacene_resource"}
-)
-def get_relevancy_classifications(context):
-    # Empty dataframe of files to fetch
-    df_ml_enrichment_files = pd.DataFrame(None, columns = ['job_id', 'name', 'file_path'])
-
-    # Lit of jobs to remove
-    l_completed_job_indexes = []
-
-    # Create instance of ml enrichment tracker
-    my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
-
-    for index, row in my_ml_enrichment_jobs_tracker.df_ml_enrichment_jobs.iterrows():
-        job_info = context.resources.novacene_resource.job_info(row['job_id'])
-
-        if job_info['status'] == 'Completed':
-            # Append new job to existing list
-            data_ml_enrichment_file = [[row['job_id'], job_info['source']['name'], job_info['result']['path']]]
-            df_ml_enrichment_file = pd.DataFrame(data_ml_enrichment_file, columns = ['job_id', 'name', 'file_path'])
-            df_ml_enrichment_files = df_ml_enrichment_files.append(df_ml_enrichment_file)
-
-            # Keep track of jobs to remove from tracking log
-            l_completed_job_indexes.append(index)
-
-    # Updating job from log of enrichment jobs
-    my_ml_enrichment_jobs_tracker.remove_completed_job(l_completed_job_indexes)
-    my_ml_enrichment_jobs_tracker.upload_job_log()
-
-    return df_ml_enrichment_files
-
-
-@op(
-    required_resource_keys = {"novacene_resource"}
-)
-def store_relevancy_classifications(context, df_ml_enrichment_files):
-    s3 = boto3.resource('s3')
-
-    for index, row in df_ml_enrichment_files.iterrows():
-        # Read csv as pandas
-        df_ml_enrichment_file = context.resources.novacene_resource.get_file(row['file_path'])
-
-        # Extract date from file name
-        file_date = row['name'].split("_")[2].split(".")[0][0 : 8]
-
-        # Save df as csv in S3
-        csv_buffer = StringIO()
-        df_ml_enrichment_file.to_csv(csv_buffer, index = False)
-        s3.Object('discursus-io', 'sources/ml/' + file_date + '/ml_enriched_' + row['name']).put(Body=csv_buffer.getvalue())
-
-        # Materialize and yield asset
-        yield AssetMaterialization(
-            asset_key=["sources", "gdelt_ml_enriched_mentions"],
-            description="List of ML enriched mentions mined from GDELT",
-            metadata={
-                "path": "s3://discursus-io/" + 'sources/ml/' + file_date + '/ml_enriched_' + row['name'],
-                "rows": df_ml_enrichment_file.index.size
-        }
-    )
-    
-    yield Output(1)

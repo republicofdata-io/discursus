@@ -6,13 +6,13 @@ from dagster import (
 )
 from jobs import (
     gdelt_events_job, 
-    get_relevancy_classification_of_gdelt_mentions, 
+    gdelt_mentions_relevant_job, 
     build_data_warehouse, 
     feed_ml_trainer_engine
 )
 
-mine_gdelt_events_schedule = ScheduleDefinition(job = gdelt_events_job, cron_schedule = "2,17,32,47 * * * *")
-get_relevancy_classification_of_gdelt_mentions_schedule = ScheduleDefinition(job = get_relevancy_classification_of_gdelt_mentions, cron_schedule = "7,22,37,52 * * * *")
+gdelt_events_schedule = ScheduleDefinition(job = gdelt_events_job, cron_schedule = "2,17,32,47 * * * *")
+gdelt_mentions_relevant_schedule = ScheduleDefinition(job = gdelt_mentions_relevant_job, cron_schedule = "7,22,37,52 * * * *")
 feed_ml_trainer_engine_schedule = ScheduleDefinition(job = feed_ml_trainer_engine, cron_schedule = "13,28,43,58 * * * *")
 
 @schedule(job=build_data_warehouse, cron_schedule="15 3,9,15,21 * * *")

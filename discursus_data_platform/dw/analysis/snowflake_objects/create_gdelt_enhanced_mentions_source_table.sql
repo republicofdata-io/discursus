@@ -1,4 +1,4 @@
-create table gdelt_enhanced_mentions (
+create table gdelt_mentions_enhanced (
 
     mention_identifier varchar,
     file_name varchar,

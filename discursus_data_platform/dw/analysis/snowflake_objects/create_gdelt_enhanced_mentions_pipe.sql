@@ -1,6 +1,6 @@
-create pipe gdelt_enhanced_mentions_pipe as
+create pipe gdelt_mentions_enhanced_pipe as
 
-copy into gdelt_enhanced_mentions(
+copy into gdelt_mentions_enhanced(
 
   mention_identifier,
   file_name,
