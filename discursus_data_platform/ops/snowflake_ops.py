@@ -20,7 +20,7 @@ def launch_gdelt_mentions_snowpipe(context, launch_gdelt_events_snowpipe_result)
 
 @op(required_resource_keys = {"snowflake"})
 def launch_gdelt_mentions_enhanced_snowpipe(context, launch_gdelt_mentions_snowpipe_result):
-    q_load_gdelt_mentions_enhanced_events = "alter pipe gdelt_mentions_enhanced_pipe refresh;"
+    q_load_gdelt_mentions_enhanced_events = "alter pipe gdelt_enhanced_mentions_pipe refresh;"
     context.resources.snowflake.execute_query(q_load_gdelt_mentions_enhanced_events)
 
 @op(required_resource_keys = {"snowflake"})

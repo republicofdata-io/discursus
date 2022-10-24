@@ -1,4 +1,4 @@
-create pipe gdelt_mentions_enhanced_pipe as
+create pipe gdelt_enhanced_mentions_pipe as
 
 copy into gdelt_mentions_enhanced(
 

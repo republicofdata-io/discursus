@@ -1,4 +1,4 @@
-from dagster import asset, multi_asset, Output
+from dagster import asset, AssetObservation, Output, Out
 import pandas as pd
 import boto3
 from io import StringIO
@@ -32,7 +32,7 @@ def gdelt_events(context):
 
     # Return asset
     return Output(
-        df_latest_events_filtered, 
+        value = df_latest_events_filtered, 
         metadata = {
             "path": "s3://discursus-io/" + latest_events_source_path,
             "rows": df_latest_events_filtered.index.size
@@ -70,7 +70,7 @@ def gdelt_mentions(context):
 
     # Return asset
     return Output(
-        df_latest_mentions_filtered, 
+        value = df_latest_mentions_filtered, 
         metadata = {
             "path": "s3://discursus-io/" + latest_mentions_source_path,
             "rows": df_latest_mentions_filtered.index.size
@@ -81,10 +81,9 @@ def gdelt_mentions(context):
 @asset(
     non_argument_deps = {"gdelt_mentions"},
     description = "List of enhanced mentions mined from GDELT",
-    group_name = "preparation",
+    group_name = "prepared_sources",
     resource_defs = {
         'aws_resource': resources.my_resources.my_aws_resource,
-        'gdelt_resource': resources.my_resources.my_gdelt_resource,
         'web_scraper_resource': resources.my_resources.my_web_scraper_resource
     }
 )
@@ -118,7 +117,7 @@ def gdelt_mentions_enhanced(context):
 
     # Return asset
     return Output(
-        df_gdelt_mentions_enhanced, 
+        value = df_gdelt_mentions_enhanced, 
         metadata = {
             "path": "s3://discursus-io/" + enhanced_mentions_source_path,
             "rows": df_gdelt_mentions_enhanced.index.size
@@ -128,7 +127,7 @@ def gdelt_mentions_enhanced(context):
 
 @asset(
     description = "Relevancy classification of GDELT mentions",
-    group_name = "preparation",
+    group_name = "prepared_sources",
     resource_defs = {
         'novacene_resource': resources.my_resources.my_novacene_resource
     }
@@ -173,13 +172,13 @@ def gdelt_mentions_relevant(context):
         df_ml_enrichment_file.to_csv(csv_buffer, index = False)
         s3.Object('discursus-io', 'sources/ml/' + file_date + '/ml_enriched_' + row['name']).put(Body=csv_buffer.getvalue())
 
-        # Return asset
-        yield Output(
-            df_ml_enrichment_file, 
-            metadata = {
-                "path": "s3://discursus-io/" + 'sources/ml/' + file_date + '/ml_enriched_' + row['name'],
-                "rows": df_ml_enrichment_file.index.size
-            }
+        # Get trace of asset metadata
+        context.log_event(
+            AssetObservation(
+                asset_key = "gdelt_mentions_relevant",
+                metadata = {
+                    "path": "s3://discursus-io/" + 'sources/ml/' + file_date + '/ml_enriched_' + row['name'],
+                    "rows": df_ml_enrichment_file.index.size
+                }
+            )
         )
-    
-    return Output(1)
