@@ -11,7 +11,7 @@ with source as (
     select
         *,
         date(split(metadata_filename, '/')[2], 'yyyymmdd') as source_file_date
-    from {{ source('gdelt', 'gdelt_mentions_enhanced') }}
+    from {{ source('gdelt', 'gdelt_enhanced_mentions') }}
     {% if is_incremental() %}
         where date(split(metadata_filename, '/')[2], 'yyyymmdd') >= (select max(source_file_date) from {{ this }})
     {% endif %}
