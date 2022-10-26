@@ -40,10 +40,18 @@ build_data_warehouse_job = define_asset_job(
 )
 
 
+refresh_hex_job = define_asset_job(
+    name = "refresh_hex_job", 
+    selection = [
+        "hex_project_refresh"
+    ]
+)
+
+
 @job(
     description = "Feed our ML training engine",
     resource_defs = {
-        'airtable_client': resources.my_resources.my_airtable_client
+        'airtable_client': resources.my_resources.my_airtable_resource
     }
 )
 def feed_ml_trainer_engine():

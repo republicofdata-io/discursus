@@ -16,12 +16,14 @@ from assets.dw_assets import (
     dw_integration_layer,
     dw_entity_layer,
     dw_data_tests,
-    dw_clean_up
+    dw_clean_up,
+    hex_project_refresh
 )
 from jobs import (
     source_gdelt_assets_job,
     enrich_gdelt_assets_job,
     build_data_warehouse_job,
+    refresh_hex_job,
     feed_ml_trainer_engine
 )
 from schedules import (
@@ -51,12 +53,14 @@ def discursus_repo():
         dw_integration_layer,
         dw_entity_layer,
         dw_data_tests,
-        dw_clean_up
+        dw_clean_up,
+        hex_project_refresh
     ]
     jobs = [
         source_gdelt_assets_job,
         enrich_gdelt_assets_job,
         build_data_warehouse_job,
+        refresh_hex_job,
         feed_ml_trainer_engine
     ]
     schedules = [
