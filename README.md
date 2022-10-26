@@ -12,6 +12,10 @@
 
 Social analytics data product that continuously deliver data on protest movements throughout North America.
 
+Visit the [Hex dashboard](https://app.hex.tech/bca77dcf-0dcc-4d33-8a23-c4c73f6b11c3/app/d6824152-38b4-4f39-8f5e-c3a963cc48c8/latest) for a glimpse of the data produced via the discursus platform.
+
+Please [contact me](mailto:odupuis@lantrns.co) if you have any comments / suggestions / questions in regards to discursus.
+
 ## License
 
 The __Social Analytics Framework__ is [MIT licensed](./LICENSE.md).

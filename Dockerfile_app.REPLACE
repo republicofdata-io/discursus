@@ -74,4 +74,4 @@ WORKDIR /opt/dagster/saf_core/
 # Run dagster gRPC server on port 4000
 EXPOSE 4000
 
-CMD ["dagster", "api", "grpc", "--host", "0.0.0.0", "--port", "4000", "--python-file", "discursus_repo.py", "--working-directory", "/opt/dagster/discursus_core/"]
+CMD ["dagster", "api", "grpc", "--host", "0.0.0.0", "--port", "4000", "--python-file", "repository.py", "--working-directory", "/opt/dagster/discursus_core/"]
