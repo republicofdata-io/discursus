@@ -35,7 +35,8 @@ build_data_warehouse_job = define_asset_job(
         "dw_integration_layer",
         "dw_entity_layer",
         "dw_data_tests",
-        "dw_clean_up"
+        "dw_clean_up",
+        "hex_project_refresh"
     ]
 )
 
@@ -43,7 +44,7 @@ build_data_warehouse_job = define_asset_job(
 @job(
     description = "Feed our ML training engine",
     resource_defs = {
-        'airtable_client': resources.my_resources.my_airtable_client
+        'airtable_client': resources.my_resources.my_airtable_resource
     }
 )
 def feed_ml_trainer_engine():
