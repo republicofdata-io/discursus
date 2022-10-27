@@ -35,14 +35,7 @@ build_data_warehouse_job = define_asset_job(
         "dw_integration_layer",
         "dw_entity_layer",
         "dw_data_tests",
-        "dw_clean_up"
-    ]
-)
-
-
-refresh_hex_job = define_asset_job(
-    name = "refresh_hex_job", 
-    selection = [
+        "dw_clean_up",
         "hex_project_refresh"
     ]
 )

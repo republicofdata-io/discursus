@@ -23,7 +23,6 @@ from jobs import (
     source_gdelt_assets_job,
     enrich_gdelt_assets_job,
     build_data_warehouse_job,
-    refresh_hex_job,
     feed_ml_trainer_engine
 )
 from schedules import (
@@ -60,7 +59,6 @@ def discursus_repo():
         source_gdelt_assets_job,
         enrich_gdelt_assets_job,
         build_data_warehouse_job,
-        refresh_hex_job,
         feed_ml_trainer_engine
     ]
     schedules = [

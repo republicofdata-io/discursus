@@ -103,7 +103,7 @@ def dw_clean_up(context):
 
 
 @asset(
-    #non_argument_deps = {"dw_data_tests"},
+    non_argument_deps = {"dw_data_tests"},
     description = "Hex project refresh",
     group_name = "data_apps",
     resource_defs = {
@@ -113,7 +113,7 @@ def dw_clean_up(context):
 def hex_project_refresh(context):
     hex_output: HexOutput = context.resources.hex_resource.run_and_poll(
         project_id = "d6824152-38b4-4f39-8f5e-c3a963cc48c8",
-        inputs = None,
+        inputs = {},
         update_cache = False,
         kill_on_timeout = True,
         poll_interval = DEFAULT_POLL_INTERVAL,
@@ -123,7 +123,7 @@ def hex_project_refresh(context):
 
     return Output(
         value = asset_name, 
-        metadata={
+        metadata = {
             "run_url": MetadataValue.url(hex_output.run_response["runUrl"]),
             "run_status_url": MetadataValue.url(
                 hex_output.run_response["runStatusUrl"]
