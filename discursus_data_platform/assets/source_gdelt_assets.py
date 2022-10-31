@@ -87,7 +87,7 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
     gdelt_asset_filename_zip = str(latest_mentions_url).split('gdeltv2/')[1]
     gdelt_asset_filename_csv = gdelt_asset_filename_zip.split('.zip')[0]
     gdelt_asset_filedate = gdelt_asset_filename_csv[0:8]
-    gdelt_asset_source_path = 'sources/gdelt/' + gdelt_asset_filedate + '/' + gdelt_asset_filename_csv
+    gdelt_asset_source_path = 'sources/gdelt/' + gdelt_asset_filedate + '/' + gdelt_asset_filename_csv[0:14] + '.mentions.enhanced.csv'
 
     # Dedup articles
     context.log.info(gdelt_mentions[5])
