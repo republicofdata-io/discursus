@@ -31,4 +31,4 @@ The data warehouse entities are produced with the following DAG.
 
 ## License
 
-The __Social Analytics Framework__ is [MIT licensed](./LICENSE.md).
+The __discursus data platform__ is [MIT licensed](./LICENSE.md).
