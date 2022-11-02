@@ -114,7 +114,7 @@ def hex_project_refresh(context):
     hex_output: HexOutput = context.resources.hex_resource.run_and_poll(
         project_id = "d6824152-38b4-4f39-8f5e-c3a963cc48c8",
         inputs = {},
-        update_cache = False,
+        update_cache = True,
         kill_on_timeout = True,
         poll_interval = DEFAULT_POLL_INTERVAL,
         poll_timeout = None,
