@@ -1,0 +1,16 @@
+version: 2
+
+metrics:
+  - name: event_count
+    label: Events count
+    model: ref('events_fct')
+    description: "The count of events"
+
+    calculation_method: count
+    expression: event_pk 
+
+    timestamp: event_ts
+    time_grains: [day, week, month, quarter, year]
+
+    dimensions:
+      - action_geo_country_name
