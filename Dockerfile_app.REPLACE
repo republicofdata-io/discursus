@@ -37,7 +37,6 @@ RUN apt-get update && apt-get install -y \
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.1/zsh-in-docker.sh)"
 
 RUN pip3 install \
-    awscli \
     dagster==1.0.12 \
     dagit==1.0.12 \
     dagster-graphql==1.0.12 \
