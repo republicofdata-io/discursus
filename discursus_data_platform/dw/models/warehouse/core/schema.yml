@@ -2,16 +2,6 @@ version: 2
 
 models:
 
-  - name: actors_dim
-    description: Table of actors
-    columns:
-      - name: actor_pk
-        description: >
-          Unique identifier for actors
-        tests:
-          - unique
-          - not_null
-
   - name: events_fct
     description: Table of events
     columns:
@@ -21,31 +11,11 @@ models:
         tests:
           - unique
           - not_null
-      - name: protest_fk
+      - name: movement_fk
         tests:
           - relationships:
-              to: ref('protests_dim')
-              field: protest_pk
-
-  - name: narratives_fct
-    description: Table of narratives
-    columns:
-      - name: narrative_pk
-        description: >
-          Unique identifier for narratives
-        tests:
-          - unique
-          - not_null
-      - name: event_fk
-        tests:
-          - relationships:
-              to: ref('events_fct')
-              field: event_pk
-      - name: actor_fk
-        tests:
-          - relationships:
-              to: ref('actors_dim')
-              field: actor_pk
+              to: ref('movements_dim')
+              field: movement_pk
 
   - name: observations_fct
     description: Table of observations
@@ -61,28 +31,13 @@ models:
           - relationships:
               to: ref('events_fct')
               field: event_pk
-      - name: observer_fk
-        tests:
-          - relationships:
-              to: ref('observers_dim')
-              field: observer_pk
   
-  - name: observers_dim
-    description: Table of observers
+  - name: movements_dim
+    description: Table of movements
     columns:
-      - name: observer_pk
+      - name: movement_pk
         description: >
-          Unique identifier for observers
-        tests:
-          - unique
-          - not_null
-
-  - name: protests_dim
-    description: Table of protests
-    columns:
-      - name: protest_pk
-        description: >
-          Unique identifier for protests
+          Unique identifier for movements
         tests:
           - unique
           - not_null

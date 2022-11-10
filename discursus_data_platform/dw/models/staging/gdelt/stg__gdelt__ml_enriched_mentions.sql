@@ -36,4 +36,4 @@ final as (
 )
 
 select * from final
-where source_file_date >= dateadd(week, -26, current_date)
+where source_file_date >= dateadd(week, -52, current_date)
