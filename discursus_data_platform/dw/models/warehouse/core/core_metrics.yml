@@ -9,7 +9,7 @@ metrics:
     calculation_method: count
     expression: event_pk 
 
-    timestamp: event_ts
+    timestamp: event_date
     time_grains: [day, week, month, quarter, year]
 
     dimensions:

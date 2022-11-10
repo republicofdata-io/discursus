@@ -9,10 +9,10 @@ dbml_path: semantics/dbml
 cube_path: semantics/cube
 
 test_schemas:
-    - analytics
+    - analytics_qa
 
 dbml_schemas:
-    - analytics
+    - analytics_qa
 
 explores:
   parent_table: 

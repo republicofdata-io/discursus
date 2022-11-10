@@ -107,7 +107,8 @@ base as (
 
 select * from base
 
-where creation_ts >= dateadd(week, -26, current_date)
+where creation_ts >= dateadd(week, -52, current_date)
 and event_root_code = '14'
 and action_geo_latitude is not null
 and action_geo_longitude is not null
+and action_geo_country_code in ('us', 'ca')
