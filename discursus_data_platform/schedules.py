@@ -7,7 +7,8 @@ from dagster import (
 from jobs import (
     source_gdelt_assets_job, 
     enrich_gdelt_assets_job, 
-    build_data_warehouse_job, 
+    build_data_warehouse_job,
+    share_daily_summary_assets_job,
     feed_ml_trainer_engine
 )
 
@@ -27,3 +28,5 @@ def build_data_warehouse_schedule(context: ScheduleEvaluationContext):
             }
         }
     )
+
+share_daily_summary_assets_schedule = ScheduleDefinition(job = share_daily_summary_assets_job, cron_schedule = "15 6 * * *")

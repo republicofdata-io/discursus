@@ -16,20 +16,25 @@ from assets.dw_assets import (
     dw_integration_layer,
     dw_entity_layer,
     dw_data_tests,
-    dw_clean_up,
-    hex_project_refresh
+    dw_clean_up
+)
+from assets.hex_assets import (
+    hex_main_dashboard_refresh,
+    hex_daily_assets_refresh
 )
 from jobs import (
     source_gdelt_assets_job,
     enrich_gdelt_assets_job,
     build_data_warehouse_job,
+    share_daily_summary_assets_job,
     feed_ml_trainer_engine
 )
 from schedules import (
     source_gdelt_assets_schedule, 
     enrich_gdelt_assets_schedule,
     feed_ml_trainer_engine_schedule,
-    build_data_warehouse_schedule
+    build_data_warehouse_schedule,
+    share_daily_summary_assets_schedule
 )
 
 
@@ -52,20 +57,25 @@ def discursus_repo():
         dw_integration_layer,
         dw_entity_layer,
         dw_data_tests,
-        dw_clean_up,
-        hex_project_refresh
+        dw_clean_up
+    ]
+    hex_assets = [
+        hex_main_dashboard_refresh,
+        hex_daily_assets_refresh
     ]
     jobs = [
         source_gdelt_assets_job,
         enrich_gdelt_assets_job,
         build_data_warehouse_job,
+        share_daily_summary_assets_job,
         feed_ml_trainer_engine
     ]
     schedules = [
         source_gdelt_assets_schedule, 
         enrich_gdelt_assets_schedule,
         feed_ml_trainer_engine_schedule,
-        build_data_warehouse_schedule
+        build_data_warehouse_schedule,
+        share_daily_summary_assets_schedule
     ]
 
-    return source_gdelt_assets + prep_gdelt_assets + dw_assets + jobs + schedules
+    return source_gdelt_assets + prep_gdelt_assets + dw_assets + hex_assets + jobs + schedules
