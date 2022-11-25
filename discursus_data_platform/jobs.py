@@ -36,7 +36,16 @@ build_data_warehouse_job = define_asset_job(
         "dw_entity_layer",
         "dw_data_tests",
         "dw_clean_up",
-        "hex_project_refresh"
+        "hex_main_dashboard_refresh"
+    ]
+)
+
+
+share_daily_summary_assets_job = define_asset_job(
+    name = "share_daily_summary_assets_job", 
+    selection = [
+        "hex_daily_assets_refresh",
+        "twitter_share_daily_assets"
     ]
 )
 
