@@ -44,7 +44,8 @@ build_data_warehouse_job = define_asset_job(
 share_daily_summary_assets_job = define_asset_job(
     name = "share_daily_summary_assets_job", 
     selection = [
-        "hex_daily_assets_refresh"
+        "hex_daily_assets_refresh",
+        "twitter_share_daily_assets"
     ]
 )
 

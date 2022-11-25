@@ -18,6 +18,7 @@ ENV SNOWFLAKE_DW_SCHEMA=REPLACE_VALUE
 ENV ML_HOST=REPLACE_VALUE
 ENV ML_LOGIN=REPLACE_VALUE
 ENV ML_PASSWORD=REPLACE_VALUE
+ENV TWITTER_BEARER_TOKEN=REPLACE_VALUE
 
 
 # Create environment
@@ -37,20 +38,24 @@ RUN apt-get update && apt-get install -y \
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.1/zsh-in-docker.sh)"
 
 RUN pip3 install \
-    dagster==1.0.12 \
-    dagit==1.0.12 \
-    dagster-graphql==1.0.12 \
-    dagster-postgres==0.16.12 \
-    dagster-docker==0.16.12 \
-    dagster_shell==0.16.12 \
-    dagster_snowflake==0.16.12 \
-    dagster_dbt==0.16.12 \
-    dbt-core==1.3.0 \
+    dagster==1.1.3 \
+    dagit==1.1.3 \
+    dagster-graphql==1.1.3 \
+    dagster-postgres==0.17.3 \
+    dagster-docker==0.17.3 \
+    dagster_shell==0.17.3 \
+    dagster_snowflake==0.17.3 \
+    dagster_dbt==0.17.3 \
+    dagster_hex \
+    dbt-core==1.3.1 \
     dbt-snowflake==1.3.0 \
+    pandas \
     bs4 \
     optparse-pretty \
     boto3 \
-    fsspec
+    fsspec \
+    tweepy \
+    pillow
 
 
 # Install framework packages

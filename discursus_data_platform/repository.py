@@ -22,6 +22,9 @@ from assets.hex_assets import (
     hex_main_dashboard_refresh,
     hex_daily_assets_refresh
 )
+from assets.twitter_assets import (
+    twitter_share_daily_assets
+)
 from jobs import (
     source_gdelt_assets_job,
     enrich_gdelt_assets_job,
@@ -63,6 +66,9 @@ def discursus_repo():
         hex_main_dashboard_refresh,
         hex_daily_assets_refresh
     ]
+    twitter_assets = [
+        twitter_share_daily_assets
+    ]
     jobs = [
         source_gdelt_assets_job,
         enrich_gdelt_assets_job,
@@ -78,4 +84,4 @@ def discursus_repo():
         share_daily_summary_assets_schedule
     ]
 
-    return source_gdelt_assets + prep_gdelt_assets + dw_assets + hex_assets + jobs + schedules
+    return source_gdelt_assets + prep_gdelt_assets + dw_assets + hex_assets + twitter_assets + jobs + schedules
