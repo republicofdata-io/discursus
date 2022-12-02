@@ -150,7 +150,7 @@ def gdelt_mentions_relevancy_ml_jobs(context, gdelt_mentions_enhanced):
         protest_classification_job = context.resources.novacene_resource.enrich_dataset(protest_classification_dataset_id['id'], 17, 4)
 
         # Update log of enrichment jobs
-        my_ml_enrichment_jobs_tracker.add_new_job(protest_classification_job['id'], 'processing')
+        my_ml_enrichment_jobs_tracker.add_new_job(protest_classification_job['id'], 'relevancy', 'processing')
         my_ml_enrichment_jobs_tracker.upload_job_log()
 
         # Return asset

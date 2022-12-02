@@ -26,7 +26,7 @@ def gdelt_mentions_relevancy(context):
     for index, row in my_ml_enrichment_jobs_tracker.df_ml_enrichment_jobs.iterrows():
         job_info = context.resources.novacene_resource.job_info(row['job_id'])
 
-        if job_info['status'] == 'Completed':
+        if job_info['type'] == 'relevancy' and job_info['status'] == 'Completed':
             # Append new job to existing list
             data_ml_enrichment_file = [[row['job_id'], job_info['source']['name'], job_info['result']['path']]]
             df_ml_enrichment_file = pd.DataFrame(data_ml_enrichment_file, columns = ['job_id', 'name', 'file_path'])
@@ -102,7 +102,7 @@ def article_entity_extraction_ml_jobs(context, gdelt_mentions_relevancy):
         entity_extraction_job = context.resources.novacene_resource.named_entity_recognition(entity_extraction_dataset_id['id'], 4)
 
         # Update log of enrichment jobs
-        my_ml_enrichment_jobs_tracker.add_new_job(entity_extraction_job['id'], 'processing')
+        my_ml_enrichment_jobs_tracker.add_new_job(entity_extraction_job['id'], 'entity_extraction', 'processing')
         my_ml_enrichment_jobs_tracker.upload_job_log()
 
         # Return asset
