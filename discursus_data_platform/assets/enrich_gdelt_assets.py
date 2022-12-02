@@ -80,3 +80,39 @@ def snowpipe_transfers_classified_gdelt_mentions(context):
     return Output(
         value = snowpipe_result
     )
+
+
+@asset(
+    non_argument_deps = {"gdelt_mentions_relevancy"},
+    description = "Entity extraction of relevant articles",
+    group_name = "prepared_sources",
+    resource_defs = {
+        'novacene_resource': resources.my_resources.my_novacene_resource
+    }
+)
+def article_entity_extraction_ml_jobs(context, gdelt_mentions_relevancy): 
+    # Create instance of ml enrichment tracker
+    my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
+    
+    # Sending latest batch of articles to Novacene for relevancy classification
+    if gdelt_mentions_relevancy.index.size > 0:
+        context.log.info("Sending " + str(gdelt_mentions_relevancy.index.size) + " articles for entity extraction")
+
+        entity_extraction_dataset_id = context.resources.novacene_resource.create_dataset("entity_extraction_" + gdelt_asset_source_path.split("/")[3], gdelt_mentions_relevancy)
+        entity_extraction_job = context.resources.novacene_resource.named_entity_recognition(entity_extraction_dataset_id['id'], 4)
+
+        # Update log of enrichment jobs
+        my_ml_enrichment_jobs_tracker.add_new_job(entity_extraction_job['id'], 'processing')
+        my_ml_enrichment_jobs_tracker.upload_job_log()
+
+        # Return asset
+        return Output(
+            value = protest_classification_job, 
+            metadata = {
+                "job id": protest_classification_job['id'],
+                "dataset enriched": gdelt_asset_source_path,
+                "dataset enrtries": gdelt_mentions_enhanced.index.size
+            }
+        )
+    else:
+        return Output(1)
