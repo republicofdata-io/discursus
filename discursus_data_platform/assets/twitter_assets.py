@@ -62,7 +62,7 @@ def twitter_share_daily_assets(context):
     return Output(
         value = twitter_status, 
         metadata = {
-            "Id": twitter_status.id_str
+            "id": twitter_status.id_str
         }
     )
     

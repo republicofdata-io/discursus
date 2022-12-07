@@ -8,7 +8,8 @@ from assets.source_gdelt_assets import (
 )
 from assets.enrich_gdelt_assets import (
     gdelt_mentions_relevancy,
-    snowpipe_transfers_classified_gdelt_mentions
+    snowpipe_transfers_classified_gdelt_mentions,
+    article_entity_extraction_ml_jobs
 )
 from assets.dw_assets import (
     dw_seeds,
@@ -26,15 +27,16 @@ from assets.twitter_assets import (
     twitter_share_daily_assets
 )
 from jobs import (
-    source_gdelt_assets_job,
-    enrich_gdelt_assets_job,
+    source_and_classify_relevancy_of_gdelt_assets_job,
+    get_relevancy_classifications_job,
+    extract_article_entities_job,
     build_data_warehouse_job,
     share_daily_summary_assets_job,
     feed_ml_trainer_engine
 )
 from schedules import (
-    source_gdelt_assets_schedule, 
-    enrich_gdelt_assets_schedule,
+    source_and_classify_relevancy_of_gdelt_assets_schedule, 
+    get_relevancy_classifications_schedule,
     feed_ml_trainer_engine_schedule,
     build_data_warehouse_schedule,
     share_daily_summary_assets_schedule
@@ -52,7 +54,8 @@ def discursus_repo():
     ]
     prep_gdelt_assets = [
         gdelt_mentions_relevancy,
-        snowpipe_transfers_classified_gdelt_mentions
+        snowpipe_transfers_classified_gdelt_mentions,
+        article_entity_extraction_ml_jobs
     ]
     dw_assets = [
         dw_seeds,
@@ -70,15 +73,16 @@ def discursus_repo():
         twitter_share_daily_assets
     ]
     jobs = [
-        source_gdelt_assets_job,
-        enrich_gdelt_assets_job,
+        source_and_classify_relevancy_of_gdelt_assets_job,
+        get_relevancy_classifications_job,
+        extract_article_entities_job,
         build_data_warehouse_job,
         share_daily_summary_assets_job,
         feed_ml_trainer_engine
     ]
     schedules = [
-        source_gdelt_assets_schedule, 
-        enrich_gdelt_assets_schedule,
+        source_and_classify_relevancy_of_gdelt_assets_schedule, 
+        get_relevancy_classifications_schedule,
         feed_ml_trainer_engine_schedule,
         build_data_warehouse_schedule,
         share_daily_summary_assets_schedule

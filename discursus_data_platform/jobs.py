@@ -6,8 +6,8 @@ from ops.airtable_ops import (
 )
 
 
-source_gdelt_assets_job = define_asset_job(
-    name = "source_gdelt_assets_job", 
+source_and_classify_relevancy_of_gdelt_assets_job = define_asset_job(
+    name = "source_and_classify_relevancy_of_gdelt_assets_job", 
     selection = [
         "gdelt_events",
         "gdelt_mentions",
@@ -18,11 +18,19 @@ source_gdelt_assets_job = define_asset_job(
 )
 
 
-enrich_gdelt_assets_job = define_asset_job(
-    name = "enrich_gdelt_assets_job", 
+get_relevancy_classifications_job = define_asset_job(
+    name = "get_relevancy_classifications_job", 
     selection = [
         "gdelt_mentions_relevancy",
         "snowpipe_transfers_classified_gdelt_mentions"
+    ]
+)
+
+
+extract_article_entities_job = define_asset_job(
+    name = "extract_article_entities_job", 
+    selection = [
+        "article_entity_extraction_ml_jobs"
     ]
 )
 

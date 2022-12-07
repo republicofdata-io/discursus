@@ -157,9 +157,10 @@ def gdelt_mentions_relevancy_ml_jobs(context, gdelt_mentions_enhanced):
         return Output(
             value = protest_classification_job, 
             metadata = {
-                "job id": protest_classification_job['id'],
-                "dataset enriched": gdelt_asset_source_path,
-                "dataset enrtries": gdelt_mentions_enhanced.index.size
+                "dataset_id": protest_classification_dataset_id['id'],
+                "dataset_source_path": gdelt_asset_source_path,
+                "dataset_enrtries": gdelt_mentions_enhanced.index.size,
+                "job_id": protest_classification_job['id']
             }
         )
     else:

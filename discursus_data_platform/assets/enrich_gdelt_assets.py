@@ -7,6 +7,7 @@ from resources.ml_enrichment_tracker import MLEnrichmentJobTracker
 
 
 @asset(
+    non_argument_deps = {"gdelt_mentions_enhanced"},
     description = "Relevancy classification of GDELT mentions",
     group_name = "prepared_sources",
     resource_defs = {
@@ -83,23 +84,22 @@ def snowpipe_transfers_classified_gdelt_mentions(context):
 
 
 @asset(
-    non_argument_deps = {"gdelt_mentions_relevancy"},
     description = "Entity extraction of relevant articles",
     group_name = "prepared_sources",
     resource_defs = {
         'novacene_resource': resources.my_resources.my_novacene_resource
     }
 )
-def article_entity_extraction_ml_jobs(context, gdelt_mentions_relevancy): 
+def article_entity_extraction_ml_jobs(context, gdelt_mentions_relevancy):
+    context.log.info(gdelt_mentions_relevancy) 
+
     # Create instance of ml enrichment tracker
     my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
     
-    # Sending latest batch of articles to Novacene for relevancy classification
+    # Sending latest batch of articles to Novacene for entity extraction
     if gdelt_mentions_relevancy.index.size > 0:
         context.log.info("Sending " + str(gdelt_mentions_relevancy.index.size) + " articles for entity extraction")
-
-        entity_extraction_dataset_id = context.resources.novacene_resource.create_dataset("entity_extraction_" + gdelt_asset_source_path.split("/")[3], gdelt_mentions_relevancy)
-        entity_extraction_job = context.resources.novacene_resource.named_entity_recognition(entity_extraction_dataset_id['id'], 4)
+        entity_extraction_job = context.resources.novacene_resource.named_entity_recognition(gdelt_mentions_relevancy.metadata['dataset_id'], 4)
 
         # Update log of enrichment jobs
         my_ml_enrichment_jobs_tracker.add_new_job(entity_extraction_job['id'], 'entity_extraction', 'processing')
@@ -107,11 +107,12 @@ def article_entity_extraction_ml_jobs(context, gdelt_mentions_relevancy):
 
         # Return asset
         return Output(
-            value = protest_classification_job, 
+            value = entity_extraction_job, 
             metadata = {
-                "job id": protest_classification_job['id'],
-                "dataset enriched": gdelt_asset_source_path,
-                "dataset enrtries": gdelt_mentions_enhanced.index.size
+                "dataset_id": gdelt_mentions_relevancy.metadata['dataset_id'],
+                "dataset_source_path": gdelt_mentions_relevancy.metadata['dataset_source_path'],
+                "dataset_enrtries": gdelt_mentions_relevancy.index.size,
+                "job_id": entity_extraction_job['id']
             }
         )
     else:

@@ -45,6 +45,7 @@ def hex_main_dashboard_refresh(context):
 
 
 @asset(
+    non_argument_deps = {"dw_data_tests"},
     description = "Hex daily assets refresh",
     group_name = "data_apps",
     resource_defs = {
