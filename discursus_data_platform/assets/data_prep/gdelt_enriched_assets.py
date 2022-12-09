@@ -15,7 +15,8 @@ from resources.ml_enrichment_tracker import MLEnrichmentJobTracker
         'aws_resource': resources.my_resources.my_aws_resource,
         'gdelt_resource': resources.my_resources.my_gdelt_resource,
         'web_scraper_resource': resources.my_resources.my_web_scraper_resource,
-        'snowflake_resource': resources.my_resources.my_snowflake_resource
+        'snowflake_resource': resources.my_resources.my_snowflake_resource,
+        'novacene_resource': resources.my_resources.my_novacene_resource
     }
 )
 def gdelt_mentions_enhanced(context, gdelt_mentions) -> DataFrame:
@@ -53,6 +54,20 @@ def gdelt_mentions_enhanced(context, gdelt_mentions) -> DataFrame:
     # Transfer to Snowflake
     q_load_gdelt_mentions_enhanced_events = "alter pipe gdelt_enhanced_mentions_pipe refresh;"
     snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_mentions_enhanced_events)
+
+    # Transfer to Novacene for relevancy classification
+    my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
+    
+    # Sending latest batch of articles to Novacene for relevancy classification
+    if gdelt_mentions_enhanced.index.size > 0:
+        context.log.info("Sending " + str(gdelt_mentions_enhanced.index.size) + " articles for relevancy classification")
+
+        protest_classification_dataset_id = context.resources.novacene_resource.create_dataset("protest_events_" + gdelt_asset_source_path.split("/")[3], gdelt_mentions_enhanced)
+        protest_classification_job = context.resources.novacene_resource.enrich_dataset(protest_classification_dataset_id['id'], 17, 4)
+
+        # Update log of enrichment jobs
+        my_ml_enrichment_jobs_tracker.add_new_job(protest_classification_job['id'], 'processing')
+        my_ml_enrichment_jobs_tracker.upload_job_log()
 
     # Return asset
     return Output(
