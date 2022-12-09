@@ -80,6 +80,7 @@ def gdelt_mentions_enhanced(context, gdelt_mentions) -> DataFrame:
 
 
 @asset(
+    non_argument_deps = {"gdelt_mentions_enhanced"},
     description = "Relevancy classification of GDELT mentions",
     group_name = "prepared_sources",
     resource_defs = {
@@ -140,4 +141,4 @@ def gdelt_mentions_relevancy(context):
     
     # Transfer to Snowflake
     q_load_ml_enriched_mentions = "alter pipe gdelt_ml_enriched_mentions_pipe refresh;"
-    snowpipe_result =  context.resources.snowflake_resource.execute_query(q_load_ml_enriched_mentions)
+    context.resources.snowflake_resource.execute_query(q_load_ml_enriched_mentions)

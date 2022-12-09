@@ -14,6 +14,7 @@ from dagster_hex.resources import DEFAULT_POLL_INTERVAL
 
 
 @asset(
+    non_argument_deps = {"dw_data_tests"},
     description = "Hex daily assets refresh",
     group_name = "data_apps",
     resource_defs = {
@@ -76,11 +77,9 @@ def twitter_share_daily_assets(context):
             object_type = 'csv',
             dataframe_conversion = True)
 
-
     # Upload map to Twitter
     twitter_media = context.resources.twitter_resource.upload_media(protest_movements_map_file_name)
     context.log.info(twitter_media)
-    
 
     # Create text for tweet
     tweet = f""" Here are the top protest movements for {today}.
@@ -89,11 +88,9 @@ def twitter_share_daily_assets(context):
     
     Visit the dashboard for further insights: https://app.hex.tech/bca77dcf-0dcc-4d33-8a23-c4c73f6b11c3/app/d6824152-38b4-4f39-8f5e-c3a963cc48c8/latest"""
 
-
     # Post tweet
     twitter_status = context.resources.twitter_resource.post(tweet, [twitter_media.media_id_string])
     context.log.info(twitter_status)
-
 
     # Return asset
     return Output(

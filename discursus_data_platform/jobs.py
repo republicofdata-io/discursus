@@ -6,27 +6,6 @@ from ops.airtable_ops import (
 )
 
 
-source_gdelt_assets_job = define_asset_job(
-    name = "source_gdelt_assets_job", 
-    selection = [
-        "gdelt_events",
-        "gdelt_mentions",
-        "gdelt_mentions_enhanced",
-        "gdelt_mentions_relevancy_ml_jobs",
-        "snowpipe_transfers_gdelt_assets"
-    ]
-)
-
-
-enrich_gdelt_assets_job = define_asset_job(
-    name = "enrich_gdelt_assets_job", 
-    selection = [
-        "gdelt_mentions_relevancy",
-        "snowpipe_transfers_classified_gdelt_mentions"
-    ]
-)
-
-
 build_data_warehouse_job = define_asset_job(
     name = "build_data_warehouse_job", 
     selection = [
@@ -37,15 +16,6 @@ build_data_warehouse_job = define_asset_job(
         "dw_data_tests",
         "dw_clean_up",
         "hex_main_dashboard_refresh"
-    ]
-)
-
-
-share_daily_summary_assets_job = define_asset_job(
-    name = "share_daily_summary_assets_job", 
-    selection = [
-        "hex_daily_assets_refresh",
-        "twitter_share_daily_assets"
     ]
 )
 
