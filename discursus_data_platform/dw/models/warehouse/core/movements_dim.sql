@@ -14,7 +14,7 @@ with s_movements as (
 final as (
 
   select
-    {{ dbt_utils.surrogate_key(['movement_name']) }} as movement_pk, 
+    {{ dbt_utils.generate_surrogate_key(['movement_name']) }} as movement_pk, 
 
     movement_name,
     published_date_start,

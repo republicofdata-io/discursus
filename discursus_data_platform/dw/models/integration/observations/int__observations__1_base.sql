@@ -1,7 +1,7 @@
 with s_gdelt_events as (
 
     select
-        {{ dbt_utils.surrogate_key([
+        {{ dbt_utils.generate_surrogate_key([
             'published_date',
             'action_geo_latitude',
             'action_geo_longitude'

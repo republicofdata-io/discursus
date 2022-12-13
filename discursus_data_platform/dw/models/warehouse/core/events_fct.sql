@@ -13,13 +13,13 @@ with s_events as (
 final as (
 
     select distinct
-        {{ dbt_utils.surrogate_key([
+        {{ dbt_utils.generate_surrogate_key([
             'event_date',
             'movement_name',
             'action_geo_latitude',
             'action_geo_longitude'
         ]) }} as event_pk, 
-        {{ dbt_utils.surrogate_key(['movement_name']) }} as movement_fk,
+        {{ dbt_utils.generate_surrogate_key(['movement_name']) }} as movement_fk,
 
         event_date, 
         action_geo_country_code,

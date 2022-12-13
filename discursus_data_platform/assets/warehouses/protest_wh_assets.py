@@ -1,6 +1,7 @@
 from dagster import (
     asset, 
-    Output
+    Output,
+    FreshnessPolicy
 )
 import resources.my_resources
 
@@ -59,7 +60,8 @@ def dw_integration_layer(context):
     resource_defs = {
         'dbt_resource': resources.my_resources.my_dbt_resource
     },
-    config_schema={"full_refresh_flag": bool}
+    config_schema={"full_refresh_flag": bool},
+    freshness_policy = FreshnessPolicy(maximum_lag_minutes=60 * 24)
 )
 def dw_entity_layer(context):
     full_refresh_flag = context.op_config["full_refresh_flag"] if context.op_config["full_refresh_flag"] else False

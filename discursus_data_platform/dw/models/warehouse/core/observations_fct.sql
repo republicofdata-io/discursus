@@ -13,14 +13,14 @@ with s_observations as (
 final as (
 
     select distinct
-        {{ dbt_utils.surrogate_key([
+        {{ dbt_utils.generate_surrogate_key([
             'published_date',
             'movement_name',
             'action_geo_latitude',
             'action_geo_longitude',
             'observation_url'
         ]) }} as observation_pk, 
-        {{ dbt_utils.surrogate_key([
+        {{ dbt_utils.generate_surrogate_key([
             'published_date',
             'movement_name',
             'action_geo_latitude',
