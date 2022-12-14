@@ -1,8 +1,4 @@
-from dagster import (
-    asset, 
-    Output,
-    FreshnessPolicy
-)
+from dagster import asset, Output, FreshnessPolicy
 import resources.my_resources
 
 
@@ -25,12 +21,10 @@ def dw_seeds(context):
     group_name = "data_warehouse",
     resource_defs = {
         'dbt_resource': resources.my_resources.my_dbt_resource
-    },
-    config_schema={"full_refresh_flag": bool}
+    }
 )
 def dw_staging_layer(context):
-    full_refresh_flag = context.op_config["full_refresh_flag"] if context.op_config["full_refresh_flag"] else False
-    context.resources.dbt_resource.run(select=["staging"], full_refresh=full_refresh_flag)
+    context.resources.dbt_resource.run(select=["staging"])
     context.resources.dbt_resource.test(select=["staging,test_type:generic"])
 
     return Output(1)
@@ -42,12 +36,10 @@ def dw_staging_layer(context):
     group_name = "data_warehouse",
     resource_defs = {
         'dbt_resource': resources.my_resources.my_dbt_resource
-    },
-    config_schema={"full_refresh_flag": bool}
+    }
 )
 def dw_integration_layer(context):
-    full_refresh_flag = context.op_config["full_refresh_flag"] if context.op_config["full_refresh_flag"] else False
-    context.resources.dbt_resource.run(select=["integration"], full_refresh=full_refresh_flag)
+    context.resources.dbt_resource.run(select=["integration"])
     context.resources.dbt_resource.test(select=["integration,test_type:generic"])
 
     return Output(1)
@@ -60,12 +52,10 @@ def dw_integration_layer(context):
     resource_defs = {
         'dbt_resource': resources.my_resources.my_dbt_resource
     },
-    config_schema={"full_refresh_flag": bool},
-    freshness_policy = FreshnessPolicy(maximum_lag_minutes=60 * 24)
+    freshness_policy = FreshnessPolicy(maximum_lag_minutes=60 * 23, cron_schedule = "15 3,15 * * *")
 )
 def dw_entity_layer(context):
-    full_refresh_flag = context.op_config["full_refresh_flag"] if context.op_config["full_refresh_flag"] else False
-    context.resources.dbt_resource.run(select=["warehouse"], full_refresh=full_refresh_flag)
+    context.resources.dbt_resource.run(select=["warehouse"])
     context.resources.dbt_resource.test(select=["warehouse,test_type:generic"])
 
     return Output(1)

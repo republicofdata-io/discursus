@@ -1,16 +1,12 @@
-from dagster import (
-    asset, 
-    Output, 
-    MetadataValue
-)
+from dagster import asset, Output, MetadataValue, FreshnessPolicy
+from dagster_hex.types import HexOutput
+from dagster_hex.resources import DEFAULT_POLL_INTERVAL
+
 import resources.my_resources
 import pandas as pd 
 from datetime import date
 import PIL.Image as Image
 import io
-
-from dagster_hex.types import HexOutput
-from dagster_hex.resources import DEFAULT_POLL_INTERVAL
 
 
 @asset(
@@ -20,6 +16,7 @@ from dagster_hex.resources import DEFAULT_POLL_INTERVAL
     resource_defs = {
         'hex_resource': resources.my_resources.my_hex_resource
     },
+    freshness_policy = FreshnessPolicy(maximum_lag_minutes = 60 * 23, cron_schedule = "15 6 * * *")
 )
 def hex_daily_assets_refresh(context):
     hex_output: HexOutput = context.resources.hex_resource.run_and_poll(
@@ -55,7 +52,7 @@ def hex_daily_assets_refresh(context):
     resource_defs = {
         'aws_resource': resources.my_resources.my_aws_resource,
         'twitter_resource': resources.my_resources.my_twitter_resource
-    },
+    }
 )
 def twitter_share_daily_assets(context):
     # Retrieve daily summary assets

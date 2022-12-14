@@ -1,5 +1,4 @@
-from dagster import asset, Output
-from dagster_pandas import DataFrame
+from dagster import asset, Output, FreshnessPolicy
 import pandas as pd
 import boto3
 from io import StringIO
@@ -14,9 +13,10 @@ from resources.ml_enrichment_tracker import MLEnrichmentJobTracker
         'aws_resource': resources.my_resources.my_aws_resource,
         'gdelt_resource': resources.my_resources.my_gdelt_resource,
         'snowflake_resource': resources.my_resources.my_snowflake_resource
-    }
+    },
+    freshness_policy = FreshnessPolicy(maximum_lag_minutes = 15)
 )
-def gdelt_events(context) -> DataFrame:
+def gdelt_events(context):
     # Build source path
     latest_events_url = context.resources.gdelt_resource.get_url_to_latest_asset("events")
     gdelt_asset_filename_zip = str(latest_events_url).split('gdeltv2/')[1]
@@ -54,7 +54,7 @@ def gdelt_events(context) -> DataFrame:
         'snowflake_resource': resources.my_resources.my_snowflake_resource
     }
 )
-def gdelt_mentions(context, gdelt_events) -> DataFrame:
+def gdelt_mentions(context, gdelt_events):
     # Build source path
     latest_mentions_url = context.resources.gdelt_resource.get_url_to_latest_asset("mentions")
     gdelt_asset_filename_zip = str(latest_mentions_url).split('gdeltv2/')[1]

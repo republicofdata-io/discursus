@@ -1,12 +1,8 @@
-from dagster import (
-    asset, 
-    Output, 
-    MetadataValue
-)
-import resources.my_resources
-
+from dagster import asset, Output, MetadataValue
 from dagster_hex.types import HexOutput
 from dagster_hex.resources import DEFAULT_POLL_INTERVAL
+
+import resources.my_resources
 
 
 @asset(
@@ -15,7 +11,7 @@ from dagster_hex.resources import DEFAULT_POLL_INTERVAL
     group_name = "data_apps",
     resource_defs = {
         'hex_resource': resources.my_resources.my_hex_resource
-    },
+    }
 )
 def hex_main_dashboard_refresh(context):
     hex_output: HexOutput = context.resources.hex_resource.run_and_poll(

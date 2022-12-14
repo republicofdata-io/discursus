@@ -1,4 +1,4 @@
-from dagster import repository
+from dagster import repository, AssetSelection, build_asset_reconciliation_sensor
 
 from assets.sources import gdelt_source_assets
 from assets.data_prep import gdelt_enriched_assets
@@ -22,7 +22,12 @@ def discursus_repo():
         protest_wh_assets.dw_clean_up,
         public_dashboard_assets.hex_main_dashboard_refresh,
         social_media_assets.hex_daily_assets_refresh,
-        social_media_assets.twitter_share_daily_assets
+        social_media_assets.twitter_share_daily_assets,
+
+        build_asset_reconciliation_sensor(
+            asset_selection=AssetSelection.all(),
+            name="asset_reconciliation_sensor"
+        )
     ]
 
     return assets

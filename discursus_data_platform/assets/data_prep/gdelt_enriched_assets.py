@@ -1,8 +1,8 @@
-from dagster import asset, AssetObservation, Output
-from dagster_pandas import DataFrame
+from dagster import asset, AssetObservation, Output, FreshnessPolicy
 import pandas as pd
 import boto3
 from io import StringIO
+
 import resources.my_resources
 from resources.ml_enrichment_tracker import MLEnrichmentJobTracker
 
@@ -19,7 +19,7 @@ from resources.ml_enrichment_tracker import MLEnrichmentJobTracker
         'novacene_resource': resources.my_resources.my_novacene_resource
     }
 )
-def gdelt_mentions_enhanced(context, gdelt_mentions) -> DataFrame:
+def gdelt_mentions_enhanced(context, gdelt_mentions):
     # Build source path
     latest_mentions_url = context.resources.gdelt_resource.get_url_to_latest_asset("mentions")
     gdelt_asset_filename_zip = str(latest_mentions_url).split('gdeltv2/')[1]
@@ -59,10 +59,10 @@ def gdelt_mentions_enhanced(context, gdelt_mentions) -> DataFrame:
     my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
     
     # Sending latest batch of articles to Novacene for relevancy classification
-    if gdelt_mentions_enhanced.index.size > 0:
-        context.log.info("Sending " + str(gdelt_mentions_enhanced.index.size) + " articles for relevancy classification")
+    if df_gdelt_mentions_enhanced.index.size > 0:
+        context.log.info("Sending " + str(df_gdelt_mentions_enhanced.index.size) + " articles for relevancy classification")
 
-        protest_classification_dataset_id = context.resources.novacene_resource.create_dataset("protest_events_" + gdelt_asset_source_path.split("/")[3], gdelt_mentions_enhanced)
+        protest_classification_dataset_id = context.resources.novacene_resource.create_dataset("protest_events_" + gdelt_asset_source_path.split("/")[3], df_gdelt_mentions_enhanced)
         protest_classification_job = context.resources.novacene_resource.enrich_dataset(protest_classification_dataset_id['id'], 17, 4)
 
         # Update log of enrichment jobs
@@ -86,7 +86,8 @@ def gdelt_mentions_enhanced(context, gdelt_mentions) -> DataFrame:
     resource_defs = {
         'novacene_resource': resources.my_resources.my_novacene_resource,
         'snowflake_resource': resources.my_resources.my_snowflake_resource
-    }
+    },
+    freshness_policy = FreshnessPolicy(maximum_lag_minutes = 30)
 )
 def gdelt_mentions_relevancy(context):
     # Empty dataframe of files to fetch
