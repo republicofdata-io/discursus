@@ -1,4 +1,4 @@
-from dagster import asset, Output, FreshnessPolicy
+from dagster import asset, AssetIn, Output, FreshnessPolicy
 import pandas as pd
 import boto3
 from io import StringIO
@@ -8,6 +8,7 @@ from resources.ml_enrichment_tracker import MLEnrichmentJobTracker
 
 @asset(
     description = "List of events mined on GDELT",
+    key_prefix = ["gdelt"],
     group_name = "sources",
     resource_defs = {
         'aws_resource': resources.my_resources.my_aws_resource,
@@ -46,7 +47,9 @@ def gdelt_events(context):
 
 
 @asset(
+    ins = {"gdelt_events": AssetIn(key_prefix = "gdelt")},
     description = "List of mentions mined from GDELT",
+    key_prefix = ["gdelt"],
     group_name = "sources",
     resource_defs = {
         'aws_resource': resources.my_resources.my_aws_resource,

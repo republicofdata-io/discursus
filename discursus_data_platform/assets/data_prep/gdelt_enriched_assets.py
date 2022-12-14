@@ -1,4 +1,4 @@
-from dagster import asset, AssetObservation, Output, FreshnessPolicy
+from dagster import asset, AssetIn, AssetObservation, Output, FreshnessPolicy
 import pandas as pd
 import boto3
 from io import StringIO
@@ -9,6 +9,7 @@ from resources.ml_enrichment_tracker import MLEnrichmentJobTracker
 
 
 @asset(
+    ins = {"gdelt_mentions": AssetIn(key_prefix = "gdelt")},
     description = "List of enhanced mentions mined from GDELT",
     group_name = "prepared_sources",
     resource_defs = {
@@ -81,7 +82,8 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
 
 @asset(
     non_argument_deps = {"gdelt_mentions_enhanced"},
-    description = "Relevancy classification of GDELT mentions",
+    description = "ML enriched GDELT mentions",
+    key_prefix = ["gdelt"],
     group_name = "prepared_sources",
     resource_defs = {
         'novacene_resource': resources.my_resources.my_novacene_resource,
@@ -89,7 +91,7 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
     },
     freshness_policy = FreshnessPolicy(maximum_lag_minutes = 30)
 )
-def gdelt_mentions_relevancy(context):
+def gdelt_ml_enriched_mentions(context):
     # Empty dataframe of files to fetch
     df_relevancy_classifications = pd.DataFrame(None, columns = ['job_id', 'name', 'file_path'])
 
@@ -132,7 +134,7 @@ def gdelt_mentions_relevancy(context):
         # Get trace of asset metadata
         context.log_event(
             AssetObservation(
-                asset_key = "gdelt_mentions_relevancy",
+                asset_key = "gdelt_ml_enriched_mentions",
                 metadata = {
                     "path": "s3://discursus-io/" + 'sources/ml/' + file_date + '/ml_enriched_' + row['name'],
                     "rows": df_ml_enrichment_file.index.size

@@ -1,4 +1,4 @@
-from dagster import asset, Output, MetadataValue
+from dagster import asset, AssetKey, Output, MetadataValue
 from dagster_hex.types import HexOutput
 from dagster_hex.resources import DEFAULT_POLL_INTERVAL
 
@@ -6,7 +6,7 @@ import resources.my_resources
 
 
 @asset(
-    non_argument_deps = {"dw_data_tests"},
+    non_argument_deps = {AssetKey(["data_warehouse", "events_fct"])},
     description = "Hex main dashboard refresh",
     group_name = "data_apps",
     resource_defs = {
