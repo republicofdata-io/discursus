@@ -16,7 +16,10 @@ import io
     resource_defs = {
         'hex_resource': resources.my_resources.my_hex_resource
     },
-    freshness_policy = FreshnessPolicy(maximum_lag_minutes = 60 * 23, cron_schedule = "15 6 * * *")
+    freshness_policy = FreshnessPolicy(
+        maximum_lag_minutes = 60 * 23, 
+        cron_schedule = "15 6 * * *"
+    )
 )
 def hex_daily_assets_refresh(context):
     hex_output: HexOutput = context.resources.hex_resource.run_and_poll(
@@ -52,7 +55,11 @@ def hex_daily_assets_refresh(context):
     resource_defs = {
         'aws_resource': resources.my_resources.my_aws_resource,
         'twitter_resource': resources.my_resources.my_twitter_resource
-    }
+    },
+    freshness_policy = FreshnessPolicy(
+        maximum_lag_minutes = 60 * 23, 
+        cron_schedule = "15 7 * * *"
+    )
 )
 def twitter_share_daily_assets(context):
     # Retrieve daily summary assets

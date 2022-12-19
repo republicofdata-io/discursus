@@ -10,7 +10,6 @@ from dagster_dbt import dbt_cli_resource, load_assets_from_dbt_project
 
 from assets.sources import gdelt_source_assets, airbyte_source_assets
 from assets.data_prep import gdelt_enriched_assets
-from assets.warehouses import protest_wh_assets
 from assets.data_apps import public_dashboard_assets, social_media_assets
 
 
@@ -21,7 +20,8 @@ protest_wh_assets = with_resources(
     load_assets_from_dbt_project(
         project_dir = DBT_PROJECT_DIR, 
         profiles_dir = DBT_PROFILES_DIR, 
-        key_prefix = ["data_warehouse"]
+        key_prefix = ["data_warehouse"],
+        use_build_command = True
     ),
     {
         "dbt": dbt_cli_resource.configured(
