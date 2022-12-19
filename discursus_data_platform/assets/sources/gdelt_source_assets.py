@@ -1,7 +1,9 @@
 from dagster import asset, AssetIn, Output, FreshnessPolicy
+from dagster_aws.s3 import s3_pickle_io_manager, s3_resource
 import pandas as pd
 import boto3
 from io import StringIO
+
 import resources.my_resources
 from resources.ml_enrichment_tracker import MLEnrichmentJobTracker
 
