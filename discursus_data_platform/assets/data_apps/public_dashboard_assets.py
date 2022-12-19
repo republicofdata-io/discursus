@@ -6,7 +6,11 @@ import resources.my_resources
 
 
 @asset(
-    non_argument_deps = {AssetKey(["data_warehouse", "events_fct"])},
+    non_argument_deps = {
+        AssetKey(["data_warehouse", "events_fct"]), 
+        AssetKey(["data_warehouse", "observations_fct"]),
+        AssetKey(["data_warehouse", "movements_dim"])
+    },
     description = "Hex main dashboard refresh",
     group_name = "data_apps",
     resource_defs = {

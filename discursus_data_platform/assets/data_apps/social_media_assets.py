@@ -10,7 +10,11 @@ import io
 
 
 @asset(
-    non_argument_deps = {AssetKey(["data_warehouse", "events_fct"])},
+    non_argument_deps = {
+        AssetKey(["data_warehouse", "events_fct"]), 
+        AssetKey(["data_warehouse", "observations_fct"]),
+        AssetKey(["data_warehouse", "movements_dim"])
+    },
     description = "Hex daily assets refresh",
     group_name = "data_apps",
     resource_defs = {
