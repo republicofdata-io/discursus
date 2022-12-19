@@ -55,7 +55,8 @@ def gdelt_events(context):
         'aws_resource': resources.my_resources.my_aws_resource,
         'gdelt_resource': resources.my_resources.my_gdelt_resource,
         'snowflake_resource': resources.my_resources.my_snowflake_resource
-    }
+    },
+    freshness_policy = FreshnessPolicy(maximum_lag_minutes = 0)
 )
 def gdelt_mentions(context, gdelt_events):
     # Build source path

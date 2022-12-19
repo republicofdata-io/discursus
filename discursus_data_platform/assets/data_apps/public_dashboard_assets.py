@@ -1,4 +1,4 @@
-from dagster import asset, AssetKey, Output, MetadataValue
+from dagster import asset, AssetKey, Output, MetadataValue, FreshnessPolicy
 from dagster_hex.types import HexOutput
 from dagster_hex.resources import DEFAULT_POLL_INTERVAL
 
@@ -11,7 +11,11 @@ import resources.my_resources
     group_name = "data_apps",
     resource_defs = {
         'hex_resource': resources.my_resources.my_hex_resource
-    }
+    },
+    freshness_policy = FreshnessPolicy(
+        maximum_lag_minutes = 60 * 4, 
+        cron_schedule = "15 3,9,15,21 * * *"
+    )
 )
 def hex_main_dashboard_refresh(context):
     hex_output: HexOutput = context.resources.hex_resource.run_and_poll(

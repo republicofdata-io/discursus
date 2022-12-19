@@ -7,5 +7,4 @@ from dagster import asset, Output
     group_name = "sources"
 )
 def protest_groupings(context):
-    # Return asset
-    return Output(1)
+    pass

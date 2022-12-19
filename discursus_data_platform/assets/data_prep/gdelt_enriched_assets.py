@@ -18,7 +18,7 @@ from resources.ml_enrichment_tracker import MLEnrichmentJobTracker
         'web_scraper_resource': resources.my_resources.my_web_scraper_resource,
         'snowflake_resource': resources.my_resources.my_snowflake_resource,
         'novacene_resource': resources.my_resources.my_novacene_resource
-    }
+    },
 )
 def gdelt_mentions_enhanced(context, gdelt_mentions):
     # Build source path
@@ -89,7 +89,9 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
         'novacene_resource': resources.my_resources.my_novacene_resource,
         'snowflake_resource': resources.my_resources.my_snowflake_resource
     },
-    freshness_policy = FreshnessPolicy(maximum_lag_minutes = 30)
+    freshness_policy = FreshnessPolicy(
+        maximum_lag_minutes = 60
+    )
 )
 def gdelt_ml_enriched_mentions(context):
     # Empty dataframe of files to fetch
