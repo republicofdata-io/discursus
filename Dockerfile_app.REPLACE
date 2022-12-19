@@ -47,6 +47,7 @@ RUN pip3 install \
     dagster_snowflake==0.17.7 \
     dagster_dbt==0.17.7 \
     dagster_pandas==0.17.7 \
+    dagster_aws==0.17.7 \
     dagster_hex \
     dbt-core==1.3.1 \
     dbt-snowflake==1.3.0 \
