@@ -45,7 +45,8 @@ platform_assets = [
 
     build_asset_reconciliation_sensor(
         asset_selection=AssetSelection.all(),
-        name="asset_reconciliation_sensor"
+        name="asset_reconciliation_sensor",
+        minimum_interval_seconds = 60 * 5
     )        
 ]
 
