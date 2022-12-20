@@ -28,7 +28,7 @@ from (
   from @s3_dio_sources/ml (
 
     file_format => csv,
-    pattern => '.*.mentions.CSV'
+    pattern => '.*.mentions.enhanced.csv'
 
   ) t
 );
