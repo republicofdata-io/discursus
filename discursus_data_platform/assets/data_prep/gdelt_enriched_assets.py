@@ -65,9 +65,10 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
 
         protest_classification_dataset_id = context.resources.novacene_resource.create_dataset("protest_events_" + gdelt_asset_source_path.split("/")[3], df_gdelt_mentions_enhanced)
         protest_classification_job = context.resources.novacene_resource.enrich_dataset(protest_classification_dataset_id['id'], 17, 4)
+        context.log.info("Protest classification job id: " + str(protest_classification_job['id']))
 
         # Update log of enrichment jobs
-        my_ml_enrichment_jobs_tracker.add_new_job(protest_classification_job['id'], 'processing')
+        my_ml_enrichment_jobs_tracker.add_new_job(str(protest_classification_job['id']), 'processing')
         my_ml_enrichment_jobs_tracker.upload_job_log()
 
     # Return asset
