@@ -4,8 +4,7 @@ import pandas as pd
 import boto3
 from io import StringIO
 
-import resources.my_resources
-from resources.ml_enrichment_tracker import MLEnrichmentJobTracker
+from discursus_data_platform.utils.resources import my_resources
 
 
 @asset(
@@ -13,9 +12,9 @@ from resources.ml_enrichment_tracker import MLEnrichmentJobTracker
     key_prefix = ["gdelt"],
     group_name = "sources",
     resource_defs = {
-        'aws_resource': resources.my_resources.my_aws_resource,
-        'gdelt_resource': resources.my_resources.my_gdelt_resource,
-        'snowflake_resource': resources.my_resources.my_snowflake_resource
+        'aws_resource': my_resources.my_aws_resource,
+        'gdelt_resource': my_resources.my_gdelt_resource,
+        'snowflake_resource': my_resources.my_snowflake_resource
     },
     freshness_policy = FreshnessPolicy(maximum_lag_minutes = 15)
 )
@@ -54,9 +53,9 @@ def gdelt_events(context):
     key_prefix = ["gdelt"],
     group_name = "sources",
     resource_defs = {
-        'aws_resource': resources.my_resources.my_aws_resource,
-        'gdelt_resource': resources.my_resources.my_gdelt_resource,
-        'snowflake_resource': resources.my_resources.my_snowflake_resource
+        'aws_resource': my_resources.my_aws_resource,
+        'gdelt_resource': my_resources.my_gdelt_resource,
+        'snowflake_resource': my_resources.my_snowflake_resource
     }
 )
 def gdelt_mentions(context, gdelt_events):

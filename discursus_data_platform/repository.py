@@ -2,36 +2,34 @@ from dagster import (
     AssetSelection, 
     build_asset_reconciliation_sensor,
     file_relative_path,
+    load_assets_from_package_module,
     repository, 
     with_resources
 )
 from dagster_aws.s3 import s3_pickle_io_manager, s3_resource
 from dagster_dbt import dbt_cli_resource, load_assets_from_dbt_project
 
-from assets.sources import gdelt_source_assets, airbyte_source_assets
-from assets.data_prep import gdelt_enriched_assets
-from assets.data_apps import public_dashboard_assets, social_media_assets
+from discursus_data_platform import (
+    dp_apps,
+    dp_data_warehouse,
+    dp_gdelt,
+    dp_movement_groupings
+)
 
+DBT_PROFILES_DIR = file_relative_path(__file__, "./dp_data_warehouse")
+DBT_PROJECT_DIR = file_relative_path(__file__, "./dp_data_warehouse")
 
-DBT_PROFILES_DIR = file_relative_path(__file__, "./dw")
-DBT_PROJECT_DIR = file_relative_path(__file__, "./dw")
-
-protest_assets = with_resources(
+my_assets = with_resources(
     load_assets_from_dbt_project(
         project_dir = DBT_PROJECT_DIR, 
         profiles_dir = DBT_PROFILES_DIR, 
         key_prefix = ["data_warehouse"],
         use_build_command = True
-    ) + [
-        gdelt_source_assets.gdelt_events,
-        gdelt_source_assets.gdelt_mentions,
-        airbyte_source_assets.protest_groupings,
-        gdelt_enriched_assets.gdelt_mentions_enhanced,
-        gdelt_enriched_assets.gdelt_ml_enriched_mentions,
-        public_dashboard_assets.hex_main_dashboard_refresh,
-        social_media_assets.hex_daily_assets_refresh,
-        social_media_assets.twitter_share_daily_assets
-    ],
+    ) + 
+    load_assets_from_package_module(dp_apps) +
+    load_assets_from_package_module(dp_data_warehouse) +
+    load_assets_from_package_module(dp_gdelt) +
+    load_assets_from_package_module(dp_movement_groupings),
     resource_defs = {
         "dbt": dbt_cli_resource.configured(
             {
@@ -57,4 +55,4 @@ asset_sensor = [
 
 @repository
 def discursus_repo():
-    return protest_assets + asset_sensor
+    return my_assets + asset_sensor

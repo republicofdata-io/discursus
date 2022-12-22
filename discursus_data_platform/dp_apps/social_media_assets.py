@@ -2,11 +2,12 @@ from dagster import asset, AssetKey, Output, MetadataValue, FreshnessPolicy
 from dagster_hex.types import HexOutput
 from dagster_hex.resources import DEFAULT_POLL_INTERVAL
 
-import resources.my_resources
 import pandas as pd 
 from datetime import date
 import PIL.Image as Image
 import io
+
+from discursus_data_platform.utils.resources import my_resources
 
 
 @asset(
@@ -18,7 +19,7 @@ import io
     description = "Hex daily assets refresh",
     group_name = "data_apps",
     resource_defs = {
-        'hex_resource': resources.my_resources.my_hex_resource
+        'hex_resource': my_resources.my_hex_resource
     },
     freshness_policy = FreshnessPolicy(
         maximum_lag_minutes = 60 * 23, 
@@ -57,8 +58,8 @@ def hex_daily_assets_refresh(context):
     description = "Twitter share of daily summary assets",
     group_name = "data_apps",
     resource_defs = {
-        'aws_resource': resources.my_resources.my_aws_resource,
-        'twitter_resource': resources.my_resources.my_twitter_resource
+        'aws_resource': my_resources.my_aws_resource,
+        'twitter_resource': my_resources.my_twitter_resource
     },
     freshness_policy = FreshnessPolicy(
         maximum_lag_minutes = 60 * 23, 
