@@ -3,8 +3,8 @@ import pandas as pd
 import boto3
 from io import StringIO
 
-import resources.my_resources
-from resources.ml_enrichment_tracker import MLEnrichmentJobTracker
+from discursus_data_platform.utils.resources import my_resources
+from discursus_data_platform.utils.resources.ml_enrichment_tracker import MLEnrichmentJobTracker
 
 
 
@@ -13,11 +13,11 @@ from resources.ml_enrichment_tracker import MLEnrichmentJobTracker
     description = "List of enhanced mentions mined from GDELT",
     group_name = "prepared_sources",
     resource_defs = {
-        'aws_resource': resources.my_resources.my_aws_resource,
-        'gdelt_resource': resources.my_resources.my_gdelt_resource,
-        'web_scraper_resource': resources.my_resources.my_web_scraper_resource,
-        'snowflake_resource': resources.my_resources.my_snowflake_resource,
-        'novacene_resource': resources.my_resources.my_novacene_resource
+        'aws_resource': my_resources.my_aws_resource,
+        'gdelt_resource': my_resources.my_gdelt_resource,
+        'web_scraper_resource': my_resources.my_web_scraper_resource,
+        'snowflake_resource': my_resources.my_snowflake_resource,
+        'novacene_resource': my_resources.my_novacene_resource
     },
 )
 def gdelt_mentions_enhanced(context, gdelt_mentions):
@@ -87,8 +87,8 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
     key_prefix = ["gdelt"],
     group_name = "prepared_sources",
     resource_defs = {
-        'novacene_resource': resources.my_resources.my_novacene_resource,
-        'snowflake_resource': resources.my_resources.my_snowflake_resource
+        'novacene_resource': my_resources.my_novacene_resource,
+        'snowflake_resource': my_resources.my_snowflake_resource
     },
     freshness_policy = FreshnessPolicy(
         maximum_lag_minutes = 60

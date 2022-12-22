@@ -2,7 +2,7 @@ from dagster import asset, AssetKey, Output, MetadataValue, FreshnessPolicy
 from dagster_hex.types import HexOutput
 from dagster_hex.resources import DEFAULT_POLL_INTERVAL
 
-import resources.my_resources
+from discursus_data_platform.utils.resources import my_resources
 
 
 @asset(
@@ -14,7 +14,7 @@ import resources.my_resources
     description = "Hex main dashboard refresh",
     group_name = "data_apps",
     resource_defs = {
-        'hex_resource': resources.my_resources.my_hex_resource
+        'hex_resource': my_resources.my_hex_resource
     },
     freshness_policy = FreshnessPolicy(
         maximum_lag_minutes = 60 * 4, 

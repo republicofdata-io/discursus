@@ -1,4 +1,4 @@
-from dagster import asset, Output
+from dagster import asset
 
 
 @asset(

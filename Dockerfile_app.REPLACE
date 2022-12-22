@@ -1,8 +1,7 @@
-FROM ubuntu:22.04
+FROM python:3.9.8-slim-buster
 
 # Environment variables
-ENV DAGSTER_HOME=/opt/dagster/dagster_home/
-ENV DPF_MINER_GDELT_HOME=/opt/dagster/dpf_core/miners/gdelt
+ENV APP_HOME=/usr/src/app
 ENV AWS_ACCESS_KEY_ID=REPLACE_VALUE
 ENV AWS_SECRET_ACCESS_KEY=REPLACE_VALUE
 ENV SNOWFLAKE_ACCOUNT=REPLACE_VALUE
@@ -15,75 +14,39 @@ ENV SNOWFLAKE_LOAD_SCHEMA=REPLACE_VALUE
 ENV SNOWFLAKE_DW_WAREHOUSE=REPLACE_VALUE
 ENV SNOWFLAKE_DW_DATABASE=REPLACE_VALUE
 ENV SNOWFLAKE_DW_SCHEMA=REPLACE_VALUE
-ENV ML_HOST=REPLACE_VALUE
-ENV ML_LOGIN=REPLACE_VALUE
-ENV ML_PASSWORD=REPLACE_VALUE
-ENV TWITTER_BEARER_TOKEN=REPLACE_VALUE
 
 
 # Create environment
-RUN mkdir -p $DAGSTER_HOME
-
-RUN apt-get update && apt-get install -y \
-    software-properties-common
-RUN add-apt-repository universe
-RUN apt-get update && apt-get install -y \
-    curl \
-    git \
-    python3.9 \
-    python3-pip \
-    zsh \
-    unzip
-
-RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.1/zsh-in-docker.sh)"
-
-RUN pip3 install \
-    dagster==1.1.7 \
-    dagit==1.1.7 \
-    dagster-graphql==1.1.7 \
-    dagster-postgres==0.17.7 \
-    dagster-docker==0.17.7 \
-    dagster_shell==0.17.7 \
-    dagster_snowflake==0.17.7 \
-    dagster_dbt==0.17.7 \
-    dagster_pandas==0.17.7 \
-    dagster_aws==0.17.7 \
-    dagster_hex \
-    dbt-core==1.3.1 \
-    dbt-snowflake==1.3.0 \
-    pandas \
-    bs4 \
-    optparse-pretty \
-    boto3 \
-    fsspec \
-    tweepy \
-    pillow
+RUN mkdir -p $APP_HOME
+WORKDIR $APP_HOME
 
 
-# Install framework packages
-RUN pip3 install git+https://github.com/lantrns-analytics/saf_aws@release/0.2
-RUN pip3 install git+https://github.com/lantrns-analytics/saf_gdelt@release/0.2
-RUN pip3 install git+https://github.com/lantrns-analytics/saf_novacene@release/0.2
-RUN pip3 install git+https://github.com/lantrns-analytics/saf_web_scraper@release/0.2
+# Install the python package managers.
+RUN pip install -U \
+    pip \
+    poetry
 
 
-# Copy resources for Dagster
-COPY saf_core/dagster.yaml $DAGSTER_HOME
+# Copy the contents of the project root directory to the app directory in the container
+COPY . .
 
 
 # Create tmp repostiory for local temporary job files to be copied to
-RUN mkdir -p $DAGSTER_HOME/tmp
+RUN mkdir -p ./tmp
 
 
-# Copy and install saf_core package
-COPY saf_core/ /opt/dagster/saf_core/
-RUN (cd /opt/dagster/saf_core/dw/; dbt deps --profiles-dir ./)
+# Install dependancies
+COPY poetry.lock pyproject.toml ./
+
+RUN poetry config virtualenvs.create false \
+  && poetry install
 
 
-WORKDIR /opt/dagster/saf_core/
+# Copy and install discursus_data_platform package
+RUN (cd ./discursus_data_platform/dp_data_warehouse/; dbt deps --profiles-dir ./)
 
 
 # Run dagster gRPC server on port 4000
 EXPOSE 4000
 
-CMD ["dagster", "api", "grpc", "--host", "0.0.0.0", "--port", "4000", "--python-file", "repository.py", "--working-directory", "/opt/dagster/saf_core/"]
+CMD ["dagster", "api", "grpc", "--host", "0.0.0.0", "--port", "4000", "--python-file", "./discursus_data_platform/repository.py", "--working-directory", "./discursus_data_platform/"]
