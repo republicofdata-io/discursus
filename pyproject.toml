@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "discursus-data-platform"
+version = "0.1.0"
+description = "The discursus project is an OSS social analytics data product that continuously delivers data on protest movements throughout North America."
+authors = ["Olivier Dupuis <odupuis@lantrns.co>"]
+license = "MIT"
+packages = [{include = "discursus_data_platform"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
