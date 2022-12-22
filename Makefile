@@ -9,4 +9,4 @@ docker-system-prune:
 	docker system prune --all --force
 
 docker-volume-prune:
-	docker volume prune
+	docker volume prune --force
