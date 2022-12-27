@@ -1,0 +1,94 @@
+version: 2
+models:
+  - name: dbt_metrics_default_calendar
+    columns:
+      - name: date_day
+        tests:
+          - dbt_utils.at_least_one
+      - name: date_month
+        tests:
+          - dbt_utils.at_least_one
+      - name: date_quarter
+        tests:
+          - dbt_utils.at_least_one
+      - name: date_week
+        tests:
+          - dbt_utils.at_least_one
+      - name: date_year
+        tests:
+          - dbt_utils.at_least_one
+  - name: events_fct
+    columns:
+      - name: action_geo_country_code
+        tests:
+          - dbt_utils.at_least_one
+      - name: action_geo_country_name
+        tests:
+          - dbt_utils.at_least_one
+      - name: action_geo_full_name
+        tests:
+          - dbt_utils.at_least_one
+      - name: action_geo_latitude
+        tests:
+          - dbt_utils.at_least_one
+      - name: action_geo_longitude
+        tests:
+          - dbt_utils.at_least_one
+      - name: event_date
+        tests:
+          - dbt_utils.at_least_one
+      - name: event_pk
+        tests:
+          - not_null
+          - unique
+      - name: movement_fk
+        tests:
+          - not_null
+  - name: movements_dim
+    columns:
+      - name: countries
+        tests:
+          - dbt_utils.at_least_one
+      - name: movement_name
+        tests:
+          - dbt_utils.at_least_one
+      - name: movement_pk
+        tests:
+          - not_null
+          - unique
+      - name: page_description_regex
+        tests:
+          - dbt_utils.at_least_one
+      - name: published_date_end
+        tests:
+          - dbt_utils.at_least_one
+      - name: published_date_start
+        tests:
+          - dbt_utils.at_least_one
+  - name: observations_fct
+    columns:
+      - name: event_fk
+        tests:
+          - not_null
+      - name: observation_keywords
+        tests:
+          - dbt_utils.at_least_one
+      - name: observation_page_description
+        tests:
+          - dbt_utils.at_least_one
+      - name: observation_page_title
+        tests:
+          - dbt_utils.at_least_one
+      - name: observation_pk
+        tests:
+          - not_null
+          - unique
+      - name: observation_type
+        tests:
+          - dbt_utils.at_least_one
+      - name: observation_url
+        tests:
+          - dbt_utils.at_least_one
+      - name: published_date
+        tests:
+          - dbt_utils.at_least_one

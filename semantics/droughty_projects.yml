@@ -7,6 +7,7 @@ field_description_file_name: field_descriptions.md
 
 dbml_path: semantics/dbml
 cube_path: semantics/cube
+dbt_path: semantics/dbt
 
 test_schemas:
     - analytics_qa

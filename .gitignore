@@ -33,9 +33,10 @@ MANIFEST
 *.manifest
 *.spec
 
-# Installer logs
+# Logs
 pip-log.txt
 pip-delete-this-directory.txt
+logs
 
 # Unit test / coverage reports
 htmlcov/
@@ -132,3 +133,6 @@ dev/
 
 # Docker
 Dockerfile_app
+
+# Droughty
+droughty_profiles.yml

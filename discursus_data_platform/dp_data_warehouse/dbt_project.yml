@@ -11,7 +11,8 @@ analysis-paths: ["analysis"]
 test-paths: ["tests"]
 seed-paths: ["data"]
 macro-paths: ["macros"]
-snapshot-paths: ["snapshots"]
+tests: ["tests"]
+docs-paths: ["wh_docs"]
 
 target-path: "target"
 clean-targets:

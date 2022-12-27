@@ -1,0 +1,28 @@
+name: "End to end testing"
+description: "Set up profile and run dbt with test project"
+inputs:
+  dbt_target:
+    description: "Name of target to use when running dbt"
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Install python dependencies
+      shell: bash
+      run: |
+        pip install --user --upgrade pip
+        pip --version
+        pip install -r dev-requirements.txt        
+
+    ## Make sure to defined dbt_target as an environment variable
+    ## Previously we were supplying just as an input and os.environ
+    ## wasn't able to recognize it.
+    - name: Run pytest
+      shell: bash
+      env:
+        dbt_target: ${{ inputs.dbt_target }}
+      run: |
+        python3 -m pytest tests/functional

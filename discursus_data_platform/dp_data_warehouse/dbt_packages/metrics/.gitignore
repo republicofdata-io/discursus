@@ -1,0 +1,15 @@
+
+target/
+dbt_modules/
+dbt_packages/
+logs/
+.DS_Store
+integration_tests/target
+model_testing/
+test.env
+env/
+.venv
+venv/
+.env
+__pycache__
+.pytest_cache
