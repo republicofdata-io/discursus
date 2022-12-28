@@ -1,10 +1,10 @@
 cube (`dbt_metrics_default_calendar_extended`, {
-sql: `select * from ANALYTICS.dbt_metrics_default_calendar`,
+sql: `select * from ANALYTICS_QA.dbt_metrics_default_calendar`,
 extends: dbt_metrics_default_calendar,
 measures: {
 }});
 cube (`events_fct_extended`, {
-sql: `select * from ANALYTICS.events_fct`,
+sql: `select * from ANALYTICS_QA.events_fct`,
 extends: events_fct,
 measures: {
 sum_of_action_geo_latitude:  {
@@ -21,7 +21,7 @@ count_of_event_pk:  {
 } ,
 }});
 cube (`movements_dim_extended`, {
-sql: `select * from ANALYTICS.movements_dim`,
+sql: `select * from ANALYTICS_QA.movements_dim`,
 extends: movements_dim,
 measures: {
 count_of_movement_pk:  {
@@ -30,7 +30,7 @@ count_of_movement_pk:  {
 } ,
 }});
 cube (`observations_fct_extended`, {
-sql: `select * from ANALYTICS.observations_fct`,
+sql: `select * from ANALYTICS_QA.observations_fct`,
 extends: observations_fct,
 measures: {
 count_of_observation_pk:  {
