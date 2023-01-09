@@ -1,103 +1,94 @@
 version: 2
 models:
+  - name: dbt_metrics_default_calendar
+    columns:
+      - name: date_day
+        tests:
+          - dbt_utils.at_least_one
+      - name: date_month
+        tests:
+          - dbt_utils.at_least_one
+      - name: date_quarter
+        tests:
+          - dbt_utils.at_least_one
+      - name: date_week
+        tests:
+          - dbt_utils.at_least_one
+      - name: date_year
+        tests:
+          - dbt_utils.at_least_one
   - name: events_fct
     columns:
       - name: action_geo_country_code
-        description: '{{ doc("action_geo_country_code") }}'
         tests:
           - dbt_utils.at_least_one
       - name: action_geo_country_name
-        description: '{{ doc("action_geo_country_name") }}'
         tests:
           - dbt_utils.at_least_one
       - name: action_geo_full_name
-        description: '{{ doc("action_geo_full_name") }}'
         tests:
           - dbt_utils.at_least_one
       - name: action_geo_latitude
-        description: '{{ doc("action_geo_latitude") }}'
         tests:
           - dbt_utils.at_least_one
       - name: action_geo_longitude
-        description: '{{ doc("action_geo_longitude") }}'
         tests:
           - dbt_utils.at_least_one
       - name: event_date
-        description: '{{ doc("event_date") }}'
         tests:
           - dbt_utils.at_least_one
       - name: event_pk
-        description: '{{ doc("event_pk") }}'
         tests:
           - not_null
           - unique
       - name: movement_fk
-        description: '{{ doc("movement_fk") }}'
         tests:
           - not_null
-          - relationships:
-              to: ref('movements_dim')
-              field: movement_pk
   - name: movements_dim
     columns:
       - name: countries
-        description: '{{ doc("countries") }}'
         tests:
           - dbt_utils.at_least_one
       - name: movement_name
-        description: '{{ doc("movement_name") }}'
         tests:
           - dbt_utils.at_least_one
       - name: movement_pk
-        description: '{{ doc("movement_pk") }}'
         tests:
           - not_null
           - unique
       - name: page_description_regex
-        description: '{{ doc("page_description_regex") }}'
         tests:
           - dbt_utils.at_least_one
       - name: published_date_end
-        description: '{{ doc("published_date_end") }}'
+        tests:
+          - dbt_utils.at_least_one
       - name: published_date_start
-        description: '{{ doc("published_date_start") }}'
         tests:
           - dbt_utils.at_least_one
   - name: observations_fct
     columns:
       - name: event_fk
-        description: '{{ doc("event_fk") }}'
         tests:
           - not_null
-          - relationships:
-              to: ref('events_fct')
-              field: event_pk
       - name: observation_keywords
-        description: '{{ doc("observation_keywords") }}'
         tests:
           - dbt_utils.at_least_one
       - name: observation_page_description
-        description: '{{ doc("observation_page_description") }}'
         tests:
           - dbt_utils.at_least_one
       - name: observation_page_title
-        description: '{{ doc("observation_page_title") }}'
         tests:
           - dbt_utils.at_least_one
       - name: observation_pk
-        description: '{{ doc("observation_pk") }}'
         tests:
           - not_null
           - unique
       - name: observation_type
-        description: '{{ doc("observation_type") }}'
         tests:
           - dbt_utils.at_least_one
       - name: observation_url
-        description: '{{ doc("observation_url") }}'
         tests:
           - dbt_utils.at_least_one
       - name: published_date
-        description: '{{ doc("published_date") }}'
         tests:
           - dbt_utils.at_least_one

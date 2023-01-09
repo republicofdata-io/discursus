@@ -11,7 +11,7 @@ analysis-paths: ["analysis"]
 test-paths: ["tests"]
 seed-paths: ["data"]
 macro-paths: ["macros"]
-snapshot-paths: ["snapshots"]
+docs-paths: ["wh_docs"]
 
 target-path: "target"
 clean-targets:
@@ -27,11 +27,6 @@ seeds:
                 CODE: varchar(3)
                 LABEL: varchar
 
-        event_types:
-            +column_types:
-                CODE: varchar
-                LABEL: varchar
-
         fips_country:
             +column_types:
                 CODE: varchar(2)
@@ -40,6 +35,10 @@ seeds:
 
 models:
     discursus_dw:
+        +persist_docs:
+            relation: true
+            columns: true
+            
         staging:
             materialized: view
             schema: staging
@@ -53,4 +52,4 @@ models:
 
 
 vars:
-  surrogate_key_treat_nulls_as_empty_strings: true #turn on legacy behaviour
+    surrogate_key_treat_nulls_as_empty_strings: true #turn on legacy behaviour
