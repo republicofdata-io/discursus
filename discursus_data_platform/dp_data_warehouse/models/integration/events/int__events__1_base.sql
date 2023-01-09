@@ -1,3 +1,9 @@
+{{
+    config(
+        dagster_freshness_policy = {"maximum_lag_minutes": 6 * 60}
+    )
+}}
+
 with s_gdelt_events as (
 
     select * from {{ ref('stg__gdelt__events') }}
