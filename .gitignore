@@ -136,3 +136,7 @@ Dockerfile_app
 
 # Droughty
 droughty_profiles.yml
+
+# dbt
+target/
+dbt_packages/
