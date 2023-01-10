@@ -1,91 +1,58 @@
-from dagster import repository
-from assets.source_gdelt_assets import (
-    gdelt_events,
-    gdelt_mentions,
-    gdelt_mentions_enhanced,
-    gdelt_mentions_relevancy_ml_jobs,
-    snowpipe_transfers_gdelt_assets
+from dagster import (
+    AssetSelection, 
+    build_asset_reconciliation_sensor,
+    file_relative_path,
+    load_assets_from_package_module,
+    repository, 
+    with_resources
 )
-from assets.enrich_gdelt_assets import (
-    gdelt_mentions_relevancy,
-    snowpipe_transfers_classified_gdelt_mentions,
-    article_entity_extraction_ml_jobs
+from dagster_aws.s3 import s3_pickle_io_manager, s3_resource
+from dagster_dbt import dbt_cli_resource, load_assets_from_dbt_project
+
+from discursus_data_platform import (
+    dp_apps,
+    dp_data_warehouse,
+    dp_gdelt,
+    dp_movement_groupings
 )
-from assets.dw_assets import (
-    dw_seeds,
-    dw_staging_layer,
-    dw_integration_layer,
-    dw_entity_layer,
-    dw_data_tests,
-    dw_clean_up
+
+DBT_PROFILES_DIR = file_relative_path(__file__, "./dp_data_warehouse")
+DBT_PROJECT_DIR = file_relative_path(__file__, "./dp_data_warehouse")
+
+my_assets = with_resources(
+    load_assets_from_dbt_project(
+        project_dir = DBT_PROJECT_DIR, 
+        profiles_dir = DBT_PROFILES_DIR, 
+        key_prefix = ["data_warehouse"],
+        use_build_command = True
+    ) + 
+    load_assets_from_package_module(dp_apps) +
+    load_assets_from_package_module(dp_data_warehouse) +
+    load_assets_from_package_module(dp_gdelt) +
+    load_assets_from_package_module(dp_movement_groupings),
+    resource_defs = {
+        "dbt": dbt_cli_resource.configured(
+            {
+                "project_dir": DBT_PROFILES_DIR,
+                "profiles_dir": DBT_PROJECT_DIR,
+            },
+        ),
+        "io_manager": s3_pickle_io_manager.configured(
+            {"s3_bucket": "discursus-io", "s3_prefix": "platform"}
+        ),
+        "s3": s3_resource,
+    },
 )
-from assets.hex_assets import (
-    hex_main_dashboard_refresh,
-    hex_daily_assets_refresh
-)
-from assets.twitter_assets import (
-    twitter_share_daily_assets
-)
-from jobs import (
-    source_and_classify_relevancy_of_gdelt_assets_job,
-    get_relevancy_classifications_job,
-    extract_article_entities_job,
-    build_data_warehouse_job,
-    share_daily_summary_assets_job,
-    feed_ml_trainer_engine
-)
-from schedules import (
-    source_and_classify_relevancy_of_gdelt_assets_schedule, 
-    get_relevancy_classifications_schedule,
-    feed_ml_trainer_engine_schedule,
-    build_data_warehouse_schedule,
-    share_daily_summary_assets_schedule
-)
+
+asset_sensor = [
+    build_asset_reconciliation_sensor(
+        asset_selection=AssetSelection.all(),
+        name="asset_reconciliation_sensor",
+        minimum_interval_seconds = 60 * 5
+    )
+]
 
 
 @repository
 def discursus_repo():
-    source_gdelt_assets = [
-        gdelt_events,
-        gdelt_mentions,
-        gdelt_mentions_enhanced,
-        gdelt_mentions_relevancy_ml_jobs,
-        snowpipe_transfers_gdelt_assets
-    ]
-    prep_gdelt_assets = [
-        gdelt_mentions_relevancy,
-        snowpipe_transfers_classified_gdelt_mentions,
-        article_entity_extraction_ml_jobs
-    ]
-    dw_assets = [
-        dw_seeds,
-        dw_staging_layer,
-        dw_integration_layer,
-        dw_entity_layer,
-        dw_data_tests,
-        dw_clean_up
-    ]
-    hex_assets = [
-        hex_main_dashboard_refresh,
-        hex_daily_assets_refresh
-    ]
-    twitter_assets = [
-        twitter_share_daily_assets
-    ]
-    jobs = [
-        source_and_classify_relevancy_of_gdelt_assets_job,
-        get_relevancy_classifications_job,
-        extract_article_entities_job,
-        build_data_warehouse_job,
-        share_daily_summary_assets_job,
-        feed_ml_trainer_engine
-    ]
-    schedules = [
-        source_and_classify_relevancy_of_gdelt_assets_schedule, 
-        get_relevancy_classifications_schedule,
-        feed_ml_trainer_engine_schedule,
-        build_data_warehouse_schedule,
-        share_daily_summary_assets_schedule
-    ]
-
-    return source_gdelt_assets + prep_gdelt_assets + dw_assets + hex_assets + twitter_assets + jobs + schedules
+    return my_assets + asset_sensor
