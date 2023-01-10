@@ -105,16 +105,17 @@ def gdelt_mentions_relevancy(context):
     my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
 
     for index, row in my_ml_enrichment_jobs_tracker.df_ml_enrichment_jobs.iterrows():
-        job_info = context.resources.novacene_resource.job_info(row['job_id'])
+        if row['type'] == 'relevancy':
+            job_info = context.resources.novacene_resource.job_info(row['job_id'])
 
-        if job_info['type'] == 'relevancy' and job_info['status'] == 'Completed':
-            # Append new job to existing list
-            data_ml_enrichment_file = [[row['job_id'], job_info['source']['name'], job_info['result']['path']]]
-            df_ml_enrichment_file = pd.DataFrame(data_ml_enrichment_file, columns = ['job_id', 'name', 'file_path'])
-            df_relevancy_classifications = df_relevancy_classifications.append(df_ml_enrichment_file)
+            if job_info['status'] == 'Completed':
+                # Append new job to existing list
+                data_ml_enrichment_file = [[row['job_id'], job_info['source']['name'], job_info['result']['path']]]
+                df_ml_enrichment_file = pd.DataFrame(data_ml_enrichment_file, columns = ['job_id', 'name', 'file_path'])
+                df_relevancy_classifications = df_relevancy_classifications.append(df_ml_enrichment_file)
 
-            # Keep track of jobs to remove from tracking log
-            l_completed_job_indexes.append(index)
+                # Keep track of jobs to remove from tracking log
+                l_completed_job_indexes.append(index)
 
     # Updating job from log of enrichment jobs
     my_ml_enrichment_jobs_tracker.remove_completed_job(l_completed_job_indexes)
@@ -190,16 +191,17 @@ def gdelt_mentions_entity_extraction(context):
     my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
 
     for index, row in my_ml_enrichment_jobs_tracker.df_ml_enrichment_jobs.iterrows():
-        job_info = context.resources.novacene_resource.job_info(row['job_id'])
+        if row['type'] == 'entity_extraction':
+            job_info = context.resources.novacene_resource.job_info(row['job_id'])
 
-        if job_info['type'] == 'entity_extraction' and job_info['status'] == 'Completed':
-            # Append new job to existing list
-            data_ml_enrichment_file = [[row['job_id'], job_info['source']['name'], job_info['result']['path']]]
-            df_ml_enrichment_file = pd.DataFrame(data_ml_enrichment_file, columns = ['job_id', 'name', 'file_path'])
-            df_entity_extractions = df_entity_extractions.append(df_ml_enrichment_file)
+            if job_info['status'] == 'Completed':
+                # Append new job to existing list
+                data_ml_enrichment_file = [[row['job_id'], job_info['source']['name'], job_info['result']['path']]]
+                df_ml_enrichment_file = pd.DataFrame(data_ml_enrichment_file, columns = ['job_id', 'name', 'file_path'])
+                df_entity_extractions = df_entity_extractions.append(df_ml_enrichment_file)
 
-            # Keep track of jobs to remove from tracking log
-            l_completed_job_indexes.append(index)
+                # Keep track of jobs to remove from tracking log
+                l_completed_job_indexes.append(index)
 
     # Updating job from log of enrichment jobs
     my_ml_enrichment_jobs_tracker.remove_completed_job(l_completed_job_indexes)
