@@ -1,4 +1,4 @@
-create table gdelt_ml_enriched_mentions (
+create table gdelt_mentions_relevancy (
 
     mention_identifier varchar,
     page_name varchar,

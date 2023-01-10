@@ -94,7 +94,7 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
         maximum_lag_minutes = 60
     )
 )
-def gdelt_ml_enriched_mentions(context):
+def gdelt_mentions_relevancy(context):
     # Empty dataframe of files to fetch
     df_relevancy_classifications = pd.DataFrame(None, columns = ['job_id', 'name', 'file_path'])
 
@@ -137,7 +137,7 @@ def gdelt_ml_enriched_mentions(context):
         # Get trace of asset metadata
         context.log_event(
             AssetObservation(
-                asset_key = "gdelt_ml_enriched_mentions",
+                asset_key = "gdelt_mentions_relevancy",
                 metadata = {
                     "path": "s3://discursus-io/" + 'sources/ml/' + file_date + '/ml_enriched_' + row['name'],
                     "rows": df_ml_enrichment_file.index.size
@@ -146,5 +146,5 @@ def gdelt_ml_enriched_mentions(context):
         )
     
     # Transfer to Snowflake
-    q_load_ml_enriched_mentions = "alter pipe gdelt_ml_enriched_mentions_pipe refresh;"
+    q_load_ml_enriched_mentions = "alter pipe gdelt_mentions_relevancy_pipe refresh;"
     context.resources.snowflake_resource.execute_query(q_load_ml_enriched_mentions)
