@@ -10,10 +10,10 @@ with s_gdelt_events as (
 
 ),
 
-s_gdelt_ml_enriched_mentions as (
+s_gdelt_mentions_relevancy as (
 
     select *
-    from {{ ref('stg__gdelt__ml_enriched_mentions') }}
+    from {{ ref('stg__gdelt__mentions_relevancy') }}
     where mention_url is not null
     and is_relevant
 
@@ -39,7 +39,7 @@ final as (
         s_gdelt_events.action_geo_longitude
 
     from s_gdelt_events
-    inner join s_gdelt_ml_enriched_mentions using (mention_url)
+    inner join s_gdelt_mentions_relevancy using (mention_url)
     left join s_countries on s_gdelt_events.action_geo_country_code = s_countries.country_code
 
 )

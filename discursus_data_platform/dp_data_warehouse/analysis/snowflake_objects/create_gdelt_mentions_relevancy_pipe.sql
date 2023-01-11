@@ -1,6 +1,6 @@
-create pipe gdelt_ml_enriched_mentions_pipe as
+create pipe gdelt_mentions_relevancy_pipe as
 
-copy into gdelt_ml_enriched_mentions(
+copy into gdelt_mentions_relevancy(
 
   mention_identifier,
   page_name,
@@ -28,7 +28,7 @@ from (
   from @s3_dio_sources/ml (
 
     file_format => csv,
-    pattern => '.*.mentions.enhanced.csv'
+    pattern => '.*_relevancy_classification.csv'
 
   ) t
 );

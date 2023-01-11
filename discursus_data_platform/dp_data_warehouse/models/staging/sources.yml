@@ -12,7 +12,7 @@ sources:
     tables:
       - name: gdelt_events
       - name: gdelt_mentions
-      - name: gdelt_ml_enriched_mentions
+      - name: gdelt_mentions_relevancy
 
   - name: airbyte
     database: discursus_sources_airbyte

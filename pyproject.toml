@@ -30,7 +30,7 @@ tweepy = "^4.12.1"
 pillow = "^9.3.0"
 saf-aws = {git = "https://github.com/lantrns-analytics/saf_aws", rev = "release/0.2"}
 saf-gdelt = {git = "https://github.com/lantrns-analytics/saf_gdelt", rev = "release/0.2"}
-saf-novacene = {git = "https://github.com/lantrns-analytics/saf_novacene", rev = "release/0.2"}
+saf-novacene = {git = "https://github.com/discursus-data/saf_novacene.git", rev = "release/0.2.1"}
 saf-web-scraper = {git = "https://github.com/lantrns-analytics/saf_web_scraper", rev = "release/0.2"}
 
 
