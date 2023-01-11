@@ -139,7 +139,7 @@ def gdelt_mentions_relevancy(context):
         # Only keep relevant articles
         df_relevant_articles = df_ml_enrichment_file[df_ml_enrichment_file['predict_relevantTECLM3_v2.sav'] == 1]
         
-        # Sending latest batch of articles to Novacene for relevancy classification
+        # Sending latest batch of articles to Novacene for entity extraction
         if df_relevant_articles.index.size > 0:
             context.log.info("Sending " + str(df_relevant_articles.index.size) + " articles for entity extraction")
 
@@ -215,7 +215,7 @@ def gdelt_mentions_entity_extraction(context):
 
         # Extract date from file name
         file_date = row['name'].split("_")[2].split(".")[0][0 : 8]
-        file_date_time = row['name'].split("_")[2].split(".")[0]
+        file_date_time = row['name'].split("_")[4].split(".")[0]
 
         # Save df as csv in S3
         csv_buffer = StringIO()
