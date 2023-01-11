@@ -32,6 +32,7 @@ saf-aws = {git = "https://github.com/lantrns-analytics/saf_aws", rev = "release/
 saf-gdelt = {git = "https://github.com/lantrns-analytics/saf_gdelt", rev = "release/0.2"}
 saf-novacene = {git = "https://github.com/discursus-data/saf_novacene.git", rev = "release/0.2.1"}
 saf-web-scraper = {git = "https://github.com/lantrns-analytics/saf_web_scraper", rev = "release/0.2"}
+future = "^0.18.2"
 
 
 [build-system]
