@@ -1,4 +1,4 @@
-from dagster import asset, AssetIn, AssetObservation, Output, FreshnessPolicy
+from dagster import asset, AssetKey, AssetIn, AssetObservation, Output, FreshnessPolicy
 import pandas as pd
 import boto3
 from io import StringIO
@@ -11,6 +11,7 @@ from discursus_data_platform.utils.resources.ml_enrichment_tracker import MLEnri
 @asset(
     ins = {"gdelt_mentions": AssetIn(key_prefix = "gdelt")},
     description = "List of enhanced mentions mined from GDELT",
+    key_prefix = ["gdelt"],
     group_name = "prepared_sources",
     resource_defs = {
         'aws_resource': my_resources.my_aws_resource,
@@ -154,7 +155,7 @@ def gdelt_mentions_relevancy(context):
         # Get trace of asset metadata
         context.log_event(
             AssetObservation(
-                asset_key = "gdelt_mentions_relevancy",
+                asset_key = AssetKey(['gdelt', 'gdelt_mentions_relevancy_ml_job']),
                 metadata = {
                     "path": "s3://discursus-io/" + 'sources/ml/' + file_date + '/' + file_date_time + '_relevancy_classification.csv',
                     "rows": df_ml_enrichment_file.index.size
@@ -225,7 +226,7 @@ def gdelt_mentions_entity_extraction(context):
         # Get trace of asset metadata
         context.log_event(
             AssetObservation(
-                asset_key = "gdelt_mentions_entity_extraction",
+                asset_key = AssetKey(['gdelt', 'gdelt_mentions_entity_extraction_ml_job']),
                 metadata = {
                     "path": "s3://discursus-io/" + 'sources/ml/' + file_date + '/' + file_date_time + '_entity_extraction.csv',
                     "rows": df_ml_enrichment_file.index.size

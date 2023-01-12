@@ -13,6 +13,7 @@ from discursus_data_platform.utils.resources import my_resources
     },
     description = "Hex main dashboard refresh",
     group_name = "data_apps",
+    key_prefix = ["hex"],
     resource_defs = {
         'hex_resource': my_resources.my_hex_resource
     },
