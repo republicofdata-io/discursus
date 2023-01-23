@@ -1,34 +1,24 @@
-create pipe gdelt_mentions_relevancy_pipe as
+create pipe gdelt_mentions_named_entities_pipe as
 
-copy into gdelt_mentions_relevancy(
+copy into gdelt_mentions_named_entities(
 
   mention_identifier,
-  page_name,
-  file_name,
-  page_title,
-  page_description,
-  keywords,
-  metadata_filename,
-  is_relevant
+  named_entities,
+  metadata_filename
 
 )
 
 from (
 
   select 
-    t.$2,
     t.$3,
-    t.$3,
-    t.$4,
-    t.$5,
-    t.$6,
-    metadata$filename,
-    t.$7
+    t.$9,
+    metadata$filename
 
   from @s3_dio_sources/ml (
 
     file_format => csv,
-    pattern => '.*_relevancy_classification.csv'
+    pattern => '.*_entity_extraction.csv'
 
   ) t
 );

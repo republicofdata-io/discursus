@@ -233,3 +233,7 @@ def gdelt_mentions_entity_extraction(context):
                 }
             )
         )
+    
+    # Transfer to Snowflake
+    q_load_ml_entity_extractions = "alter pipe gdelt_mentions_named_entities_pipe refresh;"
+    context.resources.snowflake_resource.execute_query(q_load_ml_entity_extractions)
