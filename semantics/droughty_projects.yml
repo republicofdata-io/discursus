@@ -9,6 +9,7 @@ dbml_path: semantics/dbml
 cube_path: semantics/cube
 dbt_path: semantics/dbt
 docs_path: semantics/docs
+lookml_path: semantics/lookml
 
 test_schemas:
     - analytics_qa
