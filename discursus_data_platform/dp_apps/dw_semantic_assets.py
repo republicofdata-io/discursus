@@ -1,4 +1,4 @@
-from dagster import asset, AssetKey, Output
+from dagster import asset, AssetKey, FreshnessPolicy, Output
 from discursus_data_platform.utils.resources import my_resources
 
 
@@ -12,7 +12,11 @@ from discursus_data_platform.utils.resources import my_resources
     group_name = "data_apps",
     resource_defs = {
         'dbt_resource': my_resources.my_dbt_resource
-    }
+    },
+    freshness_policy = FreshnessPolicy(
+        maximum_lag_minutes = 60 * 4, 
+        cron_schedule = "15 3,15 * * *"
+    )
 )
 def semantic_definitions(context):
     # clean up the data warehouse
