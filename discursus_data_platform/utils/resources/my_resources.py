@@ -1,5 +1,6 @@
-from dagster import config_from_pkg_resources
+from dagster import config_from_pkg_resources, file_relative_path, config_from_files
 from dagster_snowflake import snowflake_resource
+from dagster_dbt import dbt_cli_resource
 from dagster_hex.resources import hex_resource 
 
 from saf_aws import aws_resource
@@ -8,6 +9,9 @@ from saf_novacene import novacene_resource
 from saf_web_scraper import web_scraper_resource
 
 from discursus_data_platform.utils.resources import airtable_resource, twitter_resource
+
+DBT_PROFILES_DIR = file_relative_path(__file__, "./../../dp_data_warehouse/")
+DBT_PROJECT_DIR = file_relative_path(__file__, "./../../dp_data_warehouse/")
 
 
 snowflake_configs = config_from_pkg_resources(
@@ -38,6 +42,9 @@ hex_configs = config_from_pkg_resources(
 
 my_gdelt_resource = gdelt_resource.initiate_gdelt_resource.configured(None)
 my_snowflake_resource = snowflake_resource.configured(snowflake_configs)
+my_dbt_resource = dbt_cli_resource.configured({
+    "profiles_dir": DBT_PROFILES_DIR, 
+    "project_dir": DBT_PROJECT_DIR})
 my_novacene_resource = novacene_resource.initiate_novacene_resource.configured(novacene_configs)
 my_aws_resource = aws_resource.initiate_aws_resource.configured(None)
 my_web_scraper_resource = web_scraper_resource.initiate_web_scraper_resource.configured(None)

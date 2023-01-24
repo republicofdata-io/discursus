@@ -15,6 +15,8 @@ with source as (
     from {{ source('gdelt', 'gdelt_mentions') }}
     {% if is_incremental() %}
         where date(split(metadata_filename, '/')[2], 'yyyymmdd') >= (select max(source_file_date) from {{ this }})
+    {% else %}
+        where date(split(metadata_filename, '/')[2], 'yyyymmdd') >= dateadd(week, -52, current_date)
     {% endif %}
 
 ),
@@ -45,4 +47,3 @@ final as (
 )
 
 select * from final
-where source_file_date >= dateadd(week, -52, current_date)
