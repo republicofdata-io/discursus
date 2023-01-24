@@ -10,14 +10,14 @@ from dagster_aws.s3 import s3_pickle_io_manager, s3_resource
 from dagster_dbt import dbt_cli_resource, load_assets_from_dbt_project
 
 from discursus_data_platform import (
-    dp_apps,
-    dp_data_warehouse,
     dp_gdelt,
-    dp_movement_groupings
+    dp_movement_groupings,
+    dp_data_warehouse,
+    dp_apps
 )
 
-DBT_PROFILES_DIR = file_relative_path(__file__, "./dp_data_warehouse")
-DBT_PROJECT_DIR = file_relative_path(__file__, "./dp_data_warehouse")
+DBT_PROFILES_DIR = file_relative_path(__file__, "./dp_data_warehouse/")
+DBT_PROJECT_DIR = file_relative_path(__file__, "./dp_data_warehouse/")
 
 my_assets = with_resources(
     load_assets_from_dbt_project(
@@ -26,10 +26,10 @@ my_assets = with_resources(
         key_prefix = ["data_warehouse"],
         use_build_command = True
     ) + 
-    load_assets_from_package_module(dp_apps) +
-    load_assets_from_package_module(dp_data_warehouse) +
     load_assets_from_package_module(dp_gdelt) +
-    load_assets_from_package_module(dp_movement_groupings),
+    load_assets_from_package_module(dp_movement_groupings) +
+    load_assets_from_package_module(dp_data_warehouse) +
+    load_assets_from_package_module(dp_apps),
     resource_defs = {
         "dbt": dbt_cli_resource.configured(
             {
