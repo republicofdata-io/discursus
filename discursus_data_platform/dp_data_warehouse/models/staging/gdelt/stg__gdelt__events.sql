@@ -10,9 +10,17 @@
 with source as (
 
     select * from {{ source('gdelt', 'gdelt_events') }}
+    
     {% if is_incremental() %}
         where to_timestamp(cast(date_added as string), 'YYYYMMDDHH24MISS') >= (select max(creation_ts) from {{ this }})
+    {% else %}
+        where to_timestamp(cast(date_added as string), 'YYYYMMDDHH24MISS') >= dateadd(week, -52, current_date)
     {% endif %}
+
+    and event_root_code = '14'
+    and cast(actor1_geo_lat as number(8,6)) is not null
+    and cast(action_geo_long as number(9,6)) is not null
+    and lower(cast(action_geo_country_code as string)) in ('us', 'ca')
 
 ),
 
@@ -104,12 +112,13 @@ base as (
 
     from source
 
+),
+
+dedup_based_on_geo as (
+
+    select * from base
+    qualify row_number() over (partition by mention_url, action_geo_country_code, action_geo_adm1_code order by action_geo_type desc) = 1
+
 )
 
-select * from base
-
-where creation_ts >= dateadd(week, -52, current_date)
-and event_root_code = '14'
-and action_geo_latitude is not null
-and action_geo_longitude is not null
-and action_geo_country_code in ('us', 'ca')
+select * from dedup_based_on_geo
