@@ -65,13 +65,6 @@ models:
           - dbt_utils.at_least_one
   - name: observations_fct
     columns:
-      - name: event_fk
-        description: '{{ doc("event_fk") }}'
-        tests:
-          - not_null
-          - relationships:
-              to: ref('events_fct')
-              field: event_pk
       - name: observation_keywords
         description: '{{ doc("observation_keywords") }}'
         tests:
@@ -101,3 +94,23 @@ models:
         description: '{{ doc("published_date") }}'
         tests:
           - dbt_utils.at_least_one
+  - name: events_observations_bridge
+    columns:
+      - name: event_observation_pk
+        tests:
+          - not_null
+          - unique
+      - name: event_fk
+        description: '{{ doc("event_fk") }}'
+        tests:
+          - not_null
+          - relationships:
+              to: ref('events_fct')
+              field: event_pk
+      - name: observation_fk
+        description: '{{ doc("observation_pk") }}'
+        tests:
+          - not_null
+          - relationships:
+              to: ref('observations_fct')
+              field: observation_pk
