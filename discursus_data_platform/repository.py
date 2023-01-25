@@ -16,15 +16,14 @@ from discursus_data_platform import (
     dp_apps
 )
 
-DBT_PROFILES_DIR = file_relative_path(__file__, "./dp_data_warehouse/")
 DBT_PROJECT_DIR = file_relative_path(__file__, "./dp_data_warehouse/")
 
 my_assets = with_resources(
     load_assets_from_dbt_project(
         project_dir = DBT_PROJECT_DIR, 
-        profiles_dir = DBT_PROFILES_DIR, 
+        profiles_dir = DBT_PROJECT_DIR, 
         key_prefix = ["data_warehouse"],
-        use_build_command = True
+        use_build_command = False
     ) + 
     load_assets_from_package_module(dp_gdelt) +
     load_assets_from_package_module(dp_movement_groupings) +
@@ -33,7 +32,7 @@ my_assets = with_resources(
     resource_defs = {
         "dbt": dbt_cli_resource.configured(
             {
-                "project_dir": DBT_PROFILES_DIR,
+                "project_dir": DBT_PROJECT_DIR,
                 "profiles_dir": DBT_PROJECT_DIR,
             },
         ),
