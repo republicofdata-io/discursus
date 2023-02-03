@@ -1,5 +1,8 @@
 .PHONY: docker
 
+dagit:
+	dagit --package-name discursus_data_platform
+	
 docker:
 	docker compose -p "discursus-data-platform" --file docker-compose.yml up --build
 
