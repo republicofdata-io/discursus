@@ -16,7 +16,7 @@ from discursus_data_platform import (
     dp_apps
 )
 
-DBT_PROJECT_DIR = file_relative_path(__file__, "./dp_data_warehouse/")
+DBT_PROJECT_DIR = dp_data_warehouse.__path__[0]
 
 my_assets = with_resources(
     load_assets_from_dbt_project(
@@ -27,7 +27,6 @@ my_assets = with_resources(
     ) + 
     load_assets_from_package_module(dp_gdelt) +
     load_assets_from_package_module(dp_movement_groupings) +
-    load_assets_from_package_module(dp_data_warehouse) +
     load_assets_from_package_module(dp_apps),
     resource_defs = {
         "dbt": dbt_cli_resource.configured(
