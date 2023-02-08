@@ -49,4 +49,4 @@ RUN (cd ./discursus_data_platform/dp_data_warehouse/; dbt deps --profiles-dir ./
 # Run dagster gRPC server on port 4000
 EXPOSE 4000
 
-CMD ["dagster", "api", "grpc", "--host", "0.0.0.0", "--port", "4000", "--python-file", "./discursus_data_platform/repository.py", "--working-directory", "./discursus_data_platform/"]
+CMD ["dagster", "api", "grpc", "--host", "0.0.0.0", "--port", "4000", "--package-name", "discursus_data_platform", "--working-directory", "./discursus_data_platform/"]

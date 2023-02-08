@@ -16,14 +16,14 @@ from discursus_data_platform import (
     dp_apps
 )
 
-DBT_PROJECT_DIR = dp_data_warehouse.__path__[0]
+DBT_PROJECT_DIR = file_relative_path(__file__, "./dp_data_warehouse/")
 
 my_assets = with_resources(
     load_assets_from_dbt_project(
         project_dir = DBT_PROJECT_DIR, 
         profiles_dir = DBT_PROJECT_DIR, 
         key_prefix = ["data_warehouse"],
-        use_build_command = True
+        use_build_command = False
     ) + 
     load_assets_from_package_module(dp_gdelt) +
     load_assets_from_package_module(dp_movement_groupings) +
