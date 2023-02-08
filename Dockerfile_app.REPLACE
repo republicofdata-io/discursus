@@ -46,6 +46,10 @@ RUN poetry config virtualenvs.create false \
 RUN (cd ./discursus_data_platform/dp_data_warehouse/; dbt deps --profiles-dir ./)
 
 
+# Seed data
+RUN (cd ./discursus_data_platform/dp_data_warehouse/; dbt seed --profiles-dir ./)
+
+
 # Run dagster gRPC server on port 4000
 EXPOSE 4000
 
