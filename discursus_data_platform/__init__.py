@@ -16,12 +16,13 @@ from discursus_data_platform import (
     dp_apps
 )
 
-DBT_PROJECT_DIR = file_relative_path(__file__, "./dp_data_warehouse/")
+dbt_project_dir = file_relative_path(__file__, "./dp_data_warehouse/")
+dbt_profile_dir = file_relative_path(__file__, "./dp_data_warehouse/config/")
 
 my_assets = with_resources(
     load_assets_from_dbt_project(
-        project_dir = DBT_PROJECT_DIR, 
-        profiles_dir = DBT_PROJECT_DIR, 
+        project_dir = dbt_project_dir, 
+        profiles_dir = dbt_profile_dir, 
         key_prefix = ["data_warehouse"],
         use_build_command = False
     ) + 
@@ -31,8 +32,8 @@ my_assets = with_resources(
     resource_defs = {
         "dbt": dbt_cli_resource.configured(
             {
-                "project_dir": DBT_PROJECT_DIR,
-                "profiles_dir": DBT_PROJECT_DIR,
+                "project_dir": dbt_project_dir,
+                "profiles_dir": dbt_profile_dir,
             },
         ),
         "io_manager": s3_pickle_io_manager.configured(
