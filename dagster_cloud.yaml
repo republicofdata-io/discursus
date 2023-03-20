@@ -1,0 +1,4 @@
+locations:
+  - location_name: discursus_data_platform
+    code_source:
+      package_name: discursus_data_platform
