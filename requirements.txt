@@ -1,6 +1,8 @@
 dagster==1.2.2
 dagster-cloud==1.2.2
 dagster-dbt==0.18.2
+dagster-aws==0.18.2
+dagster-hex==0.1.2
 dbt-core==1.4.5
 dbt-snowflake==1.4.2
 git+https://github.com/discursus-data/saf_aws.git@0.2#egg=saf-aws
