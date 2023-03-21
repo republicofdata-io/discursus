@@ -8,6 +8,7 @@ if __name__ == "__main__":
             "pandas>=1.5.2",
             "dagster==1.2.2",
             "dagster-cloud==1.2.2",
+            "dagster_snowflake==0.18.2",
             "dagster-dbt==0.18.2",
             "dagster-aws==0.18.2",
             "dagster-pandas==0.18.2",
