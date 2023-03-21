@@ -9,6 +9,7 @@ if __name__ == "__main__":
             "dbt-snowflake==1.4.2",
             "dagster==1.2.2",
             "dagit==1.2.2",
+            "dagster-cloud==1.2.2",
             "dagster-graphql>=1.2.2,<2.0.0",
             "dagster-postgres==0.18.2",
             "dagster-docker==0.18.2",
