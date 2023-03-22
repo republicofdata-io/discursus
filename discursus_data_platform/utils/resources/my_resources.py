@@ -10,7 +10,7 @@ from saf_web_scraper import web_scraper_resource
 
 from discursus_data_platform.utils.resources import airtable_resource, twitter_resource
 
-DBT_PROFILES_DIR = file_relative_path(__file__, "./../../dp_data_warehouse/")
+DBT_PROFILES_DIR = file_relative_path(__file__, "./../../dp_data_warehouse/config/")
 DBT_PROJECT_DIR = file_relative_path(__file__, "./../../dp_data_warehouse/")
 
 
