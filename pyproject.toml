@@ -8,6 +8,8 @@ packages = [{include = "discursus_data_platform"}]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
+sqlalchemy = "1.4.46"
+future = "^0.18.2"
 dbt-core = "1.4.5"
 dbt-snowflake = "1.4.2"
 dagster = "1.2.2"
@@ -21,9 +23,7 @@ dagster-dbt = "0.18.2"
 dagster-aws = "0.18.2"
 dagster-snowflake = "0.18.2"
 dagster-hex = "0.1.2"
-sqlalchemy = "1.4.46"
 pandas = "^1.5.2"
-bs4 = "^0.0.1"
 optparse-pretty = "^0.1.1"
 boto3 = "^1.26.35"
 fsspec = "^2022.11.0"
@@ -31,8 +31,7 @@ tweepy = "^4.12.1"
 saf-aws = {git = "https://github.com/lantrns-analytics/saf_aws", rev = "release/0.2"}
 saf-gdelt = {git = "https://github.com/lantrns-analytics/saf_gdelt", rev = "release/0.2"}
 saf-novacene = {git = "https://github.com/discursus-data/saf_novacene.git", rev = "release/0.2.1"}
-saf-web-scraper = {git = "https://github.com/lantrns-analytics/saf_web_scraper", rev = "release/0.2"}
-future = "^0.18.2"
+saf-web-scraper = {git = "https://github.com/lantrns-analytics/saf_web_scraper", rev = "scrape_full_content"}
 
 
 [build-system]
