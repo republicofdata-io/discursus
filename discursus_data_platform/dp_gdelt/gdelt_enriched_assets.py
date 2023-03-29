@@ -56,6 +56,9 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
     # Save data to S3
     context.resources.aws_resource.s3_put(df_gdelt_mentions_enhanced, 'discursus-io', gdelt_asset_source_path)
 
+    # Drop the 'content' field before returning the asset
+    df_gdelt_mentions_enhanced_without_content = df_gdelt_mentions_enhanced.drop('content', axis=1)
+
     # Transfer to Snowflake
     q_load_gdelt_mentions_enhanced_events = "alter pipe gdelt_enhanced_mentions_pipe refresh;"
     snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_mentions_enhanced_events)
@@ -64,10 +67,10 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
     my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
     
     # Sending latest batch of articles to Novacene for relevancy classification
-    if df_gdelt_mentions_enhanced.index.size > 0:
-        context.log.info("Sending " + str(df_gdelt_mentions_enhanced.index.size) + " articles for relevancy classification")
+    if df_gdelt_mentions_enhanced_without_content.index.size > 0:
+        context.log.info("Sending " + str(df_gdelt_mentions_enhanced_without_content.index.size) + " articles for relevancy classification")
 
-        protest_classification_dataset_id = context.resources.novacene_resource.create_dataset("protest_events_" + gdelt_asset_source_path.split("/")[3], df_gdelt_mentions_enhanced)
+        protest_classification_dataset_id = context.resources.novacene_resource.create_dataset("protest_events_" + gdelt_asset_source_path.split("/")[3], df_gdelt_mentions_enhanced_without_content)
         protest_classification_job = context.resources.novacene_resource.enrich_dataset(protest_classification_dataset_id['id'], 17, 4)
         context.log.info("Protest classification job id: " + str(protest_classification_job['id']))
 
@@ -77,10 +80,10 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
 
     # Return asset
     return Output(
-        value = df_gdelt_mentions_enhanced, 
+        value = df_gdelt_mentions_enhanced_without_content, 
         metadata = {
             "path": "s3://discursus-io/" + gdelt_asset_source_path,
-            "rows": df_gdelt_mentions_enhanced.index.size
+            "rows": df_gdelt_mentions_enhanced_without_content.index.size
         }
     )
 
