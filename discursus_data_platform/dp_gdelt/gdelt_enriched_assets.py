@@ -30,23 +30,25 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
     gdelt_asset_source_path = 'sources/gdelt/' + gdelt_asset_filedate + '/' + gdelt_asset_filename_csv[0:14] + '.mentions.enhanced.csv'
 
     # Dedup articles
-    context.log.info(gdelt_mentions[5])
     df_articles = gdelt_mentions.drop_duplicates(subset=[5], keep='first')
 
     # Create dataframe
-    column_names = ['mention_identifier', 'file_name', 'title', 'description', 'keywords']
+    column_names = ['mention_identifier', 'file_name', 'title', 'description', 'keywords', 'content']
     df_gdelt_mentions_enhanced = pd.DataFrame(columns = column_names)
 
-    # Scrape urls and populate dataframe
     for index, row in df_articles.iterrows():
-        scraped_article = context.resources.web_scraper_resource.scrape_url(row[5])
+        scraped_article = context.resources.web_scraper_resource.scrape_article(row[5])
+    
+        # Use get method with default value (empty string) for each element in scraped_row
         scraped_row = [
-            scraped_article['mention_identifier'][0], 
-            scraped_article['file_name'][0],
-            scraped_article['title'][0],
-            scraped_article['description'][0],
-            scraped_article['keywords'][0]
+            scraped_article.get('url', ''),
+            scraped_article.get('filename', ''),
+            scraped_article.get('title', ''),
+            scraped_article.get('description', ''),
+            scraped_article.get('keywords', ''),
+            scraped_article.get('content', '')
         ]
+        
         df_length = len(df_gdelt_mentions_enhanced)
         df_gdelt_mentions_enhanced.loc[df_length] = scraped_row
     
