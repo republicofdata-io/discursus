@@ -1,7 +1,8 @@
 from dagster import config_from_pkg_resources, file_relative_path, config_from_files
 from dagster_snowflake import snowflake_resource
 from dagster_dbt import dbt_cli_resource
-from dagster_hex.resources import hex_resource 
+from dagster_hex.resources import hex_resource
+from dagster_cube.cube_resource import cube_resource
 
 from saf_aws import aws_resource
 from saf_gdelt import gdelt_resource
@@ -39,6 +40,11 @@ hex_configs = config_from_pkg_resources(
         ('discursus_data_platform.utils.configs', 'hex_configs.yaml')
     ],
 )
+cube_configs = config_from_pkg_resources(
+    pkg_resource_defs=[
+        ('discursus_data_platform.utils.configs', 'cube_configs.yaml')
+    ],
+)
 
 my_gdelt_resource = gdelt_resource.initiate_gdelt_resource.configured(None)
 my_snowflake_resource = snowflake_resource.configured(snowflake_configs)
@@ -51,3 +57,4 @@ my_web_scraper_resource = web_scraper_resource.initiate_web_scraper_resource.con
 my_airtable_resource = airtable_resource.airtable_api_client.configured(airtable_configs)
 my_twitter_resource = twitter_resource.twitter_api_client.configured(twitter_configs)
 my_hex_resource = hex_resource.configured(hex_configs)
+my_cube_resource = cube_resource.configured(cube_configs)

@@ -12,16 +12,16 @@ sqlalchemy = "1.4.46"
 future = "^0.18.2"
 dbt-core = "1.4.5"
 dbt-snowflake = "1.4.2"
-dagster = "1.2.2"
-dagit = "1.2.2"
-dagster-graphql = "^1.2.2"
-dagster-postgres = "0.18.2"
-dagster-docker = "0.18.2"
-dagster-shell = "0.18.2"
-dagster-pandas = "0.18.2"
-dagster-dbt = "0.18.2"
-dagster-aws = "0.18.2"
-dagster-snowflake = "0.18.2"
+dagster = "1.2.4"
+dagit = "1.2.4"
+dagster-graphql = "^1.2.4"
+dagster-postgres = "0.18.4"
+dagster-docker = "0.18.4"
+dagster-shell = "0.18.4"
+dagster-pandas = "0.18.4"
+dagster-dbt = "0.18.4"
+dagster-aws = "0.18.4"
+dagster-snowflake = "0.18.4"
 dagster-hex = "0.1.2"
 pandas = "^1.5.2"
 optparse-pretty = "^0.1.1"
@@ -32,6 +32,7 @@ saf-aws = {git = "https://github.com/lantrns-analytics/saf_aws", rev = "release/
 saf-gdelt = {git = "https://github.com/lantrns-analytics/saf_gdelt", rev = "release/0.2"}
 saf-novacene = {git = "https://github.com/discursus-data/saf_novacene.git", rev = "release/0.2.1"}
 saf-web-scraper = {git = "https://github.com/lantrns-analytics/saf_web_scraper", rev = "release/0.3"}
+dagster-cube = { git = "git@github.com:discursus-data/dagster-cube.git" }
 
 
 [build-system]

@@ -1,0 +1,4 @@
+instance_url:
+  env: CUBE_INSTANCE_URL
+api_key:
+  env: CUBE_API_KEY

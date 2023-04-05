@@ -23,3 +23,39 @@ def semantic_definitions(context):
     context.resources.dbt_resource.run_operation(macro="drop_old_relations")
     
     return Output(1)
+
+
+@asset(
+    non_argument_deps = {
+        AssetKey(["data_warehouse", "events_fct"]), 
+        AssetKey(["data_warehouse", "observations_fct"]),
+        AssetKey(["data_warehouse", "movements_dim"])
+    },
+    description = "Cube pre-agg refresh",
+    group_name = "data_apps",
+    resource_defs = {
+        'cube_resource': my_resources.my_cube_resource
+    },
+)
+def cube_pre_agg_refresh(context):
+    pre_aggregation_dio = 'Event.daily_events_and_observations'
+
+    response = context.resources.cube_resource.make_request(
+        method="POST",
+        endpoint="pre-aggregations/jobs",
+        data={
+            'action': 'post',
+            'selector': {
+                'preAggregations': [pre_aggregation_dio],
+                'timezones': ['UTC'],
+                'contexts': [{'securityContext': {}}]
+            }
+        }    
+    )
+
+    return Output(
+        value = "cube_pre_agg_refresh",
+        metadata = {
+            "run_id": response,
+        },
+    )
