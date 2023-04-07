@@ -131,8 +131,8 @@ def gdelt_mentions_entity_extraction(context):
         df_ml_enrichment_file = context.resources.novacene_resource.get_file(row['file_path'])
 
         # Extract date from file name
-        file_date = row['name'].split("_")[2]
-        file_date_time = row['file_path'].split("_")[4]
+        file_date = row['name'].split("_")[2].split(".")[0][0 : 8]
+        file_date_time = row['name'].split("_")[2].split(".")[0]
 
         # Save df as csv in S3
         csv_buffer = StringIO()
