@@ -61,17 +61,17 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
 
     # Transfer to Novacene for relevancy classification
     my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
-    
-    # Sending latest batch of articles to Novacene for relevancy classification
-    if df_gdelt_mentions_enhanced.index.size > 0:
-        context.log.info("Sending " + str(df_gdelt_mentions_enhanced.index.size) + " articles for relevancy classification")
 
-        protest_classification_dataset_id = context.resources.novacene_resource.create_dataset("protest_events_" + gdelt_asset_source_path.split("/")[3], df_gdelt_mentions_enhanced)
-        protest_classification_job = context.resources.novacene_resource.enrich_dataset(protest_classification_dataset_id['id'], 17, 4)
-        context.log.info("Protest classification job id: " + str(protest_classification_job['id']))
+    # Sending latest batch of articles to Novacene for entity extraction
+    if df_gdelt_mentions_enhanced.index.size > 0:
+        context.log.info("Sending " + str(df_gdelt_mentions_enhanced.index.size) + " articles for entity extraction")
+
+        entity_extraction_dataset_id = context.resources.novacene_resource.create_dataset("entity_extraction_" + gdelt_asset_source_path.split("/")[3], df_gdelt_mentions_enhanced)
+        entity_extraction_job = context.resources.novacene_resource.named_entity_recognition(entity_extraction_dataset_id['id'], 5)
+        context.log.info("Entity extraction job id: " + str(entity_extraction_job['id']))
 
         # Update log of enrichment jobs
-        my_ml_enrichment_jobs_tracker.add_new_job(str(protest_classification_job['id']), 'relevancy', 'processing')
+        my_ml_enrichment_jobs_tracker.add_new_job(str(entity_extraction_job['id']), 'entity_extraction', 'processing')
         my_ml_enrichment_jobs_tracker.upload_job_log()
 
     # Return asset
@@ -86,92 +86,6 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
 
 @asset(
     non_argument_deps = {"gdelt_mentions_enhanced"},
-    description = "ML enriched GDELT mentions",
-    key_prefix = ["gdelt"],
-    group_name = "prepared_sources",
-    resource_defs = {
-        'novacene_resource': my_resources.my_novacene_resource,
-        'snowflake_resource': my_resources.my_snowflake_resource
-    },
-    freshness_policy = FreshnessPolicy(
-        maximum_lag_minutes = 60
-    )
-)
-def gdelt_mentions_relevancy(context):
-    # Empty dataframe of files to fetch
-    df_relevancy_classifications = pd.DataFrame(None, columns = ['job_id', 'name', 'file_path'])
-
-    # Lit of jobs to remove
-    l_completed_job_indexes = []
-
-    # Create instance of ml enrichment tracker
-    my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
-
-    for index, row in my_ml_enrichment_jobs_tracker.df_ml_enrichment_jobs.iterrows():
-        if row['type'] == 'relevancy':
-            job_info = context.resources.novacene_resource.job_info(row['job_id'])
-
-            if job_info['status'] == 'Completed':
-                # Append new job to existing list
-                data_ml_enrichment_file = [[row['job_id'], job_info['source']['name'], job_info['result']['path']]]
-                df_ml_enrichment_file = pd.DataFrame(data_ml_enrichment_file, columns = ['job_id', 'name', 'file_path'])
-                df_relevancy_classifications = df_relevancy_classifications.append(df_ml_enrichment_file)
-
-                # Keep track of jobs to remove from tracking log
-                l_completed_job_indexes.append(index)
-
-    # Updating job from log of enrichment jobs
-    my_ml_enrichment_jobs_tracker.remove_completed_job(l_completed_job_indexes)
-    my_ml_enrichment_jobs_tracker.upload_job_log()
-
-    s3 = boto3.resource('s3')
-
-    for index, row in df_relevancy_classifications.iterrows():
-        # Read csv as pandas
-        df_ml_enrichment_file = context.resources.novacene_resource.get_file(row['file_path'])
-
-        # Extract date from file name
-        file_date = row['name'].split("_")[2].split(".")[0][0 : 8]
-        file_date_time = row['name'].split("_")[2].split(".")[0]
-
-        # Save df as csv in S3
-        csv_buffer = StringIO()
-        df_ml_enrichment_file.to_csv(csv_buffer, index = False)
-        s3.Object('discursus-io', 'sources/ml/' + file_date + '/' + file_date_time + '_relevancy_classification.csv').put(Body=csv_buffer.getvalue())
-
-        # Only keep relevant articles
-        df_relevant_articles = df_ml_enrichment_file[df_ml_enrichment_file['predict_relevantTECLM3_v2.sav'] == 1]
-        
-        # Sending latest batch of articles to Novacene for entity extraction
-        if df_relevant_articles.index.size > 0:
-            context.log.info("Sending " + str(df_relevant_articles.index.size) + " articles for entity extraction")
-
-            entity_extraction_dataset_id = context.resources.novacene_resource.create_dataset("entity_extraction_" + file_date, df_relevant_articles)
-            entity_extraction_job = context.resources.novacene_resource.named_entity_recognition(entity_extraction_dataset_id['id'], 5)
-            context.log.info("Entity extraction job id: " + str(entity_extraction_job['id']))
-
-            # Update log of enrichment jobs
-            my_ml_enrichment_jobs_tracker.add_new_job(str(entity_extraction_job['id']), 'entity_extraction', 'processing')
-            my_ml_enrichment_jobs_tracker.upload_job_log()
-
-        # Get trace of asset metadata
-        context.log_event(
-            AssetObservation(
-                asset_key = AssetKey(['gdelt', 'gdelt_mentions_relevancy_ml_job']),
-                metadata = {
-                    "path": "s3://discursus-io/" + 'sources/ml/' + file_date + '/' + file_date_time + '_relevancy_classification.csv',
-                    "rows": df_ml_enrichment_file.index.size
-                }
-            )
-        )
-    
-    # Transfer to Snowflake
-    q_load_ml_enriched_mentions = "alter pipe gdelt_mentions_relevancy_pipe refresh;"
-    context.resources.snowflake_resource.execute_query(q_load_ml_enriched_mentions)
-
-
-@asset(
-    non_argument_deps = {"gdelt_mentions_relevancy"},
     description = "Entity extraction of GDELT mentions",
     key_prefix = ["gdelt"],
     group_name = "prepared_sources",
