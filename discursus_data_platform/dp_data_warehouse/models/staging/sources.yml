@@ -13,7 +13,8 @@ sources:
       - name: gdelt_events
       - name: gdelt_mentions
       - name: gdelt_mentions_named_entities
-      - name: gdelt_mentions_relevancy
+      - name: gdelt_mentions_metadata
+        identifier: gdelt_mentions_relevancy
 
   - name: airbyte
     database: discursus_sources_airbyte
@@ -21,4 +22,4 @@ sources:
 
     tables:
       - name: protest_groupings
-        identifier: protest_groupings
+      - name: observation_relevancy
