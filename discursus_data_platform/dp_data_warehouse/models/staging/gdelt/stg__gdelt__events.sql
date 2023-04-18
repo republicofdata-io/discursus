@@ -18,7 +18,7 @@ with source as (
     {% endif %}
 
     and event_root_code = '14'
-    and cast(actor1_geo_lat as number(8,6)) is not null
+    and cast(action_geo_lat as number(8,6)) is not null
     and cast(action_geo_long as number(9,6)) is not null
     and lower(cast(action_geo_country_code as string)) in ('us', 'ca')
 
@@ -112,13 +112,6 @@ base as (
 
     from source
 
-),
-
-dedup_based_on_geo as (
-
-    select * from base
-    qualify row_number() over (partition by mention_url, action_geo_country_code, action_geo_adm1_code order by action_geo_type desc) = 1
-
 )
 
-select * from dedup_based_on_geo
+select * from base

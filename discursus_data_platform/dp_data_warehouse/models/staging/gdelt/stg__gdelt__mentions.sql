@@ -21,9 +21,9 @@ with source as (
 
 ),
 
-final as (
+format_fields as (
 
-    select distinct
+    select
         lower(cast(mention_identifier as string)) as mention_url,
         cast(gdelt_id as bigint) as gdelt_event_natural_key,
 
@@ -32,18 +32,46 @@ final as (
         to_date(left(mention_time_date, 8), 'yyyymmdd') as mention_time_date,
         lower(cast(mention_type as string)) as mention_type,
         lower(cast(mention_source_name as string)) as mention_source_name,
-        lower(cast(sentence_id as int)) as sentence_id,
-        lower(cast(actor1_char_offset as int)) as actor1_char_offset,
-        lower(cast(actor2_char_offset as int)) as actor2_char_offset,
-        lower(cast(action_char_offset as int)) as action_char_offset,
-        lower(cast(in_raw_text as int)) as in_raw_text,
-        lower(cast(confidence as string)) as confidence,
+        cast(sentence_id as int) as sentence_id,
+        cast(actor1_char_offset as int) as actor1_char_offset,
+        cast(actor2_char_offset as int) as actor2_char_offset,
+        cast(action_char_offset as int) as action_char_offset,
+        cast(in_raw_text as int) as in_raw_text,
+        cast(confidence as int) as confidence,
         lower(cast(mention_doc_len as string)) as mention_doc_len,
         lower(cast(mention_doc_tone as float)) as mention_doc_tone,
         lower(cast(mention_doc_translation_info as string)) as mention_doc_translation_info
 
     from source
 
+),
+
+{% set partition = '(partition by mention_url order by sentence_id, confidence desc)' %}
+
+final as (
+
+    select distinct
+        mention_url,
+        first_value(gdelt_event_natural_key) over {{ partition }} as gdelt_event_natural_key,
+
+        first_value(source_file_date) over {{ partition }} as source_file_date,
+        first_value(event_time_date) over {{ partition }} as event_time_date,
+        first_value(mention_time_date) over {{ partition }} as mention_time_date,
+        first_value(mention_type) over {{ partition }} as mention_type,
+        first_value(mention_source_name) over {{ partition }} as mention_source_name,
+        first_value(sentence_id) over {{ partition }} as sentence_id,
+        first_value(actor1_char_offset) over {{ partition }} as actor1_char_offset,
+        first_value(actor2_char_offset) over {{ partition }} as actor2_char_offset,
+        first_value(action_char_offset) over {{ partition }} as action_char_offset,
+        first_value(in_raw_text) over {{ partition }} as in_raw_text,
+        first_value(confidence) over {{ partition }} as confidence,
+        first_value(mention_doc_len) over {{ partition }} as mention_doc_len,
+        first_value(mention_doc_tone) over {{ partition }} as mention_doc_tone,
+        first_value(mention_doc_translation_info) over {{ partition }} as mention_doc_translation_info
+
+    from format_fields
+
 )
+
 
 select * from final
