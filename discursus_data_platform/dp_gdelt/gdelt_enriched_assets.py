@@ -36,10 +36,10 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
     column_names = ['mention_identifier', 'file_name', 'title', 'description', 'keywords', 'content']
     df_gdelt_mentions_enhanced = pd.DataFrame(columns = column_names)
 
-    for index, row in df_articles.iterrows():
-        try:
-            scraped_article = context.resources.web_scraper_resource.scrape_article(row[5])
-        except AttributeError:
+    for _, row in df_articles.iterrows():
+        scraped_article = context.resources.web_scraper_resource.scrape_article(row[5])
+
+        if scraped_article is None:
             scraped_article = {}
     
         # Use get method with default value (empty string) for each element in scraped_row
