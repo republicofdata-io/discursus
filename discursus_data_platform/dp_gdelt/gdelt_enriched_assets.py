@@ -1,4 +1,4 @@
-from dagster import asset, AssetKey, AssetIn, AssetObservation, Output, FreshnessPolicy
+from dagster import asset, AssetKey, AssetIn, AssetObservation, Output, FreshnessPolicy, AutoMaterializePolicy
 import pandas as pd
 import boto3
 from io import StringIO
@@ -20,6 +20,7 @@ from discursus_data_platform.utils.resources.ml_enrichment_tracker import MLEnri
         'snowflake_resource': my_resources.my_snowflake_resource,
         'novacene_resource': my_resources.my_novacene_resource
     },
+    auto_materialize_policy=AutoMaterializePolicy.eager(),
 )
 def gdelt_mentions_enhanced(context, gdelt_mentions):
     # Build source path
@@ -96,9 +97,8 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
         'novacene_resource': my_resources.my_novacene_resource,
         'snowflake_resource': my_resources.my_snowflake_resource
     },
-    freshness_policy = FreshnessPolicy(
-        maximum_lag_minutes = 60
-    )
+    auto_materialize_policy=AutoMaterializePolicy.lazy(),
+    freshness_policy = FreshnessPolicy(maximum_lag_minutes=60)
 )
 def gdelt_mentions_entity_extraction(context):
     # Empty dataframe of files to fetch

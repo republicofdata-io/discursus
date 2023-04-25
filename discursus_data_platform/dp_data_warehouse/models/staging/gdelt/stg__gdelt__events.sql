@@ -2,8 +2,7 @@
     config(
         materialized = 'incremental',
         incremental_strategy = 'delete+insert',
-        unique_key = 'gdelt_event_natural_key',
-        dagster_freshness_policy = {"maximum_lag_minutes": 6 * 60}
+        unique_key = 'gdelt_event_natural_key'
     )
 }}
 

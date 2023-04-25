@@ -1,4 +1,4 @@
-from dagster import asset, AssetIn, Output, FreshnessPolicy
+from dagster import asset, AssetIn, Output, FreshnessPolicy, AutoMaterializePolicy
 from dagster_aws.s3 import s3_pickle_io_manager, s3_resource
 import pandas as pd
 import boto3
@@ -16,7 +16,8 @@ from discursus_data_platform.utils.resources import my_resources
         'gdelt_resource': my_resources.my_gdelt_resource,
         'snowflake_resource': my_resources.my_snowflake_resource
     },
-    freshness_policy = FreshnessPolicy(maximum_lag_minutes = 15)
+    auto_materialize_policy=AutoMaterializePolicy.lazy(),
+    freshness_policy = FreshnessPolicy(maximum_lag_minutes=10),
 )
 def gdelt_events(context):
     # Build source path
@@ -56,7 +57,8 @@ def gdelt_events(context):
         'aws_resource': my_resources.my_aws_resource,
         'gdelt_resource': my_resources.my_gdelt_resource,
         'snowflake_resource': my_resources.my_snowflake_resource
-    }
+    },
+    auto_materialize_policy=AutoMaterializePolicy.eager(),
 )
 def gdelt_mentions(context, gdelt_events):
     # Build source path

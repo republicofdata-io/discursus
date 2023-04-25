@@ -1,7 +1,6 @@
 {{ 
     config(
-        unique_key='event_observation_pk',
-        dagster_freshness_policy = {"maximum_lag_minutes": 6 * 60}
+        unique_key='event_observation_pk'
     )
 }}
 
