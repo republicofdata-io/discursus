@@ -10,7 +10,6 @@ from dagster_dbt import dbt_cli_resource, load_assets_from_dbt_project
 
 from discursus_data_platform import (
     dp_gdelt,
-    dp_movement_groupings,
     dp_apps
 )
 
@@ -25,7 +24,6 @@ my_assets = with_resources(
         use_build_command = False
     ) + 
     load_assets_from_package_module(dp_gdelt) +
-    load_assets_from_package_module(dp_movement_groupings) +
     load_assets_from_package_module(dp_apps),
     resource_defs = {
         "dbt": dbt_cli_resource.configured(

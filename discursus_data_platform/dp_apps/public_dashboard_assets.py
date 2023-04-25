@@ -1,4 +1,4 @@
-from dagster import asset, AssetKey, Output, MetadataValue, FreshnessPolicy
+from dagster import asset, AssetKey, Output, MetadataValue, FreshnessPolicy, AutoMaterializePolicy
 from dagster_hex.types import HexOutput
 from dagster_hex.resources import DEFAULT_POLL_INTERVAL
 
@@ -17,10 +17,8 @@ from discursus_data_platform.utils.resources import my_resources
     resource_defs = {
         'hex_resource': my_resources.my_hex_resource
     },
-    freshness_policy = FreshnessPolicy(
-        maximum_lag_minutes = 60 * 4, 
-        cron_schedule = "15 3,9,15,21 * * *"
-    )
+    auto_materialize_policy=AutoMaterializePolicy.lazy(),
+    freshness_policy = FreshnessPolicy(maximum_lag_minutes=60*4),
 )
 def hex_main_dashboard_refresh(context):
     hex_output: HexOutput = context.resources.hex_resource.run_and_poll(
