@@ -10,7 +10,7 @@ if __name__ == "__main__":
             "dagster==1.3.1",
             "dagit==1.3.1",
             "dagster-cloud==1.3.1",
-            "dagster-graphql>=1.3.1,<2.0.0",
+            "dagster-graphql==1.3.1",
             "dagster-postgres==0.19.1",
             "dagster-docker==0.19.1",
             "dagster-shell==0.19.1",
