@@ -2677,16 +2677,12 @@ develop = false
 
 [package.dependencies]
 beautifulsoup4 = "^4.12"
-dagster = "^1.2.0"
-future = "^0.18.2"
-pandas = "^1.5.2"
-sqlalchemy = "1.4.46"
 
 [package.source]
 type = "git"
 url = "https://github.com/lantrns-analytics/saf_web_scraper"
 reference = "release/0.3"
-resolved_reference = "5119227009e6da61aaaec56ed62a77cb8630c1fb"
+resolved_reference = "4c89daddf21409af5f0dc3b0ebedb72c7894bcde"
 
 [[package]]
 name = "secretstorage"
