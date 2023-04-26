@@ -16,7 +16,8 @@ from discursus_data_platform.utils.resources import my_resources
         'gdelt_resource': my_resources.my_gdelt_resource,
         'snowflake_resource': my_resources.my_snowflake_resource
     },
-    freshness_policy = FreshnessPolicy(maximum_lag_minutes=10),
+    auto_materialize_policy=AutoMaterializePolicy.lazy(),
+    freshness_policy = FreshnessPolicy(maximum_lag_minutes=15),
 )
 def gdelt_events(context):
     # Build source path

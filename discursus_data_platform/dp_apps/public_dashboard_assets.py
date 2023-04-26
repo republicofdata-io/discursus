@@ -17,8 +17,7 @@ from discursus_data_platform.utils.resources import my_resources
     resource_defs = {
         'hex_resource': my_resources.my_hex_resource
     },
-    auto_materialize_policy=AutoMaterializePolicy.lazy(),
-    freshness_policy = FreshnessPolicy(maximum_lag_minutes=60*4),
+    auto_materialize_policy=AutoMaterializePolicy.eager(),
 )
 def hex_main_dashboard_refresh(context):
     hex_output: HexOutput = context.resources.hex_resource.run_and_poll(
