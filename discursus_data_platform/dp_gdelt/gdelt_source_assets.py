@@ -16,7 +16,6 @@ from discursus_data_platform.utils.resources import my_resources
         'gdelt_resource': my_resources.my_gdelt_resource,
         'snowflake_resource': my_resources.my_snowflake_resource
     },
-    auto_materialize_policy=AutoMaterializePolicy.eager(),
     freshness_policy = FreshnessPolicy(maximum_lag_minutes=10),
 )
 def gdelt_events(context):
