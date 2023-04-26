@@ -13,8 +13,7 @@ from discursus_data_platform.utils.resources import my_resources
     resource_defs = {
         'dbt_resource': my_resources.my_dbt_resource
     },
-    auto_materialize_policy=AutoMaterializePolicy.lazy(),
-    freshness_policy = FreshnessPolicy(maximum_lag_minutes=60*24),
+    auto_materialize_policy=AutoMaterializePolicy.eager(),
 )
 def semantic_definitions(context):
     # clean up the data warehouse
