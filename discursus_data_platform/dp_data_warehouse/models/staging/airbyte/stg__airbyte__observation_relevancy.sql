@@ -1,9 +1,3 @@
-{{
-    config(
-        dagster_freshness_policy = {"maximum_lag_minutes": 6 * 60}
-    )
-}}
-
 with source as (
 
     select * from {{ source('airbyte', 'observation_relevancy') }}

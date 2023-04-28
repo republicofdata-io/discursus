@@ -1,6 +1,5 @@
 from dagster import (
     AssetSelection, 
-    build_asset_reconciliation_sensor,
     file_relative_path,
     load_assets_from_package_module,
     repository, 
@@ -11,8 +10,6 @@ from dagster_dbt import dbt_cli_resource, load_assets_from_dbt_project
 
 from discursus_data_platform import (
     dp_gdelt,
-    dp_movement_groupings,
-    dp_data_warehouse,
     dp_apps
 )
 
@@ -27,7 +24,6 @@ my_assets = with_resources(
         use_build_command = False
     ) + 
     load_assets_from_package_module(dp_gdelt) +
-    load_assets_from_package_module(dp_movement_groupings) +
     load_assets_from_package_module(dp_apps),
     resource_defs = {
         "dbt": dbt_cli_resource.configured(
@@ -43,15 +39,6 @@ my_assets = with_resources(
     },
 )
 
-asset_sensor = [
-    build_asset_reconciliation_sensor(
-        asset_selection=AssetSelection.all(),
-        name="asset_reconciliation_sensor",
-        minimum_interval_seconds = 60 * 5
-    )
-]
-
-
 @repository
 def discursus_repo():
-    return my_assets + asset_sensor
+    return my_assets

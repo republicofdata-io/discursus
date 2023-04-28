@@ -1,9 +1,3 @@
-{{
-    config(
-        dagster_freshness_policy = {"maximum_lag_minutes": 6 * 60}
-    )
-}}
-
 with s_protest_groupings as (
 
     select * from {{ ref('stg__airbyte__protest_groupings') }}
