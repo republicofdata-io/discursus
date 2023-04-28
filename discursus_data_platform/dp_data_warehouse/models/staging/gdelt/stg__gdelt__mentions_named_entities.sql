@@ -23,7 +23,10 @@ with source as (
 split_entities as (
 
     select distinct
-        lower(cast(mention_identifier as string)) as mention_url,
+        case
+            when lower(cast(mention_identifier as string)) like '://%www.msn.com%' then regexp_replace(lower(cast(mention_identifier as string)), '/[^/]*$', '/')
+            else lower(cast(mention_identifier as string))
+        end as mention_url,
 
         source_file_date,
         trim(lower(cast(named_entities_table.value as string))) as named_entity
