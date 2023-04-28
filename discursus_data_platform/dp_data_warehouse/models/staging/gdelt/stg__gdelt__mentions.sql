@@ -23,7 +23,10 @@ with source as (
 format_fields as (
 
     select
-        lower(cast(mention_identifier as string)) as mention_url,
+        case
+            when lower(cast(mention_identifier as string)) like '://%www.msn.com%' then regexp_replace(lower(cast(mention_identifier as string)), '/[^/]*$', '/')
+            else lower(cast(mention_identifier as string))
+        end as mention_url,
         cast(gdelt_id as bigint) as gdelt_event_natural_key,
 
         source_file_date,

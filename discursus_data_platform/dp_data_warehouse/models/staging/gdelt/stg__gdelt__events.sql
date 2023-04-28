@@ -106,7 +106,10 @@ base as (
         cast(num_articles as integer) as num_articles,
         cast(avg_tone as real) as avg_tone,
 
-        lower(cast(url as string)) as mention_url
+        case
+            when lower(cast(url as string)) like '://%www.msn.com%' then regexp_replace(lower(cast(url as string)), '/[^/]*$', '/')
+            else lower(cast(url as string))
+        end as mention_url
 
 
     from source
