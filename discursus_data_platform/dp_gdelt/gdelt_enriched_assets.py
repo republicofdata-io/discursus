@@ -89,6 +89,60 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
 
 
 @asset(
+    ins = {"gdelt_mentions_enhanced": AssetIn(key_prefix = "gdelt")},
+    description = "LLM-generated summary of GDELT mentions",
+    key_prefix = ["gdelt"],
+    group_name = "prepared_sources",
+    resource_defs = {
+        'aws_resource': my_resources.my_aws_resource,
+        'gdelt_resource': my_resources.my_gdelt_resource,
+        'openai_resource': my_resources.my_openai_resource,
+        'snowflake_resource': my_resources.my_snowflake_resource
+    },
+    auto_materialize_policy=AutoMaterializePolicy.eager(),
+)
+def gdelt_mention_summaries(context, gdelt_mentions_enhanced):
+    # Build sourcepath
+    latest_mentions_url = context.resources.gdelt_resource.get_url_to_latest_asset("mentions")
+    gdelt_asset_filename_zip = str(latest_mentions_url).split('gdeltv2/')[1]
+    gdelt_asset_filename_csv = gdelt_asset_filename_zip.split('.zip')[0]
+    gdelt_asset_filedate = gdelt_asset_filename_csv[0:8]
+    gdelt_asset_source_path = 'sources/ml/' + gdelt_asset_filedate + '/' + gdelt_asset_filename_csv[0:14] + '.mentions.summary.csv'
+
+    # Cycle through each article in gdelt_mentions_enhanced and generate a summary
+    df_gdelt_mention_summaries = pd.DataFrame(columns = ['mention_identifier', 'summary'])
+    for _, row in gdelt_mentions_enhanced.iterrows():
+        prompt = f"""Write a concise summary for the following article:
+        
+        Title: {row['title']}
+        Description: {row['description']}
+        Content: {row['content'][:3000]}
+
+        CONCISE SUMMARY:"""
+    
+        completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt, max_tokens=2048)
+
+        df_length = len(df_gdelt_mention_summaries)
+        df_gdelt_mention_summaries.loc[df_length] = [row['mention_identifier'], completion_str]
+
+     # Save data to S3
+    context.resources.aws_resource.s3_put(df_gdelt_mention_summaries, 'discursus-io', gdelt_asset_source_path)
+
+    # Transfer to Snowflake
+    q_load_gdelt_mention_summaries_events = "alter pipe gdelt_mention_summaries_pipe refresh;"
+    snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_mention_summaries_events)
+
+    # Return asset
+    return Output(
+        value = df_gdelt_mention_summaries, 
+        metadata = {
+            "path": "s3://discursus-io/" + gdelt_asset_source_path,
+            "rows": df_gdelt_mention_summaries.index.size
+        }
+    )
+
+
+@asset(
     non_argument_deps = {"gdelt_mentions_enhanced"},
     description = "Entity extraction of GDELT mentions",
     key_prefix = ["gdelt"],
