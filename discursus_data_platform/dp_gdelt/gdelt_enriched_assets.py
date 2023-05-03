@@ -90,6 +90,24 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
 
 @asset(
     non_argument_deps = {"gdelt_mentions_enhanced"},
+    description = "LLM-generated summary of GDELT mentions",
+    key_prefix = ["gdelt"],
+    group_name = "prepared_sources",
+    resource_defs = {
+        'openai_resource': my_resources.my_openai_resource,
+        'snowflake_resource': my_resources.my_snowflake_resource
+    },
+    auto_materialize_policy=AutoMaterializePolicy.eager(),
+)
+def gdelt_mentions_summary(context):
+    completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt='This is a test', max_tokens=5)
+    context.log.info(completion_str)
+
+    return None
+
+
+@asset(
+    non_argument_deps = {"gdelt_mentions_enhanced"},
     description = "Entity extraction of GDELT mentions",
     key_prefix = ["gdelt"],
     group_name = "prepared_sources",
