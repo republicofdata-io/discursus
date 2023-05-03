@@ -107,7 +107,7 @@ def gdelt_mention_summaries(context, gdelt_mentions_enhanced):
     gdelt_asset_filename_zip = str(latest_mentions_url).split('gdeltv2/')[1]
     gdelt_asset_filename_csv = gdelt_asset_filename_zip.split('.zip')[0]
     gdelt_asset_filedate = gdelt_asset_filename_csv[0:8]
-    gdelt_asset_source_path = 'sources/gdelt/' + gdelt_asset_filedate + '/' + gdelt_asset_filename_csv[0:14] + '.mentions.summary.csv'
+    gdelt_asset_source_path = 'sources/ml/' + gdelt_asset_filedate + '/' + gdelt_asset_filename_csv[0:14] + '.mentions.summary.csv'
 
     # Cycle through each article in gdelt_mentions_enhanced and generate a summary
     df_gdelt_mention_summaries = pd.DataFrame(columns = ['mention_identifier', 'summary'])
@@ -129,8 +129,8 @@ def gdelt_mention_summaries(context, gdelt_mentions_enhanced):
     context.resources.aws_resource.s3_put(df_gdelt_mention_summaries, 'discursus-io', gdelt_asset_source_path)
 
     # Transfer to Snowflake
-    # q_load_gdelt_mention_summaries_events = "alter pipe gdelt_mention_summaries_pipe refresh;"
-    # snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_mention_summaries_events)
+    q_load_gdelt_mention_summaries_events = "alter pipe gdelt_mention_summaries_pipe refresh;"
+    snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_mention_summaries_events)
 
     # Return asset
     return Output(
