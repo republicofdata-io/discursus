@@ -13,7 +13,12 @@ s_observation_metadata as (
 
 s_observation_relevancy as (
 
-    select * from {{ ref('stg__airbyte__observation_relevancy') }}
+    select 
+        validation_fields,
+        trim(a.value) as include_regex
+
+    from {{ ref('stg__airbyte__observation_relevancy') }},
+    lateral split_to_table(stg__airbyte__observation_relevancy.include_regex, ',') a
 
 ),
 
