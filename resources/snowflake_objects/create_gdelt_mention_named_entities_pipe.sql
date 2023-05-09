@@ -1,6 +1,6 @@
-create pipe gdelt_mentions_named_entities_pipe as
+create pipe gdelt_mention_named_entities_pipe as
 
-copy into gdelt_mentions_named_entities(
+copy into gdelt_mention_named_entities(
 
   mention_identifier,
   named_entities,
@@ -18,7 +18,7 @@ from (
   from @s3_dio_sources/ml (
 
     file_format => csv,
-    pattern => '.*_entity_extraction.csv'
+    pattern => '.*mentions.entities.csv'
 
   ) t
 );

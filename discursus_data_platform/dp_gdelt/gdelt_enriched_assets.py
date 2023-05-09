@@ -1,11 +1,8 @@
 from dagster import asset, AssetKey, AssetIn, AssetObservation, Output, FreshnessPolicy, AutoMaterializePolicy
 import pandas as pd
-import boto3
-from io import StringIO
+import spacy
 
 from discursus_data_platform.utils.resources import my_resources
-from discursus_data_platform.utils.resources.ml_enrichment_tracker import MLEnrichmentJobTracker
-
 
 
 @asset(
@@ -18,7 +15,6 @@ from discursus_data_platform.utils.resources.ml_enrichment_tracker import MLEnri
         'gdelt_resource': my_resources.my_gdelt_resource,
         'web_scraper_resource': my_resources.my_web_scraper_resource,
         'snowflake_resource': my_resources.my_snowflake_resource,
-        'novacene_resource': my_resources.my_novacene_resource
     },
     auto_materialize_policy=AutoMaterializePolicy.eager(),
 )
@@ -63,21 +59,6 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
     q_load_gdelt_mentions_enhanced_events = "alter pipe gdelt_enhanced_mentions_pipe refresh;"
     snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_mentions_enhanced_events)
 
-    # Transfer to Novacene for relevancy classification
-    my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
-
-    # Sending latest batch of articles to Novacene for entity extraction
-    if df_gdelt_mentions_enhanced.index.size > 0:
-        context.log.info("Sending " + str(df_gdelt_mentions_enhanced.index.size) + " articles for entity extraction")
-
-        entity_extraction_dataset_id = context.resources.novacene_resource.create_dataset("entity_extraction_" + gdelt_asset_source_path.split("/")[3], df_gdelt_mentions_enhanced)
-        entity_extraction_job = context.resources.novacene_resource.named_entity_recognition(entity_extraction_dataset_id['id'], 5)
-        context.log.info("Entity extraction job id: " + str(entity_extraction_job['id']))
-
-        # Update log of enrichment jobs
-        my_ml_enrichment_jobs_tracker.add_new_job(str(entity_extraction_job['id']), 'entity_extraction', 'processing')
-        my_ml_enrichment_jobs_tracker.upload_job_log()
-
     # Return asset
     return Output(
         value = df_gdelt_mentions_enhanced, 
@@ -90,7 +71,7 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
 
 @asset(
     ins = {"gdelt_mentions_enhanced": AssetIn(key_prefix = "gdelt")},
-    description = "LLM-generated summary of GDELT mentions",
+    description = "LLM-generated summary of GDELT mention",
     key_prefix = ["gdelt"],
     group_name = "prepared_sources",
     resource_defs = {
@@ -143,70 +124,47 @@ def gdelt_mention_summaries(context, gdelt_mentions_enhanced):
 
 
 @asset(
-    non_argument_deps = {"gdelt_mentions_enhanced"},
-    description = "Entity extraction of GDELT mentions",
+    ins = {"gdelt_mention_summaries": AssetIn(key_prefix = "gdelt")},
+    description = "Entity extraction of GDELT mention",
     key_prefix = ["gdelt"],
     group_name = "prepared_sources",
     resource_defs = {
-        'novacene_resource': my_resources.my_novacene_resource,
+        'aws_resource': my_resources.my_aws_resource,
+        'gdelt_resource': my_resources.my_gdelt_resource,
         'snowflake_resource': my_resources.my_snowflake_resource
     },
-    auto_materialize_policy=AutoMaterializePolicy.lazy(),
-    freshness_policy = FreshnessPolicy(maximum_lag_minutes=60)
+    auto_materialize_policy=AutoMaterializePolicy.eager(),
 )
-def gdelt_mentions_entity_extraction(context):
-    # Empty dataframe of files to fetch
-    df_entity_extractions = pd.DataFrame(None, columns = ['job_id', 'name', 'file_path'])
+def gdelt_mention_entity_extraction(context, gdelt_mention_summaries):
+    # Build sourcepath
+    latest_mentions_url = context.resources.gdelt_resource.get_url_to_latest_asset("mentions")
+    gdelt_asset_filename_zip = str(latest_mentions_url).split('gdeltv2/')[1]
+    gdelt_asset_filename_csv = gdelt_asset_filename_zip.split('.zip')[0]
+    gdelt_asset_filedate = gdelt_asset_filename_csv[0:8]
+    gdelt_asset_source_path = 'sources/ml/' + gdelt_asset_filedate + '/' + gdelt_asset_filename_csv[0:14] + '.mentions.entities.csv'
 
-    # Lit of jobs to remove
-    l_completed_job_indexes = []
+    # Cycle through each article in gdelt_mention_summaries and extract entities
+    df_gdelt_mention_entities = pd.DataFrame(columns = ['mention_identifier', 'named_entities'])
+    nlp = spacy.load("en_core_web_sm")
 
-    # Create instance of ml enrichment tracker
-    my_ml_enrichment_jobs_tracker = MLEnrichmentJobTracker()
+    for _, row in gdelt_mention_summaries.iterrows():
+        entities = [ent.text for ent in nlp(row["summary"]).ents if ent.label_ in ["PERSON", "ORG"]]
 
-    for index, row in my_ml_enrichment_jobs_tracker.df_ml_enrichment_jobs.iterrows():
-        if row['type'] == 'entity_extraction':
-            job_info = context.resources.novacene_resource.job_info(row['job_id'])
+        df_length = len(df_gdelt_mention_entities)
+        df_gdelt_mention_entities.loc[df_length] = [row['mention_identifier'], list(set(entities))]
 
-            if job_info['status'] == 'Completed':
-                # Append new job to existing list
-                data_ml_enrichment_file = [[row['job_id'], job_info['source']['name'], job_info['result']['path']]]
-                df_ml_enrichment_file = pd.DataFrame(data_ml_enrichment_file, columns = ['job_id', 'name', 'file_path'])
-                df_entity_extractions = df_entity_extractions.append(df_ml_enrichment_file)
+     # Save data to S3
+    context.resources.aws_resource.s3_put(df_gdelt_mention_entities, 'discursus-io', gdelt_asset_source_path)
 
-                # Keep track of jobs to remove from tracking log
-                l_completed_job_indexes.append(index)
-
-    # Updating job from log of enrichment jobs
-    my_ml_enrichment_jobs_tracker.remove_completed_job(l_completed_job_indexes)
-    my_ml_enrichment_jobs_tracker.upload_job_log()
-
-    s3 = boto3.resource('s3')
-
-    for index, row in df_entity_extractions.iterrows():
-        # Read csv as pandas
-        df_ml_enrichment_file = context.resources.novacene_resource.get_file(row['file_path'])
-
-        # Extract date from file name
-        file_date = row['name'].split("_")[2].split(".")[0][0 : 8]
-        file_date_time = row['name'].split("_")[2].split(".")[0]
-
-        # Save df as csv in S3
-        csv_buffer = StringIO()
-        df_ml_enrichment_file.to_csv(csv_buffer, index = False)
-        s3.Object('discursus-io', 'sources/ml/' + file_date + '/' + file_date_time + '_entity_extraction.csv').put(Body=csv_buffer.getvalue())
-
-        # Get trace of asset metadata
-        context.log_event(
-            AssetObservation(
-                asset_key = AssetKey(['gdelt', 'gdelt_mentions_entity_extraction_ml_job']),
-                metadata = {
-                    "path": "s3://discursus-io/" + 'sources/ml/' + file_date + '/' + file_date_time + '_entity_extraction.csv',
-                    "rows": df_ml_enrichment_file.index.size
-                }
-            )
-        )
-    
     # Transfer to Snowflake
-    q_load_ml_entity_extractions = "alter pipe gdelt_mentions_named_entities_pipe refresh;"
-    context.resources.snowflake_resource.execute_query(q_load_ml_entity_extractions)
+    q_load_gdelt_mention_named_entities_events = "alter pipe gdelt_mention_named_entities_pipe refresh;"
+    snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_mention_named_entities_events)
+
+    # Return asset
+    return Output(
+        value = df_gdelt_mention_entities, 
+        metadata = {
+            "path": "s3://discursus-io/" + gdelt_asset_source_path,
+            "rows": df_gdelt_mention_entities.index.size
+        }
+    )
