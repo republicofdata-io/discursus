@@ -15,7 +15,7 @@ final as (
         observation_type,
         observation_url,
         observation_page_title,
-        observation_page_description,
+        observation_summary,
         observation_keywords
     
     from s_observations

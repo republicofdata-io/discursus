@@ -11,7 +11,7 @@ with source as (
     select
         *,
         date(split(metadata_filename, '/')[2], 'yyyymmdd') as source_file_date
-    from {{ source('gdelt', 'gdelt_mentions_entity_extraction') }}
+    from {{ source('gdelt', 'gdelt_mention_entity_extraction') }}
     {% if is_incremental() %}
         where date(split(metadata_filename, '/')[2], 'yyyymmdd') >= (select max(source_file_date) from {{ this }})
     {% else %}
@@ -20,20 +20,17 @@ with source as (
 
 ),
 
-split_entities as (
+base as (
 
     select distinct
         case
             when lower(cast(mention_identifier as string)) like '://%www.msn.com%' then regexp_replace(lower(cast(mention_identifier as string)), '/[^/]*$', '/')
             else lower(cast(mention_identifier as string))
         end as mention_url,
+        named_entities,
+        source_file_date
 
-        source_file_date,
-        trim(lower(cast(named_entities_table.value as string))) as named_entity
-
-    from source, lateral split_to_table(source.named_entities, ' ||') as named_entities_table
-
-    where coalesce(trim(lower(cast(named_entities_table.value as string))), '') != ''
+    from source
 
 ),
 
@@ -42,10 +39,11 @@ final as (
     select distinct
         mention_url,
         source_file_date,
-        ltrim(cast(split(named_entity, '::')[0] as string), '(') as entity_name,
-        cast(split(named_entity, '::')[1] as string) as entity_type
-    
-    from split_entities
+        trim(lower(cast(entities.value as string))) as entity_name
+
+    from base, lateral flatten(input => parse_json(named_entities)) as entities
+
+    where coalesce(trim(lower(cast(entities.value as string))), '') != ''
 
 )
 

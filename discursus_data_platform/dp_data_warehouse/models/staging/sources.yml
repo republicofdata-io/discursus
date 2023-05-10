@@ -12,10 +12,11 @@ sources:
     tables:
       - name: gdelt_events
       - name: gdelt_mentions
-      - name: gdelt_mentions_entity_extraction
-        identifier: gdelt_mentions_named_entities
       - name: gdelt_mentions_enhanced
         identifier: gdelt_enhanced_mentions
+      - name: gdelt_mention_summaries
+      - name: gdelt_mention_entity_extraction
+        identifier: gdelt_mention_named_entities
 
   - name: airbyte
     database: discursus_sources_airbyte
