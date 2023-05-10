@@ -4,6 +4,13 @@ with s_observations as (
 
 ),
 
+s_observation_summaries as (
+
+    select * from {{ ref('stg__gdelt__mention_summaries') }}
+    where mention_url is not null
+
+),
+
 s_observation_metadata as (
 
     select * from {{ ref('stg__gdelt__mentions_metadata') }}
@@ -31,12 +38,12 @@ final as (
 
         'media article' as observation_type,
         s_observation_metadata.page_name as observation_page_name,
-        s_observation_metadata.file_name as observation_file_name,
         s_observation_metadata.page_title as observation_page_title,
-        s_observation_metadata.page_description as observation_page_description,
+        coalesce(s_observation_summaries.summary, s_observation_metadata.page_description) as observation_summary,
         s_observation_metadata.keywords as observation_keywords
 
     from s_observations
+    inner join s_observation_summaries using (mention_url)
     inner join s_observation_metadata using (mention_url)
     inner join s_observation_relevancy
         on (
