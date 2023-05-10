@@ -15,7 +15,8 @@ sources:
       - name: gdelt_mentions_enhanced
         identifier: gdelt_enhanced_mentions
       - name: gdelt_mention_summaries
-      - name: gdelt_mention_named_entities
+      - name: gdelt_mention_entity_extraction
+        identifier: gdelt_mention_named_entities
 
   - name: airbyte
     database: discursus_sources_airbyte
