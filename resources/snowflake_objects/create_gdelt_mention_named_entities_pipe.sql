@@ -11,8 +11,8 @@ copy into gdelt_mention_named_entities(
 from (
 
   select 
-    t.$3,
-    t.$9,
+    t.$1,
+    t.$2,
     metadata$filename
 
   from @s3_dio_sources/ml (
