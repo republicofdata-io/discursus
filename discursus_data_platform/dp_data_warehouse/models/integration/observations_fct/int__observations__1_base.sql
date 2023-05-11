@@ -43,7 +43,7 @@ final as (
         s_observation_metadata.keywords as observation_keywords
 
     from s_observations
-    inner join s_observation_summaries using (mention_url)
+    left join s_observation_summaries using (mention_url)
     inner join s_observation_metadata using (mention_url)
     inner join s_observation_relevancy
         on (
