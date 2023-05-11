@@ -49,6 +49,7 @@ final as (
         on (
             s_observation_metadata.page_title regexp s_observation_relevancy.include_regex
             or s_observation_metadata.page_description regexp s_observation_relevancy.include_regex
+            or lower(s_observation_summaries.summary) regexp s_observation_relevancy.include_regex
         )
 
 )

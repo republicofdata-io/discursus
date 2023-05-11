@@ -30,8 +30,8 @@ final as (
         and s_events.published_date >= s_movements.published_date_start
         and s_events.published_date <= coalesce(s_movements.published_date_end, current_date())
         and(
-            s_events.observation_summary regexp s_movements.page_description_regex
-            or s_events.observation_page_title regexp s_movements.page_description_regex
+            lower(s_events.observation_summary) regexp s_movements.page_description_regex
+            or lower(s_events.observation_page_title) regexp s_movements.page_description_regex
         )
 
 )
