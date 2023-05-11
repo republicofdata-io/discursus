@@ -43,12 +43,13 @@ final as (
         s_observation_metadata.keywords as observation_keywords
 
     from s_observations
-    inner join s_observation_summaries using (mention_url)
+    left join s_observation_summaries using (mention_url)
     inner join s_observation_metadata using (mention_url)
     inner join s_observation_relevancy
         on (
             s_observation_metadata.page_title regexp s_observation_relevancy.include_regex
             or s_observation_metadata.page_description regexp s_observation_relevancy.include_regex
+            or lower(s_observation_summaries.summary) regexp s_observation_relevancy.include_regex
         )
 
 )
