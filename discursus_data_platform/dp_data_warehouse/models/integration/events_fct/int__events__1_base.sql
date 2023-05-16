@@ -21,7 +21,8 @@ get_unique_geo as (
         s_gdelt_events.action_geo_country_code,
         s_countries.country_name as action_geo_country_name,
         s_gdelt_events.action_geo_latitude,
-        s_gdelt_events.action_geo_longitude
+        s_gdelt_events.action_geo_longitude,
+        s_gdelt_events.action_geo_h3_r3
 
     from s_gdelt_events
     left join s_countries on s_gdelt_events.action_geo_country_code = s_countries.country_code
@@ -46,7 +47,8 @@ extract_state_city as (
             else ''
         end as action_geo_city_name,
         action_geo_latitude,
-        action_geo_longitude
+        action_geo_longitude,
+        action_geo_h3_r3
 
     from get_unique_geo
 

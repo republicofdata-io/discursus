@@ -20,7 +20,7 @@ with source as (
 
 ),
 
-final as (
+clean_up as (
 
     select distinct
         case
@@ -32,6 +32,18 @@ final as (
 
     from source
 
+),
+
+dedup as (
+
+    select distinct
+        mention_url,
+        first_value(summary) over (partition by mention_url order by source_file_date desc) as summary,
+        source_file_date
+
+    from clean_up
+
+
 )
 
-select * from final
+select * from dedup

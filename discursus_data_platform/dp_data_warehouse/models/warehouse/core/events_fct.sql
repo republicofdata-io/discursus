@@ -27,8 +27,9 @@ final as (
         action_geo_country_name,
         action_geo_state_name,
         action_geo_city_name,
-        action_geo_latitude, 
-        action_geo_longitude
+        action_geo_latitude,
+        action_geo_longitude,
+        action_geo_h3_r3
 
     from s_events
 

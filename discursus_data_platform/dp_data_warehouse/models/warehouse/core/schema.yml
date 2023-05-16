@@ -23,7 +23,7 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('actors_fct')
+              to: ref('actors_dim')
               field: actor_pk
 
   - name: events_observations_bridge
