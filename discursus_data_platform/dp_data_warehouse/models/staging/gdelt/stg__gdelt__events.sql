@@ -114,6 +114,16 @@ base as (
 
     from source
 
+),
+
+encode_h3_cells as (
+
+    select
+        *,
+        analytics_toolbox.carto.h3_fromlonglat(action_geo_longitude, action_geo_latitude, 3) as action_geo_h3_r3
+    
+    from base
+
 )
 
-select * from base
+select * from encode_h3_cells
