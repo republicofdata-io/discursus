@@ -1,6 +1,8 @@
 from dagster import asset, AssetKey, AssetIn, AssetObservation, Output, FreshnessPolicy, AutoMaterializePolicy
 import pandas as pd
 import spacy
+import time
+import openai.error
 
 from discursus_data_platform.utils.resources import my_resources
 
@@ -102,6 +104,13 @@ def gdelt_mention_summaries(context, gdelt_mentions_enhanced):
         CONCISE SUMMARY:"""
     
         completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt, max_tokens=2048)
+
+        try:
+            completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt, max_tokens=2048)
+        except openai.error.RateLimitError as e:
+            # Retry the request after 5 seconds
+            time.sleep(5)
+            completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt, max_tokens=2048)
 
         df_length = len(df_gdelt_mention_summaries)
         df_gdelt_mention_summaries.loc[df_length] = [row['mention_identifier'], completion_str]
