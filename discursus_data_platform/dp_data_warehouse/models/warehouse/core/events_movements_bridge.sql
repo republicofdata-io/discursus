@@ -1,12 +1,12 @@
 {{ 
     config(
-        unique_key='event_actor_pk'
+        unique_key='event_movement_pk'
     )
 }}
 
-with s_events_actors as (
+with s_event_movements as (
 
-    select * from {{ ref('int__events_actors') }}
+    select * from {{ ref('int__events_movements') }}
 
 ),
 
@@ -19,10 +19,10 @@ bridge as (
             'action_geo_longitude'
         ]) }} as event_fk,
         {{ dbt_utils.generate_surrogate_key([
-            'actor_name'
-        ]) }} as actor_fk
+            'movement_name'
+        ]) }} as movement_fk
 
-    from s_events_actors
+    from s_event_movements
 
 ),
 
@@ -31,8 +31,8 @@ final as (
     select
         {{ dbt_utils.generate_surrogate_key([
             'event_fk',
-            'actor_fk'
-        ]) }} as event_actor_pk,
+            'movement_fk'
+        ]) }} as event_movement_pk,
         *
     
     from bridge

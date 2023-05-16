@@ -14,7 +14,6 @@ merge_sources as (
 
     select distinct
         s_events_observations.published_date,
-        s_events_observations.movement_name,
         s_events_observations.action_geo_latitude,
         s_events_observations.action_geo_longitude,
         s_named_entities.entity_name as actor_name

@@ -8,7 +8,6 @@ final as (
 
     select
         published_date,
-        movement_name,
         action_geo_latitude,
         action_geo_longitude,
         split(split(observation_url, '//')[1], '/')[0]::string as observer_domain,

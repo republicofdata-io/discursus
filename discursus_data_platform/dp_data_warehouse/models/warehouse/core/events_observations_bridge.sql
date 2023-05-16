@@ -19,7 +19,6 @@ bridge as (
         ]) }} as observation_fk, 
         {{ dbt_utils.generate_surrogate_key([
             'published_date',
-            'movement_name',
             'action_geo_latitude',
             'action_geo_longitude'
         ]) }} as event_fk

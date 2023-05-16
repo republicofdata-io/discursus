@@ -26,6 +26,25 @@ models:
               to: ref('actors_dim')
               field: actor_pk
 
+  - name: events_movements_bridge
+    columns:
+      - name: event_movement_pk
+        tests:
+          - not_null
+          - unique
+      - name: event_fk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('events_fct')
+              field: event_pk
+      - name: movement_fk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('movements_fct')
+              field: movement_pk
+
   - name: events_observations_bridge
     columns:
       - name: event_observation_pk
@@ -51,12 +70,6 @@ models:
         tests:
           - not_null
           - unique
-      - name: movement_fk
-        tests:
-          - not_null
-          - relationships:
-              to: ref('movements_dim')
-              field: movement_pk
 
   - name: movements_dim
     columns:

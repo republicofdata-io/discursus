@@ -18,7 +18,7 @@ s_movements as (
 
 ),
 
-final as (
+associate_movements as (
 
     select distinct
         s_events.*,
@@ -34,6 +34,26 @@ final as (
             or lower(s_events.observation_page_title) regexp s_movements.page_description_regex
         )
 
+),
+
+count_movements as (
+
+    select
+        *,
+        count(movement_name) over (partition by published_date, action_geo_longitude, action_geo_latitude order by movement_name) as movement_count
+
+    from associate_movements
+
+),
+
+drop_others as (
+
+    select
+        * exclude movement_count
+    
+    from count_movements 
+    where movement_count = 1 or movement_name != 'Other' -- Remove events classified as Others when there are already movements for that location and date
+
 )
 
-select * from final
+select * from drop_others
