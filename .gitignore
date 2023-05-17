@@ -132,6 +132,7 @@ dmypy.json
 dev/
 
 # Dev
+.DS_Store
 .vscode/
 droughty_profiles.yml
 target/
