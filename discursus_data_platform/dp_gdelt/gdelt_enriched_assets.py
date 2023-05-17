@@ -52,7 +52,7 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
         ]
         
         df_length = len(df_gdelt_mentions_enhanced)
-        df_gdelt_mentions_enhanced.loc[df_length] = scraped_row
+        df_gdelt_mentions_enhanced.loc[df_length] = scraped_row # type: ignore
     
     # Save data to S3
     context.resources.aws_resource.s3_put(df_gdelt_mentions_enhanced, 'discursus-io', gdelt_asset_source_path)
@@ -114,7 +114,7 @@ def gdelt_mention_summaries(context, gdelt_mentions_enhanced):
                 continue
 
         df_length = len(df_gdelt_mention_summaries)
-        df_gdelt_mention_summaries.loc[df_length] = [row['mention_identifier'], completion_str]
+        df_gdelt_mention_summaries.loc[df_length] = [row['mention_identifier'], completion_str] # type: ignore
 
      # Save data to S3
     context.resources.aws_resource.s3_put(df_gdelt_mention_summaries, 'discursus-io', gdelt_asset_source_path)
@@ -161,7 +161,7 @@ def gdelt_mention_entity_extraction(context, gdelt_mention_summaries):
         entities = [ent.text for ent in nlp(row["summary"]).ents if ent.label_ in ["PERSON", "ORG"]]
 
         df_length = len(df_gdelt_mention_entities)
-        df_gdelt_mention_entities.loc[df_length] = [row['mention_identifier'], list(set(entities))]
+        df_gdelt_mention_entities.loc[df_length] = [row['mention_identifier'], list(set(entities))] # type: ignore
 
      # Save data to S3
     context.resources.aws_resource.s3_put(df_gdelt_mention_entities, 'discursus-io', gdelt_asset_source_path)
