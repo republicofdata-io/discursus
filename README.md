@@ -22,6 +22,18 @@ Our dataset exposes the following entities, with attributes and relationships.
 <img src="resources/images/discursus_semantics.png" width="800px" alt="Discursus semantics" />
 
 
+## Data product's data mesh
+The data is produced through that process.
+
+<img src="resources/images/discursus_data_mesh.png" width="800px" alt="Discursus semantics" />
+
+
+## Data product's architecture
+The platform is supported by the following architecture.
+
+<img src="resources/images/discursus_architecture.png" width="800px" alt="Discursus semantics" />
+
+
 ## License
 
 The __discursus data platform__ is [MIT licensed](./LICENSE.md).
