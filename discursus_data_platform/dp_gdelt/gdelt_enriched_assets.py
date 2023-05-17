@@ -103,14 +103,15 @@ def gdelt_mention_summaries(context, gdelt_mentions_enhanced):
 
         CONCISE SUMMARY:"""
     
-        completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt, max_tokens=2048)
-
-        try:
-            completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt, max_tokens=2048)
-        except openai.error.RateLimitError as e:
-            # Retry the request after 5 seconds
-            time.sleep(5)
-            completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt, max_tokens=2048)
+        # Keep retrying the request until it succeeds
+        while True:
+            try:
+                completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt, max_tokens=2048)
+                break
+            except openai.error.RateLimitError as e:
+                # Wait for 5 seconds before retrying
+                time.sleep(5)
+                continue
 
         df_length = len(df_gdelt_mention_summaries)
         df_gdelt_mention_summaries.loc[df_length] = [row['mention_identifier'], completion_str]

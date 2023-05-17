@@ -23,7 +23,7 @@ my_assets = with_resources(
         key_prefix = ["data_warehouse"],
         use_build_command = False
     ) + 
-    load_assets_from_package_module(dp_gdelt) +
+    load_assets_from_package_module(dp_gdelt) + # type: ignore
     load_assets_from_package_module(dp_apps),
     resource_defs = {
         "dbt": dbt_cli_resource.configured(
