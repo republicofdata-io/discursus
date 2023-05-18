@@ -166,14 +166,14 @@ def gdelt_gkg_articles(context):
     context.resources.aws_resource.s3_put(df_latest_gkg_articles_filtered, 'discursus-io', gdelt_asset_source_path)
 
     # Transfer to Snowflake
-    # q_load_gdelt_events = "alter pipe gdelt_events_pipe refresh;"
-    # context.resources.snowflake_resource.execute_query(q_load_gdelt_events)
+    q_load_gdelt_gkg_articles = "alter pipe gdelt_gkg_articles_pipe refresh;"
+    context.resources.snowflake_resource.execute_query(q_load_gdelt_gkg_articles)
 
     # Return asset
     return Output(
         value = df_latest_gkg_articles_filtered, 
         metadata = {
-            "path": "s3://discursus-io/" + gdelt_asset_source_path,
+            "s3_path": "s3://discursus-io/" + gdelt_asset_source_path,
             "rows": df_latest_gkg_articles_filtered.index.size
         }
     )

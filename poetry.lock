@@ -3161,8 +3161,8 @@ develop = false
 [package.source]
 type = "git"
 url = "https://github.com/discursus-data/saf_gdelt"
-reference = "gkg_feed"
-resolved_reference = "16bf3682cfdc22a162225bea8b998212c416750c"
+reference = "release/0.2.1"
+resolved_reference = "024498748bf0dfb85b81350ebf08901598977d41"
 
 [[package]]
 name = "saf-openai"
@@ -4239,4 +4239,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.11"
-content-hash = "e26a84bd13066702129bf99dd33014f93f37f2ee18a595a7cbf284972c6018c7"
+content-hash = "323aa3f38029b76a363c477ea99555dec095c7407a7e782b72887b3f73abe64a"
