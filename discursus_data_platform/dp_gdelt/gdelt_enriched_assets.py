@@ -72,6 +72,70 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
 
 
 @asset(
+    ins = {"gdelt_gkg_articles": AssetIn(key_prefix = "gdelt")},
+    description = "List of enhanced articles mined from GDELT",
+    key_prefix = ["gdelt"],
+    group_name = "prepared_sources",
+    resource_defs = {
+        'aws_resource': my_resources.my_aws_resource,
+        'gdelt_resource': my_resources.my_gdelt_resource,
+        'web_scraper_resource': my_resources.my_web_scraper_resource,
+        'snowflake_resource': my_resources.my_snowflake_resource,
+    },
+    auto_materialize_policy=AutoMaterializePolicy.eager(),
+)
+def gdelt_enhanced_articles(context, gdelt_gkg_articles):
+    # Build source path
+    latest_mentions_url = context.resources.gdelt_resource.get_url_to_latest_asset("mentions")
+    gdelt_asset_filename_zip = str(latest_mentions_url).split('gdeltv2/')[1]
+    gdelt_asset_filename_csv = gdelt_asset_filename_zip.split('.zip')[0]
+    gdelt_asset_filedate = gdelt_asset_filename_csv[0:8]
+    gdelt_asset_source_path = 'sources/gdelt/' + gdelt_asset_filedate + '/' + gdelt_asset_filename_csv[0:14] + '.articles.enhanced.csv'
+
+    # Dedup articles
+    df_articles = gdelt_gkg_articles.drop_duplicates(subset=['article_identifier'], keep='first')
+
+    # Create dataframe
+    column_names = ['mention_identifier', 'file_name', 'title', 'description', 'keywords', 'content']
+    df_gdelt_enhanced_articles = pd.DataFrame(columns = column_names)
+
+    for _, row in df_articles.iterrows():
+        scraped_article = context.resources.web_scraper_resource.scrape_article(row['article_identifier'])
+
+        if scraped_article is None:
+            scraped_article = {}
+    
+        # Use get method with default value (empty string) for each element in scraped_row
+        scraped_row = [
+            scraped_article.get('url', ''),
+            scraped_article.get('filename', ''),
+            scraped_article.get('title', ''),
+            scraped_article.get('description', ''),
+            scraped_article.get('keywords', ''),
+            scraped_article.get('content', '')
+        ]
+        
+        df_length = len(df_gdelt_enhanced_articles)
+        df_gdelt_enhanced_articles.loc[df_length] = scraped_row # type: ignore
+    
+    # Save data to S3
+    context.resources.aws_resource.s3_put(df_gdelt_enhanced_articles, 'discursus-io', gdelt_asset_source_path)
+
+    # Transfer to Snowflake
+    q_load_gdelt_enhanced_articles = "alter pipe gdelt_enhanced_articles_pipe refresh;"
+    snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_enhanced_articles)
+
+    # Return asset
+    return Output(
+        value = df_gdelt_enhanced_articles, 
+        metadata = {
+            "s3_path": "s3://discursus-io/" + gdelt_asset_source_path,
+            "rows": df_gdelt_enhanced_articles.index.size
+        }
+    )
+
+
+@asset(
     ins = {"gdelt_mentions_enhanced": AssetIn(key_prefix = "gdelt")},
     description = "LLM-generated summary of GDELT mention",
     key_prefix = ["gdelt"],
