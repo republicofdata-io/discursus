@@ -3,6 +3,8 @@ from dagster_aws.s3 import s3_pickle_io_manager, s3_resource
 import pandas as pd
 import boto3
 from io import StringIO
+from urllib.request import urlretrieve
+import zipfile
 
 from discursus_data_platform.utils.resources import my_resources
 
@@ -85,5 +87,93 @@ def gdelt_mentions(context, gdelt_events):
         metadata = {
             "path": "s3://discursus-io/" + gdelt_asset_source_path,
             "rows": df_latest_mentions_filtered.index.size
+        }
+    )
+
+
+@asset(
+    description = "List of gkg articles mined on GDELT",
+    key_prefix = ["gdelt"],
+    group_name = "sources",
+    resource_defs = {
+        'aws_resource': my_resources.my_aws_resource,
+        'gdelt_resource': my_resources.my_gdelt_resource,
+        'snowflake_resource': my_resources.my_snowflake_resource
+    },
+    auto_materialize_policy=AutoMaterializePolicy.eager(),
+    freshness_policy = FreshnessPolicy(maximum_lag_minutes=15),
+)
+def gdelt_gkg_articles(context):
+    # Build source path
+    latest_events_url = context.resources.gdelt_resource.get_url_to_latest_asset("gkg")
+    gdelt_asset_filename_zip = str(latest_events_url).split('gdeltv2/')[1]
+    gdelt_asset_filename_csv = gdelt_asset_filename_zip.split('.zip')[0]
+    gdelt_asset_filedate = gdelt_asset_filename_csv[0:8]
+    gdelt_asset_source_path = 'sources/gdelt/' + gdelt_asset_filedate + '/' + gdelt_asset_filename_csv
+
+    # Mines the latest asset from GDELT    
+    urlretrieve(latest_events_url, gdelt_asset_filename_zip)
+    with zipfile.ZipFile(gdelt_asset_filename_zip, 'r') as zip_ref:
+        zip_ref.extractall('.')
+    df_latest_gkg_articles = pd.read_csv(gdelt_asset_filename_csv, sep='\t', header=None, encoding='ISO-8859-1')
+
+    # Filter data
+    df_latest_gkg_articles = df_latest_gkg_articles.iloc[:, [0, 1, 2, 3, 4, 5, 7, 9, 11, 13, 18, 21]]
+
+    # Rename the columns for better readability
+    df_latest_gkg_articles.columns = [
+        "gdelt_gkg_id",
+        "gdelt_gkg_date_time",
+        "source_collection_id",
+        "source_domain",
+        "article_identifier",
+        "counts",
+        "themes",
+        "locations",
+        "persons",
+        "organizations",
+        "article_image_url",
+        "article_video_url",
+    ]
+
+    # Convert specific columns to lowercase
+    df_latest_gkg_articles[
+        ["counts", "themes", "locations", "persons", "organizations"]
+    ] = df_latest_gkg_articles[
+        ["counts", "themes", "locations", "persons", "organizations"]
+    ].applymap(
+        lambda x: x.lower() if isinstance(x, str) else x
+    )
+
+    # Filter the DataFrame to only include rows with source_collection_id equal to 1
+    df_latest_gkg_articles_filtered = df_latest_gkg_articles[
+        df_latest_gkg_articles["source_collection_id"] == 1
+    ]
+
+    # Filter the DataFrame to only include rows with the "themes" column containing the word "protest"
+    df_latest_gkg_articles_filtered = df_latest_gkg_articles_filtered[
+        (df_latest_gkg_articles["themes"].str.contains("protest", na=False))
+    ]
+
+    # Filter the DataFrame to only include rows with the "locations" column containing the words "united states" or "canada"
+    df_latest_gkg_articles_filtered = df_latest_gkg_articles_filtered[
+        (df_latest_gkg_articles["locations"].str.contains("united states", na=False))
+        | (df_latest_gkg_articles["locations"].str.contains("canada", na=False))
+    ]
+    
+    
+    # Save data to S3
+    context.resources.aws_resource.s3_put(df_latest_gkg_articles_filtered, 'discursus-io', gdelt_asset_source_path)
+
+    # Transfer to Snowflake
+    # q_load_gdelt_events = "alter pipe gdelt_events_pipe refresh;"
+    # context.resources.snowflake_resource.execute_query(q_load_gdelt_events)
+
+    # Return asset
+    return Output(
+        value = df_latest_gkg_articles_filtered, 
+        metadata = {
+            "path": "s3://discursus-io/" + gdelt_asset_source_path,
+            "rows": df_latest_gkg_articles_filtered.index.size
         }
     )
