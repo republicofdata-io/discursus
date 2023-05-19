@@ -150,16 +150,29 @@ def gdelt_gkg_articles(context):
         df_latest_gkg_articles["source_collection_id"] == 1
     ]
 
-    # Filter the DataFrame to only include rows with the "themes" column containing the word "protest"
+    # Filter the DataFrame to only include rows with the "locations" column containing the words "united states" or "canada"
+    # Split the locations using the ; delimiter and search for the word "united states" or "canada" in the the first element of the list
     df_latest_gkg_articles_filtered = df_latest_gkg_articles_filtered[
-        (df_latest_gkg_articles["themes"].str.contains("protest", na=False))
+        (df_latest_gkg_articles["locations"].str.split(";", expand=True)[0].str.contains("united states", na=False))
+        | (df_latest_gkg_articles["locations"].str.split(";", expand=True)[0].str.contains("canada", na=False))
     ]
 
-    # Filter the DataFrame to only include rows with the "locations" column containing the words "united states" or "canada"
+    # Split the themes using the ; delimiter and search for the word "protest" in the the first 10 elements of the list
     df_latest_gkg_articles_filtered = df_latest_gkg_articles_filtered[
-        (df_latest_gkg_articles["locations"].str.contains("united states", na=False))
-        | (df_latest_gkg_articles["locations"].str.contains("canada", na=False))
+        (df_latest_gkg_articles["themes"].str.split(";", expand=True)[0].str.contains("protest", na=False))
+        | (df_latest_gkg_articles["themes"].str.split(";", expand=True)[1].str.contains("protest", na=False))
+        | (df_latest_gkg_articles["themes"].str.split(";", expand=True)[2].str.contains("protest", na=False))
+        | (df_latest_gkg_articles["themes"].str.split(";", expand=True)[3].str.contains("protest", na=False))
+        | (df_latest_gkg_articles["themes"].str.split(";", expand=True)[4].str.contains("protest", na=False))
+        | (df_latest_gkg_articles["themes"].str.split(";", expand=True)[5].str.contains("protest", na=False))
+        | (df_latest_gkg_articles["themes"].str.split(";", expand=True)[6].str.contains("protest", na=False))
+        | (df_latest_gkg_articles["themes"].str.split(";", expand=True)[7].str.contains("protest", na=False))
+        | (df_latest_gkg_articles["themes"].str.split(";", expand=True)[8].str.contains("protest", na=False))
+        | (df_latest_gkg_articles["themes"].str.split(";", expand=True)[9].str.contains("protest", na=False))
     ]
+
+    # Deduplicate the DataFrame
+    df_latest_gkg_articles_filtered = df_latest_gkg_articles_filtered.drop_duplicates()
     
     
     # Save data to S3
