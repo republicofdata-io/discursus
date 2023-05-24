@@ -100,8 +100,7 @@ def gdelt_mentions(context, gdelt_events):
         'gdelt_resource': my_resources.my_gdelt_resource,
         'snowflake_resource': my_resources.my_snowflake_resource
     },
-    auto_materialize_policy=AutoMaterializePolicy.eager(),
-    freshness_policy = FreshnessPolicy(maximum_lag_minutes=15),
+    auto_materialize_policy=AutoMaterializePolicy.lazy(),
 )
 def gdelt_gkg_articles(context):
     # Build source path
