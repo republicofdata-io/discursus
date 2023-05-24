@@ -1,5 +1,6 @@
 from dagster import config_from_pkg_resources, file_relative_path
 from dagster_snowflake import snowflake_resource
+from dagster_gcp import bigquery_resource
 from dagster_dbt import dbt_cli_resource
 from dagster_hex.resources import hex_resource 
 
@@ -8,10 +9,18 @@ from saf_gdelt import gdelt_resource
 from saf_web_scraper import web_scraper_resource
 from saf_openai import openai_resource
 
+
+# dbt paths
 DBT_PROFILES_DIR = file_relative_path(__file__, "./../../dp_data_warehouse/config/")
 DBT_PROJECT_DIR = file_relative_path(__file__, "./../../dp_data_warehouse/")
 
 
+# Configuration files
+bigquery_configs = config_from_pkg_resources(
+    pkg_resource_defs=[
+        ('discursus_data_platform.utils.configs', 'bigquery_configs.yaml')
+    ],
+)
 snowflake_configs = config_from_pkg_resources(
     pkg_resource_defs=[
         ('discursus_data_platform.utils.configs', 'snowflake_configs.yaml')
@@ -28,7 +37,10 @@ openai_configs = config_from_pkg_resources(
     ],
 )
 
+
+# Initiate resources
 my_gdelt_resource = gdelt_resource.initiate_gdelt_resource.configured(None)
+my_bigquery_resource = bigquery_resource.configured(bigquery_configs)
 my_snowflake_resource = snowflake_resource.configured(snowflake_configs)
 my_dbt_resource = dbt_cli_resource.configured({
     "profiles_dir": DBT_PROFILES_DIR, 

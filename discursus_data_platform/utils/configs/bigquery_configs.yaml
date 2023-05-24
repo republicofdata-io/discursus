@@ -1,0 +1,6 @@
+gcp_credentials:
+  env: GOOGLE_APPLICATION_CREDENTIALS
+project: 
+  env: BIGQUERY_PROJECT
+location: 
+  env: BIGQUERY_LOCATION
