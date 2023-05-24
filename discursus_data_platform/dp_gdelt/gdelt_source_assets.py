@@ -105,13 +105,11 @@ def gdelt_mentions(context, gdelt_events):
 )
 def gdelt_gkg_articles(context):
     # Build source path
-    bigquery_client = context.resources.bigquery_resource.get_client()
-
-    gdelt_gkg_articles_df = bigquery_client.query(
-        (
-            'select * from gdelt-bq.gdeltv2.gkg_partitioned limit 10'
-        ),
-    ).result()
+    query = """
+        select * from gdelt-bq.gdeltv2.gkg_partitioned limit 10
+    """
+    query_job = context.resources.bigquery_resource.query(query)
+    gdelt_gkg_articles_df = query_job.to_dataframe()
 
     context.log.info(gdelt_gkg_articles_df)
     
