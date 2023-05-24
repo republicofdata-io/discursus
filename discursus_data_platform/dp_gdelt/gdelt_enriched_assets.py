@@ -82,7 +82,7 @@ def gdelt_mentions_enhanced(context, gdelt_mentions):
         'web_scraper_resource': my_resources.my_web_scraper_resource,
         'snowflake_resource': my_resources.my_snowflake_resource,
     },
-    auto_materialize_policy=AutoMaterializePolicy.eager(),
+    auto_materialize_policy=AutoMaterializePolicy.lazy(),
 )
 def gdelt_enhanced_articles(context, gdelt_gkg_articles):
     # Build source path
@@ -208,7 +208,7 @@ def gdelt_mention_summaries(context, gdelt_mentions_enhanced):
         'openai_resource': my_resources.my_openai_resource,
         'snowflake_resource': my_resources.my_snowflake_resource
     },
-    auto_materialize_policy=AutoMaterializePolicy.eager(),
+    auto_materialize_policy=AutoMaterializePolicy.lazy(),
 )
 def gdelt_article_summaries(context, gdelt_enhanced_articles):
     # Build sourcepath
