@@ -8,7 +8,6 @@ import json
 import base64
 from google.oauth2.service_account import Credentials
 from google.cloud import bigquery
-from google.cloud import bigquery
 
 from saf_aws import aws_resource
 from saf_gdelt import gdelt_resource
