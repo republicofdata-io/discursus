@@ -25,7 +25,7 @@ gdelt_partitions_def = DynamicPartitionsDefinition(name="dagster_partition_id")
         'bigquery_resource': my_resources.my_bigquery_resource,
     },
     auto_materialize_policy=AutoMaterializePolicy.eager(),
-    freshness_policy = FreshnessPolicy(maximum_lag_minutes=15),
+    freshness_policy = FreshnessPolicy(maximum_lag_minutes=60),
 )
 def gdelt_partitions(context):
     # Get list of partitions
@@ -53,8 +53,7 @@ def gdelt_partitions(context):
         order by dagster_partition_id
     """
 
-    query_job = context.resources.bigquery_resource.query(query)
-    gdelt_partitions_df = query_job.to_dataframe()
+    gdelt_partitions_df = context.resources.bigquery_resource.query(query)
 
     # Convert gdelt_partitions to list
     gdelt_partitions_ls = gdelt_partitions_df["dagster_partition_id"].tolist()
@@ -72,18 +71,18 @@ def gdelt_partitions(context):
 
 
 @asset(
-    non_argument_deps = {AssetKey(["gdelt", "gdelt_partitions"]),},
     description = "List of gkg articles mined on GDELT",
     key_prefix = ["gdelt"],
     group_name = "sources",
     resource_defs = {
         'aws_resource': my_resources.my_aws_resource,
+        'bigquery_resource': my_resources.my_bigquery_resource,
         'snowflake_resource': my_resources.my_snowflake_resource
     },
     auto_materialize_policy=AutoMaterializePolicy.eager(),
     partitions_def=gdelt_partitions_def,
 )
-def gdelt_gkg_articles(context, gdelt_partitions):
+def gdelt_gkg_articles(context):
     # Get partition
     dagster_partition_id = context.partition_key
 
@@ -177,8 +176,7 @@ def gdelt_gkg_articles(context, gdelt_partitions):
         from filter_themes
         order by gdelt_gkg_article_id
     """
-    query_job = context.resources.bigquery_resource.query(query)
-    gdelt_gkg_articles_df = query_job.to_dataframe()
+    gdelt_gkg_articles_df = context.resources.bigquery_resource.query(query)
 
     context.log.info(gdelt_gkg_articles_df)
     

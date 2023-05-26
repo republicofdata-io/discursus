@@ -3,11 +3,7 @@ from dagster_snowflake import snowflake_resource
 from dagster_dbt import dbt_cli_resource
 from dagster_hex.resources import hex_resource
 
-import os
-import json
-import base64
-from google.oauth2.service_account import Credentials
-from google.cloud import bigquery
+from discursus_data_platform.utils.resources import bigquery_resource
 
 from saf_aws import aws_resource
 from saf_gdelt import gdelt_resource
@@ -40,6 +36,7 @@ openai_configs = config_from_pkg_resources(
 
 # Initiate resources
 my_gdelt_resource = gdelt_resource.initiate_gdelt_resource.configured(None)
+my_bigquery_resource = bigquery_resource.bigquery_client.configured(None)
 my_snowflake_resource = snowflake_resource.configured(snowflake_configs)
 my_dbt_resource = dbt_cli_resource.configured({
     "profiles_dir": DBT_PROFILES_DIR, 
@@ -48,11 +45,3 @@ my_openai_resource = openai_resource.initiate_openai_resource.configured(openai_
 my_aws_resource = aws_resource.initiate_aws_resource.configured(None)
 my_web_scraper_resource = web_scraper_resource.initiate_web_scraper_resource.configured(None)
 my_hex_resource = hex_resource.configured(hex_configs)
-
-
-# Initiative BigQuery resource
-credentials_base64 = os.environ['GOOGLE_APPLICATION_CREDENTIALS_BASE64']
-credentials_json = base64.b64decode(credentials_base64).decode('utf-8')
-credentials_info = json.loads(credentials_json)
-credentials = Credentials.from_service_account_info(credentials_info)
-my_bigquery_resource = bigquery.Client(credentials=credentials, project=credentials_info['project_id'])
