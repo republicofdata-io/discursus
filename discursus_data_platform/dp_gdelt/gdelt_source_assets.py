@@ -71,6 +71,7 @@ def gdelt_partitions(context):
 
 
 @asset(
+    non_argument_deps = {AssetKey(["gdelt", "gdelt_partitions"]),},
     description = "List of gkg articles mined on GDELT",
     key_prefix = ["gdelt"],
     group_name = "sources",
@@ -79,7 +80,7 @@ def gdelt_partitions(context):
         'bigquery_resource': my_resources.my_bigquery_resource,
         'snowflake_resource': my_resources.my_snowflake_resource
     },
-    auto_materialize_policy=AutoMaterializePolicy.eager(),
+    auto_materialize_policy=AutoMaterializePolicy.eager(max_materializations_per_minute=None),
     partitions_def=gdelt_partitions_def,
 )
 def gdelt_gkg_articles(context):
