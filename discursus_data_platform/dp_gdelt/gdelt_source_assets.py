@@ -86,6 +86,10 @@ def gdelt_gkg_articles(context):
     # Get partition
     dagster_partition_id = context.partition_key
 
+    # Define S3 path
+    dagster_partition_date = dagster_partition_id[:8]
+    gdelt_asset_source_path = 'sources/gdelt/' + dagster_partition_date + '/' + dagster_partition_id + '.articles.csv'
+
     # Fetch articles for partition
     query = f"""
         with s_articles as (
@@ -178,12 +182,20 @@ def gdelt_gkg_articles(context):
     """
     gdelt_gkg_articles_df = context.resources.bigquery_resource.query(query)
 
-    context.log.info(gdelt_gkg_articles_df)
+    # Save data to S3
+    context.resources.aws_resource.s3_put(gdelt_gkg_articles_df, 'discursus-io', gdelt_asset_source_path)
+
+    # Transfer to Snowflake
+    # q_load_gdelt_articles = "alter pipe gdelt_articles_pipe refresh;"
+    # context.resources.snowflake_resource.execute_query(q_load_gdelt_articles)
     
     # Return asset
     return Output(
         value = gdelt_gkg_articles_df, 
         metadata = {
-            "rows": gdelt_gkg_articles_df.index.size
+            "s3_path": "s3://discursus-io/" + gdelt_asset_source_path,
+            "rows": gdelt_gkg_articles_df.index.size,
+            "min_gdelt_gkg_article_id": gdelt_gkg_articles_df["gdelt_gkg_article_id"].min(),
+            "max_gdelt_gkg_article_id": gdelt_gkg_articles_df["gdelt_gkg_article_id"].max(),
         },
     )
