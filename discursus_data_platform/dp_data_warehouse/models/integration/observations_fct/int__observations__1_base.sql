@@ -1,57 +1,85 @@
-with s_observations as (
+with s_historical_mentions as (
 
     select * from {{ ref('stg__gdelt__mentions') }}
 
 ),
 
-s_observation_summaries as (
+s_historical_mention_summaries as (
 
     select * from {{ ref('stg__gdelt__mention_summaries') }}
     where mention_url is not null
 
 ),
 
-s_observation_metadata as (
+s_historical_mention_metadata as (
 
     select * from {{ ref('stg__gdelt__mentions_metadata') }}
     where mention_url is not null
 
 ),
 
-s_observation_relevancy as (
+s_articles as (
 
-    select 
-        validation_fields,
-        trim(a.value) as include_regex
-
-    from {{ ref('stg__airbyte__observation_relevancy') }},
-    lateral split_to_table(stg__airbyte__observation_relevancy.include_regex, ',') a
+    select * from {{ ref('stg__gdelt__articles') }}
 
 ),
 
-final as (
+s_article_summaries as (
+
+    select * from {{ ref('stg__gdelt__articles_summary') }}
+
+),
+
+s_article_enhanced as (
+
+    select * from {{ ref('stg__gdelt__articles_enhanced') }}
+
+),
+
+historical_mentions as (
 
     select distinct
-        s_observations.gdelt_event_natural_key,
-        s_observations.mention_url as observation_url,
-        s_observations.mention_time_date as published_date,
+        cast(s_historical_mentions.gdelt_event_natural_key as string) as gdelt_event_sk,
+        s_historical_mentions.mention_url as observation_url,
+        s_historical_mentions.mention_time_date as published_date,
 
         'media article' as observation_type,
-        s_observation_metadata.page_name as observation_page_name,
-        s_observation_metadata.page_title as observation_page_title,
-        coalesce(s_observation_summaries.summary, s_observation_metadata.page_description) as observation_summary,
-        s_observation_metadata.keywords as observation_keywords
+        s_historical_mention_metadata.page_title as observation_page_title,
+        coalesce(s_historical_mention_summaries.summary, s_historical_mention_metadata.page_description) as observation_summary,
+        s_historical_mention_metadata.keywords as observation_keywords,
+        'gdelt historical' as observation_source
 
-    from s_observations
-    left join s_observation_summaries using (mention_url)
-    inner join s_observation_metadata using (mention_url)
-    inner join s_observation_relevancy
-        on (
-            s_observation_metadata.page_title regexp s_observation_relevancy.include_regex
-            or s_observation_metadata.page_description regexp s_observation_relevancy.include_regex
-            or lower(s_observation_summaries.summary) regexp s_observation_relevancy.include_regex
-        )
+    from s_historical_mentions
+    left join s_historical_mention_summaries using (mention_url)
+    inner join s_historical_mention_metadata using (mention_url)
+
+),
+
+articles as (
+
+    select distinct
+        s_articles.gdelt_event_sk,
+        s_articles.article_url as observation_url,
+        s_articles.creation_date as published_date,
+
+        'media article' as observation_type,
+        s_article_enhanced.page_title as observation_page_title,
+        coalesce(s_article_summaries.summary, s_article_enhanced.page_description) as observation_summary,
+        s_article_enhanced.keywords as observation_keywords,
+        'gdelt' as observation_source
+
+    from s_articles
+    left join s_article_summaries using (article_url)
+    inner join s_article_enhanced using (article_url)
+
+),
+
+merge_sources as (
+
+    select * from historical_mentions
+    union all
+    select * from articles
 
 )
 
-select * from final
+select * from merge_sources

@@ -26,10 +26,11 @@ final as (
         s_observations.observation_url,
         s_observations.observation_page_title,
         s_observations.observation_summary,
-        s_observations.observation_keywords
+        s_observations.observation_keywords,
+        s_observations.observation_source
 
     from s_events
-    inner join s_observations using (gdelt_event_natural_key)
+    inner join s_observations on cast(s_events.gdelt_event_natural_key as string) = s_observations.gdelt_event_sk
 
 )
 

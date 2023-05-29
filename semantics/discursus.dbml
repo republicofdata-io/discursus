@@ -31,7 +31,8 @@ table observations_fct [headercolor: #7DB9B6] {
     observation_page_title varchar
     observation_page_description varchar
     observation_keywords varchar
-    observation_summary text //To be added
+    observation_summary text
+    observation_source varchar
 }
 
 table actors_dim [headercolor: #E96479] { //To be added

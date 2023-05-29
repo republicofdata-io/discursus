@@ -42,6 +42,7 @@ format_fields as (
         lower(cast(social_image_url as string)) as social_image_url,
         lower(cast(social_video_url as string)) as social_video_url,
 
+        to_date(creation_ts) as creation_date,
         to_timestamp(creation_ts) as creation_ts,
         cast(dagster_partition_id as int) as dagster_partition_id,
         to_timestamp(bq_partition_id) as bq_partition_ts,
@@ -51,10 +52,23 @@ format_fields as (
 
 ),
 
+event_key as (
+
+    select
+        {{ dbt_utils.generate_surrogate_key([
+            'creation_date',
+            'primary_location'
+        ]) }} as gdelt_event_sk,
+        *
+
+    from format_fields
+
+),
+
 filter_articles as (
 
-    select format_fields.*
-    from format_fields
+    select event_key.*
+    from event_key
     inner join s_article_summaries using (article_url)
 
 )
