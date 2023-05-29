@@ -6,7 +6,7 @@
     )
 }}
 
-with source as (
+with s_enhanced_articles as (
 
     select
         *,
@@ -22,7 +22,13 @@ with source as (
 
 ),
 
-final as (
+s_article_summaries as (
+
+    select * from {{ ref('stg__gdelt__articles_summary') }}
+
+),
+
+format_fields as (
 
     select
         lower(cast(article_url as string)) as article_url,
@@ -34,9 +40,16 @@ final as (
 
         source_file_date
 
-    from source
+    from s_enhanced_articles
+
+),
+
+filter_articles as (
+
+    select format_fields.*
+    from format_fields
+    inner join s_article_summaries using (article_url)
 
 )
 
-
-select * from final
+select * from filter_articles

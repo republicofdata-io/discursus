@@ -37,6 +37,7 @@ table observations_fct [headercolor: #7DB9B6] {
 table actors_dim [headercolor: #E96479] { //To be added
     actor_pk varchar [pk]
     actor_name varchar
+    actor_type varchar
 }
 
 table events_movements_bridge [headercolor: #4D455D] {

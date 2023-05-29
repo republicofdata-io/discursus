@@ -14,9 +14,13 @@ with s_actors as (
 final as (
 
   select
-    {{ dbt_utils.generate_surrogate_key(['actor_name']) }} as actor_pk, 
+    {{ dbt_utils.generate_surrogate_key([
+      'actor_name',
+      'actor_type'
+    ]) }} as actor_pk, 
 
-    actor_name
+    actor_name,
+    actor_type
 
   from s_actors
 
