@@ -9,7 +9,9 @@ from dagster import (
 )
 from dagster_aws.s3 import s3_pickle_io_manager, s3_resource
 
+import openai.error
 import pandas as pd
+import time
 
 from discursus_data_platform.utils.resources import my_resources
 
@@ -36,7 +38,7 @@ def gdelt_partitions(context):
         latest_gdelt_quarter_hour_partition = gdelt_dagster_partitions[-1]
         latest_gdelt_daily_partition = latest_gdelt_quarter_hour_partition[:8] + '000000'
     except:
-        latest_gdelt_quarter_hour_partition = '20230529150000'
+        latest_gdelt_quarter_hour_partition = '20230529163000'
         latest_gdelt_daily_partition = latest_gdelt_quarter_hour_partition[:8] + '000000'
 
     context.log.info("Latest gdelt 15 min partition: " + latest_gdelt_quarter_hour_partition)
@@ -241,13 +243,13 @@ def gdelt_articles_enhanced(context, gdelt_gkg_articles):
 
     # Create dataframe
     column_names = ['article_url', 'file_name', 'title', 'description', 'keywords', 'content']
-    df_gdelt_articles_enhanced = pd.DataFrame(columns = column_names)
+    gdelt_articles_enhanced_df = pd.DataFrame(columns = column_names)
 
     for _, row in df_articles.iterrows():
         scraped_article = context.resources.web_scraper_resource.scrape_article(row["article_url"])
 
         if scraped_article is None:
-            scraped_article = {}
+            continue
     
         # Use get method with default value (empty string) for each element in scraped_row
         scraped_row = [
@@ -259,11 +261,11 @@ def gdelt_articles_enhanced(context, gdelt_gkg_articles):
             scraped_article.get('content', '')
         ]
         
-        df_length = len(df_gdelt_articles_enhanced)
-        df_gdelt_articles_enhanced.loc[df_length] = scraped_row # type: ignore
+        df_length = len(gdelt_articles_enhanced_df)
+        gdelt_articles_enhanced_df.loc[df_length] = scraped_row # type: ignore
     
     # Save data to S3
-    context.resources.aws_resource.s3_put(df_gdelt_articles_enhanced, 'discursus-io', gdelt_asset_source_path)
+    context.resources.aws_resource.s3_put(gdelt_articles_enhanced_df, 'discursus-io', gdelt_asset_source_path)
 
     # Transfer to Snowflake
     q_load_gdelt_mentions_enhanced_events = "alter pipe gdelt_enhanced_articles_pipe refresh;"
@@ -271,9 +273,72 @@ def gdelt_articles_enhanced(context, gdelt_gkg_articles):
 
     # Return asset
     return Output(
-        value = df_gdelt_articles_enhanced, 
+        value = gdelt_articles_enhanced_df, 
         metadata = {
             "s3_path": "s3://discursus-io/" + gdelt_asset_source_path,
-            "rows": df_gdelt_articles_enhanced.index.size
+            "rows": gdelt_articles_enhanced_df.index.size
+        }
+    )
+
+
+@asset(
+    ins = {"gdelt_articles_enhanced": AssetIn(key_prefix = "gdelt")},
+    description = "LLM-generated summary of GDELT articles",
+    key_prefix = ["gdelt"],
+    group_name = "prepared_sources",
+    resource_defs = {
+        'aws_resource': my_resources.my_aws_resource,
+        'gdelt_resource': my_resources.my_gdelt_resource,
+        'openai_resource': my_resources.my_openai_resource,
+        'snowflake_resource': my_resources.my_snowflake_resource
+    },
+    auto_materialize_policy=AutoMaterializePolicy.eager(max_materializations_per_minute=None),
+    partitions_def=gdelt_partitions_def,
+)
+def gdelt_article_summaries(context, gdelt_articles_enhanced):
+    # Get partition
+    dagster_partition_id = context.partition_key
+
+    # Define S3 path
+    dagster_partition_date = dagster_partition_id[:8]
+    gdelt_asset_source_path = 'sources/gdelt/' + dagster_partition_date + '/' + dagster_partition_id + '.articles.summary.csv'
+
+    # Cycle through each article in gdelt_mentions_enhanced and generate a summary
+    gdelt_article_summaries_df = pd.DataFrame(columns = ['article_url', 'summary'])
+    for _, row in gdelt_articles_enhanced.iterrows():
+        prompt = f"""Write a concise summary for the following article:
+        
+        Title: {row['title']}
+        Description: {row['description']}
+        Content: {row['content'][:3000]}
+
+        CONCISE SUMMARY:"""
+    
+        # Keep retrying the request until it succeeds
+        while True:
+            try:
+                completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt, max_tokens=2048)
+                break
+            except openai.error.RateLimitError as e:
+                # Wait for 5 seconds before retrying
+                time.sleep(5)
+                continue
+
+        df_length = len(gdelt_article_summaries_df)
+        gdelt_article_summaries_df.loc[df_length] = [row['article_url'], completion_str] # type: ignore
+
+     # Save data to S3
+    context.resources.aws_resource.s3_put(gdelt_article_summaries_df, 'discursus-io', gdelt_asset_source_path)
+
+    # Transfer to Snowflake
+    q_load_gdelt_article_summaries_events = "alter pipe gdelt_article_summaries_pipe refresh;"
+    snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_article_summaries_events)
+
+    # Return asset
+    return Output(
+        value = gdelt_article_summaries_df, 
+        metadata = {
+            "s3_path": "s3://discursus-io/" + gdelt_asset_source_path,
+            "rows": gdelt_article_summaries_df.index.size
         }
     )
