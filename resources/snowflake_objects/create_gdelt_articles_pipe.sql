@@ -1,19 +1,20 @@
-create pipe gdelt_gkg_articles_pipe as
+create pipe gdelt_articles_pipe as
 
-copy into gdelt_gkg_articles(
+copy into gdelt_articles(
 
-  gdelt_gkg_id,
-  gdelt_gkg_date_time,
+  gdelt_gkg_article_id,
+  article_url,
   source_collection_id,
-  source_domain,
-  article_identifier,
-  counts,
   themes,
   locations,
+  primary_location,
   persons,
   organizations,
-  article_image_url,
-  article_video_url,
+  social_image_url,
+  social_video_url,
+  creation_ts,
+  dagster_partition_id,
+  bq_partition_id,
   metadata_filename
 
 )
@@ -33,12 +34,13 @@ from (
     t.$10,
     t.$11,
     t.$12,
+    t.$13,
     metadata$filename::string
 
   from @s3_dio_sources/gdelt (
 
     file_format => csv,
-    pattern => '.*.gkg.csv'
+    pattern => '.*.articles.csv'
 
   ) t
 );

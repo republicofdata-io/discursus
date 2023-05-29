@@ -9,7 +9,7 @@ from dagster_aws.s3 import s3_pickle_io_manager, s3_resource
 from dagster_dbt import dbt_cli_resource, load_assets_from_dbt_project
 
 from discursus_data_platform import (
-    dp_gdelt,
+    dp_sources,
     dp_apps
 )
 
@@ -23,7 +23,7 @@ my_assets = with_resources(
         key_prefix = ["data_warehouse"],
         use_build_command = False
     ) + 
-    load_assets_from_package_module(dp_gdelt) + # type: ignore
+    load_assets_from_package_module(dp_sources) + # type: ignore
     load_assets_from_package_module(dp_apps),
     resource_defs = {
         "dbt": dbt_cli_resource.configured(
