@@ -1,6 +1,6 @@
 with s_named_entities as (
 
-    select * from {{ ref('stg__gdelt__mention_named_entities') }}
+    select * from {{ ref('int__actors') }}
 
 ),
 
@@ -16,10 +16,11 @@ merge_sources as (
         s_events_observations.published_date,
         s_events_observations.action_geo_latitude,
         s_events_observations.action_geo_longitude,
-        s_named_entities.entity_name as actor_name
+        s_named_entities.actor_name,
+        s_named_entities.actor_type
     
     from s_events_observations
-    inner join s_named_entities on s_events_observations.observation_url = s_named_entities.mention_url
+    inner join s_named_entities on s_events_observations.observation_url = s_named_entities.article_url
 
 )
 

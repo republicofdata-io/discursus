@@ -19,7 +19,8 @@ bridge as (
             'action_geo_longitude'
         ]) }} as event_fk,
         {{ dbt_utils.generate_surrogate_key([
-            'actor_name'
+            'actor_name',
+            'actor_type'
         ]) }} as actor_fk
 
     from s_events_actors

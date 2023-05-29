@@ -44,6 +44,21 @@ dedup as (
     from clean_up
 
 
+),
+
+filter_protest_articles as (
+
+    select
+        *,
+        case
+            when summary like '%protest%' then true
+            when summary like '%manifest%' then true
+            else false
+        end as is_protest_article
+
+    from dedup
+
 )
 
-select * from dedup
+select * from filter_protest_articles
+where is_protest_article

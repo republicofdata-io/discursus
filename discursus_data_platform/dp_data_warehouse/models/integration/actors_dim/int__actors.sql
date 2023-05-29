@@ -6,7 +6,8 @@ with s_named_entities as (
 
 persons as (
 
-    select distinct
+    select
+        article_url,
         t.value as actor_name,
         'person' as actor_type
     
@@ -17,7 +18,8 @@ persons as (
 
 organizations as (
 
-    select distinct
+    select
+        article_url,
         t.value as actor_name,
         'organization' as actor_type
     

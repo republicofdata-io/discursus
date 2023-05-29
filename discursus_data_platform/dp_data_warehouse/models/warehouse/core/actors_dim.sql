@@ -6,7 +6,11 @@
 
 with s_actors as (
 
-  select * from {{ ref('int__actors') }}
+  select distinct
+    actor_name,
+    actor_type
+    
+  from {{ ref('int__actors') }}
 
 
 ),
