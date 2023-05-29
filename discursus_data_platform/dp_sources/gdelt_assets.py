@@ -1,5 +1,6 @@
 from dagster import (
     asset,
+    AssetIn,
     AssetKey,
     AutoMaterializePolicy,
     DynamicPartitionsDefinition,
@@ -35,7 +36,7 @@ def gdelt_partitions(context):
         latest_gdelt_quarter_hour_partition = gdelt_dagster_partitions[-1]
         latest_gdelt_daily_partition = latest_gdelt_quarter_hour_partition[:8] + '000000'
     except:
-        latest_gdelt_quarter_hour_partition = '20230529000000'
+        latest_gdelt_quarter_hour_partition = '20230529150000'
         latest_gdelt_daily_partition = latest_gdelt_quarter_hour_partition[:8] + '000000'
 
     context.log.info("Latest gdelt 15 min partition: " + latest_gdelt_quarter_hour_partition)
@@ -210,4 +211,69 @@ def gdelt_gkg_articles(context):
             "min_gdelt_gkg_article_id": gdelt_gkg_articles_df["gdelt_gkg_article_id"].min(),
             "max_gdelt_gkg_article_id": gdelt_gkg_articles_df["gdelt_gkg_article_id"].max(),
         },
+    )
+
+
+@asset(
+    ins = {"gdelt_gkg_articles": AssetIn(key_prefix = "gdelt")},
+    description = "List of enhanced articles mined from GDELT",
+    key_prefix = ["gdelt"],
+    group_name = "prepared_sources",
+    resource_defs = {
+        'aws_resource': my_resources.my_aws_resource,
+        'gdelt_resource': my_resources.my_gdelt_resource,
+        'web_scraper_resource': my_resources.my_web_scraper_resource,
+        'snowflake_resource': my_resources.my_snowflake_resource,
+    },
+    auto_materialize_policy=AutoMaterializePolicy.eager(max_materializations_per_minute=None),
+    partitions_def=gdelt_partitions_def,
+)
+def gdelt_articles_enhanced(context, gdelt_gkg_articles):
+    # Get partition
+    dagster_partition_id = context.partition_key
+
+    # Define S3 path
+    dagster_partition_date = dagster_partition_id[:8]
+    gdelt_asset_source_path = 'sources/gdelt/' + dagster_partition_date + '/' + dagster_partition_id + '.articles.enhanced.csv'
+
+    # Dedup articles based on article_url field
+    df_articles = gdelt_gkg_articles.drop_duplicates(subset=["article_url"], keep='first')
+
+    # Create dataframe
+    column_names = ['article_url', 'file_name', 'title', 'description', 'keywords', 'content']
+    df_gdelt_articles_enhanced = pd.DataFrame(columns = column_names)
+
+    for _, row in df_articles.iterrows():
+        scraped_article = context.resources.web_scraper_resource.scrape_article(row["article_url"])
+
+        if scraped_article is None:
+            scraped_article = {}
+    
+        # Use get method with default value (empty string) for each element in scraped_row
+        scraped_row = [
+            scraped_article.get('url', ''),
+            scraped_article.get('filename', ''),
+            scraped_article.get('title', ''),
+            scraped_article.get('description', ''),
+            scraped_article.get('keywords', ''),
+            scraped_article.get('content', '')
+        ]
+        
+        df_length = len(df_gdelt_articles_enhanced)
+        df_gdelt_articles_enhanced.loc[df_length] = scraped_row # type: ignore
+    
+    # Save data to S3
+    context.resources.aws_resource.s3_put(df_gdelt_articles_enhanced, 'discursus-io', gdelt_asset_source_path)
+
+    # Transfer to Snowflake
+    q_load_gdelt_mentions_enhanced_events = "alter pipe gdelt_enhanced_articles_pipe refresh;"
+    snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_mentions_enhanced_events)
+
+    # Return asset
+    return Output(
+        value = df_gdelt_articles_enhanced, 
+        metadata = {
+            "s3_path": "s3://discursus-io/" + gdelt_asset_source_path,
+            "rows": df_gdelt_articles_enhanced.index.size
+        }
     )

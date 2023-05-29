@@ -1,6 +1,6 @@
 create table gdelt_enhanced_articles (
 
-    article_identifier varchar,
+    article_url varchar,
     file_name varchar,
     page_title varchar,
     page_description varchar,

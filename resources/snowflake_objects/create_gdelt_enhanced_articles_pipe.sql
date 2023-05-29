@@ -2,7 +2,7 @@ create pipe gdelt_enhanced_articles_pipe as
 
 copy into gdelt_enhanced_articles(
 
-  article_identifier,
+  article_url,
   file_name,
   page_title,
   page_description,

@@ -35,6 +35,11 @@ seeds:
 
 models:
     discursus_dw:
+        # +dagster_freshness_policy:
+        #     maximum_lag_minutes: !!float 360
+        # +dagster_auto_materialize_policy: 
+        #     type: lazy
+
         +persist_docs:
             relation: true
             columns: true
