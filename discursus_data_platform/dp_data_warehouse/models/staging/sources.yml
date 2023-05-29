@@ -11,6 +11,9 @@ sources:
 
     tables:
       - name: gdelt_articles
+      - name: gdelt_articles_enhanced
+        identifier: gdelt_enhanced_articles
+      - name: gdelt_article_summaries
       - name: gdelt_events
       - name: gdelt_mentions
       - name: gdelt_mentions_enhanced
