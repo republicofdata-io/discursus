@@ -38,7 +38,7 @@ def gdelt_partitions(context):
         latest_gdelt_quarter_hour_partition = gdelt_dagster_partitions[-1]
         latest_gdelt_daily_partition = latest_gdelt_quarter_hour_partition[:8] + '000000'
     except:
-        latest_gdelt_quarter_hour_partition = '20230529163000'
+        latest_gdelt_quarter_hour_partition = '20230529000000'
         latest_gdelt_daily_partition = latest_gdelt_quarter_hour_partition[:8] + '000000'
 
     context.log.info("Latest gdelt 15 min partition: " + latest_gdelt_quarter_hour_partition)
