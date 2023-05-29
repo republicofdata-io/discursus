@@ -10,6 +10,7 @@ sources:
       error_after: {count: 2, period: day}
 
     tables:
+      - name: gdelt_articles
       - name: gdelt_events
       - name: gdelt_mentions
       - name: gdelt_mentions_enhanced
