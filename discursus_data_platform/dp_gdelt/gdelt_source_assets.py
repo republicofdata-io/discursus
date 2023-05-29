@@ -23,19 +23,32 @@ gdelt_partitions_def = DynamicPartitionsDefinition(name="dagster_partition_id")
     group_name = "sources",
     resource_defs = {
         'bigquery_resource': my_resources.my_bigquery_resource,
+        'snowflake_resource': my_resources.my_snowflake_resource,
     },
     auto_materialize_policy=AutoMaterializePolicy.eager(),
     freshness_policy = FreshnessPolicy(maximum_lag_minutes=60),
 )
 def gdelt_partitions(context):
+    # Get latest record id
+    try:
+        gdelt_dagster_partitions = context.instance.get_dynamic_partitions("dagster_partition_id")
+        latest_gdelt_quarter_hour_partition = gdelt_dagster_partitions[-1]
+        latest_gdelt_daily_partition = latest_gdelt_quarter_hour_partition[:8] + '000000'
+    except:
+        latest_gdelt_quarter_hour_partition = '20230529000000'
+        latest_gdelt_daily_partition = latest_gdelt_quarter_hour_partition[:8] + '000000'
+
+    context.log.info("Latest gdelt 15 min partition: " + latest_gdelt_quarter_hour_partition)
+    context.log.info("Latest gdelt hourly partition: " + latest_gdelt_daily_partition)
+
     # Get list of partitions
-    query = """
+    query = f"""
         with new_articles as (
 
             select distinct `DATE` as dagster_partition_id
             from `gdelt-bq.gdeltv2.gkg_partitioned`
-            where _PARTITIONTIME >= parse_timestamp('%Y%m%d%H%M%S', '20230523100000')
-            and GKGRECORDID > '20230523100000'
+            where _PARTITIONTIME >= parse_timestamp('%Y%m%d%H%M%S', '{latest_gdelt_daily_partition}')
+            and `DATE` > {latest_gdelt_quarter_hour_partition}
             order by 1
 
         ),
@@ -59,8 +72,6 @@ def gdelt_partitions(context):
     gdelt_partitions_ls = gdelt_partitions_df["dagster_partition_id"].tolist()
     context.instance.add_dynamic_partitions("dagster_partition_id", gdelt_partitions_ls)
 
-    context.log.info(gdelt_partitions)
-    
     # Return asset
     return Output(
         value = gdelt_partitions_df, 
@@ -78,7 +89,7 @@ def gdelt_partitions(context):
     resource_defs = {
         'aws_resource': my_resources.my_aws_resource,
         'bigquery_resource': my_resources.my_bigquery_resource,
-        'snowflake_resource': my_resources.my_snowflake_resource
+        'snowflake_resource': my_resources.my_snowflake_resource,
     },
     auto_materialize_policy=AutoMaterializePolicy.eager(max_materializations_per_minute=None),
     partitions_def=gdelt_partitions_def,
@@ -187,8 +198,8 @@ def gdelt_gkg_articles(context):
     context.resources.aws_resource.s3_put(gdelt_gkg_articles_df, 'discursus-io', gdelt_asset_source_path)
 
     # Transfer to Snowflake
-    # q_load_gdelt_articles = "alter pipe gdelt_articles_pipe refresh;"
-    # context.resources.snowflake_resource.execute_query(q_load_gdelt_articles)
+    q_load_gdelt_articles = "alter pipe gdelt_articles_pipe refresh;"
+    context.resources.snowflake_resource.execute_query(q_load_gdelt_articles)
     
     # Return asset
     return Output(
