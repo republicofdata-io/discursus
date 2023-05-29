@@ -310,14 +310,14 @@ def gdelt_article_summaries(context, gdelt_articles_enhanced):
         
         Title: {row['title']}
         Description: {row['description']}
-        Content: {row['content'][:3000]}
+        Content: {row['content'][:2500]}
 
         CONCISE SUMMARY:"""
     
         # Keep retrying the request until it succeeds
         while True:
             try:
-                completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt, max_tokens=2048)
+                completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt, max_tokens=1500)
                 break
             except openai.error.RateLimitError as e:
                 # Wait for 5 seconds before retrying
