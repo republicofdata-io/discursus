@@ -4,6 +4,7 @@
         incremental_strategy = 'delete+insert',
         unique_key = 'mention_url',
         dagster_auto_materialize_policy = {"type": "lazy"},
+        dagster_freshness_policy = {"maximum_lag_minutes": 60 * 24 * 7},
     )
 }}
 

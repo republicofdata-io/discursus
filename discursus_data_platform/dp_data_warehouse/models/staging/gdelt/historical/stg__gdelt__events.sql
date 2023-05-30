@@ -2,8 +2,9 @@
     config(
         materialized = 'incremental',
         incremental_strategy = 'delete+insert',
-        unique_key = 'gdelt_event_natural_key',
+        unique_key = 'gdelt_event_sk',
         dagster_auto_materialize_policy = {"type": "lazy"},
+        dagster_freshness_policy = {"maximum_lag_minutes": 60 * 24 * 7},
     )
 }}
 
@@ -129,6 +130,7 @@ get_unique_geo as (
 
     select distinct
         format_fields.gdelt_event_sk,
+        format_fields.creation_ts,
         format_fields.published_date,
         first_value(format_fields.action_geo_full_name) over (partition by {{ partition_window }} order by format_fields.action_geo_full_name) as action_geo_full_name,
         format_fields.action_geo_country_code,
@@ -145,6 +147,7 @@ extract_state_city as (
 
     select distinct
         gdelt_event_sk,
+        creation_ts,
         published_date,
         action_geo_full_name,
         action_geo_country_code,
