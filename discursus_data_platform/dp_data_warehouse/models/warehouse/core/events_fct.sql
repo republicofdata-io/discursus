@@ -15,8 +15,7 @@ final as (
     select distinct
         {{ dbt_utils.generate_surrogate_key([
             'event_date',
-            'action_geo_latitude',
-            'action_geo_longitude'
+            'action_geo_full_name'
         ]) }} as event_pk, 
 
         event_date, 

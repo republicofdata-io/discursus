@@ -16,6 +16,7 @@ merge_sources as (
         s_events_observations.event_date,
         s_events_observations.action_geo_latitude,
         s_events_observations.action_geo_longitude,
+        s_events_observations.action_geo_full_name,
         s_named_entities.actor_name,
         s_named_entities.actor_type
     

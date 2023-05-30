@@ -14,11 +14,11 @@ final as (
 
     select distinct
         {{ dbt_utils.generate_surrogate_key([
-            'published_date',
+            'event_date',
             'observation_url'
         ]) }} as observation_pk,
 
-        published_date,
+        event_date as published_date,
 
         observation_type,
         observation_url,

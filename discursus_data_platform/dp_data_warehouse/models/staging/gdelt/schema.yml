@@ -5,8 +5,19 @@ models:
   description: Source table for GDELT event
 
   columns:
-  - name: gdelt_event_natural_key
-    description: Unique dw key
+  - name: gdelt_event_sk
+    description: Unique source key
+    tests:
+    - unique
+    - not_null
+    - dbt_utils.at_least_one
+
+- name: stg__gdelt__articles
+  description: Source table for GDELT articles
+
+  columns:
+  - name: gdelt_gkg_article_id
+    description: Unique source key
     tests:
     - unique
     - not_null

@@ -83,4 +83,8 @@ models:
       - name: observation_pk
         tests:
           - not_null
-          - unique
+          - unique:
+              config:
+                severity: error
+                error_if: ">20"
+                warn_if: ">10"

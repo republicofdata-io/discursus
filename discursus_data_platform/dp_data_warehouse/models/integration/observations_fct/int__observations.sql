@@ -8,6 +8,7 @@ final as (
 
     select
         event_date,
+        action_geo_full_name,
         action_geo_latitude,
         action_geo_longitude,
         split(split(observation_url, '//')[1], '/')[0]::string as observer_domain,
