@@ -38,7 +38,7 @@ def gdelt_partitions(context):
         latest_gdelt_quarter_hour_partition = gdelt_dagster_partitions[-1]
         latest_gdelt_daily_partition = latest_gdelt_quarter_hour_partition[:8] + '000000'
     except:
-        latest_gdelt_quarter_hour_partition = '20230529000000'
+        latest_gdelt_quarter_hour_partition = '20230530120000'
         latest_gdelt_daily_partition = latest_gdelt_quarter_hour_partition[:8] + '000000'
 
     context.log.info("Latest gdelt 15 min partition: " + latest_gdelt_quarter_hour_partition)
@@ -85,7 +85,6 @@ def gdelt_partitions(context):
 
 
 @asset(
-    non_argument_deps = {AssetKey(["gdelt", "gdelt_partitions"]),},
     description = "List of gkg articles mined on GDELT",
     key_prefix = ["gdelt"],
     group_name = "sources",
@@ -246,7 +245,10 @@ def gdelt_articles_enhanced(context, gdelt_gkg_articles):
     gdelt_articles_enhanced_df = pd.DataFrame(columns = column_names)
 
     for _, row in df_articles.iterrows():
-        scraped_article = context.resources.web_scraper_resource.scrape_article(row["article_url"])
+        try:
+            scraped_article = context.resources.web_scraper_resource.scrape_article(row["article_url"])
+        except IndexError:
+            continue
 
         if scraped_article is None:
             continue
