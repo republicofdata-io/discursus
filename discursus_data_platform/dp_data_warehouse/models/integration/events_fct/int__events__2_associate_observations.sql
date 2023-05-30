@@ -13,6 +13,7 @@ s_observations as (
 final as (
 
     select distinct
+        s_events.event_date,
         s_events.action_geo_full_name,
         s_events.action_geo_country_code,
         s_events.action_geo_country_name,
@@ -21,15 +22,16 @@ final as (
         s_events.action_geo_latitude, 
         s_events.action_geo_longitude,
         s_events.action_geo_h3_r3,
-        s_observations.published_date,
+        s_events.event_source,
         s_observations.observation_type,
         s_observations.observation_url,
         s_observations.observation_page_title,
         s_observations.observation_summary,
-        s_observations.observation_keywords
+        s_observations.observation_keywords,
+        s_observations.observation_source
 
     from s_events
-    inner join s_observations using (gdelt_event_natural_key)
+    inner join s_observations using (gdelt_event_sk)
 
 )
 

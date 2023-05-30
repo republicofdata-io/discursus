@@ -2,11 +2,12 @@
     config(
         materialized = 'incremental',
         incremental_strategy = 'delete+insert',
-        unique_key = 'mention_url'
+        unique_key = 'mention_url',
+        dagster_auto_materialize_policy = {"type": "lazy"},
     )
 }}
 
-with source as (
+with s_mention_metadata as (
 
     select
         *,
@@ -24,7 +25,13 @@ with source as (
 
 ),
 
-final as (
+s_mention_summaries as (
+
+    select * from {{ ref('stg__gdelt__mention_summaries') }}
+
+),
+
+format_fields as (
 
     select distinct
         case
@@ -48,8 +55,16 @@ final as (
             else lower(keywords::string)
         end as keywords
 
-    from source
+    from s_mention_metadata
+
+),
+
+filter_articles as (
+
+    select format_fields.*
+    from format_fields
+    inner join s_mention_summaries using (mention_url)
 
 )
 
-select * from final
+select * from filter_articles

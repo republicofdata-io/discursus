@@ -27,8 +27,8 @@ associate_movements as (
     from s_events
     left join s_movements on
         array_contains(s_events.action_geo_country_code::variant, split(s_movements.countries, ','))
-        and s_events.published_date >= s_movements.published_date_start
-        and s_events.published_date <= coalesce(s_movements.published_date_end, current_date())
+        and s_events.event_date >= s_movements.published_date_start
+        and s_events.event_date <= coalesce(s_movements.published_date_end, current_date())
         and(
             lower(s_events.observation_summary) regexp s_movements.page_description_regex
             or lower(s_events.observation_page_title) regexp s_movements.page_description_regex
@@ -40,7 +40,7 @@ count_movements as (
 
     select
         *,
-        count(movement_name) over (partition by published_date, action_geo_longitude, action_geo_latitude order by movement_name) as movement_count
+        count(movement_name) over (partition by event_date, action_geo_longitude, action_geo_latitude order by movement_name) as movement_count
 
     from associate_movements
 

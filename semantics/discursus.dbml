@@ -12,6 +12,7 @@ table events_fct [headercolor: #7DB9B6] {
     action_geo_city_name varchar
     action_geo_longitude numeric
     action_geo_latitude numeric
+    action_geo_h3_r3 varchar
 }
 
 table movements_dim [headercolor: #E96479] {
@@ -31,12 +32,14 @@ table observations_fct [headercolor: #7DB9B6] {
     observation_page_title varchar
     observation_page_description varchar
     observation_keywords varchar
-    observation_summary text //To be added
+    observation_summary text
+    observation_source varchar
 }
 
 table actors_dim [headercolor: #E96479] { //To be added
     actor_pk varchar [pk]
     actor_name varchar
+    actor_type varchar
 }
 
 table events_movements_bridge [headercolor: #4D455D] {

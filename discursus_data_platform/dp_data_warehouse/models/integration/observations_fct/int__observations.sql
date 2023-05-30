@@ -7,7 +7,8 @@ with s_observations as (
 final as (
 
     select
-        published_date,
+        event_date,
+        action_geo_full_name,
         action_geo_latitude,
         action_geo_longitude,
         split(split(observation_url, '//')[1], '/')[0]::string as observer_domain,
@@ -15,7 +16,8 @@ final as (
         observation_url,
         observation_page_title,
         observation_summary,
-        observation_keywords
+        observation_keywords,
+        observation_source
     
     from s_observations
 

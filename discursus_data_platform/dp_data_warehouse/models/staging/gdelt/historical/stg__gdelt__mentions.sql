@@ -2,11 +2,12 @@
     config(
         materialized = 'incremental',
         incremental_strategy = 'delete+insert',
-        unique_key = 'mention_url'
+        unique_key = 'mention_url',
+        dagster_auto_materialize_policy = {"type": "lazy"},
     )
 }}
 
-with source as (
+with s_mentions as (
 
     select
         *,
@@ -17,6 +18,12 @@ with source as (
     {% else %}
         where date(split(metadata_filename, '/')[2], 'yyyymmdd') >= dateadd(week, -52, current_date)
     {% endif %}
+
+),
+
+s_mention_summaries as (
+
+    select * from {{ ref('stg__gdelt__mention_summaries') }}
 
 ),
 
@@ -44,13 +51,13 @@ format_fields as (
         lower(cast(mention_doc_tone as float)) as mention_doc_tone,
         lower(cast(mention_doc_translation_info as string)) as mention_doc_translation_info
 
-    from source
+    from s_mentions
 
 ),
 
 {% set partition = '(partition by mention_url order by sentence_id, confidence desc)' %}
 
-final as (
+dedup as (
 
     select distinct
         mention_url,
@@ -73,7 +80,14 @@ final as (
 
     from format_fields
 
+),
+
+filter_articles as (
+
+    select dedup.*
+    from dedup
+    inner join s_mention_summaries using (mention_url)
+
 )
 
-
-select * from final
+select * from filter_articles
