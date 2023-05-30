@@ -29,7 +29,7 @@ gdelt_partitions_def = DynamicPartitionsDefinition(name="dagster_partition_id")
         'snowflake_resource': my_resources.my_snowflake_resource,
     },
     auto_materialize_policy=AutoMaterializePolicy.eager(),
-    freshness_policy = FreshnessPolicy(maximum_lag_minutes=60),
+    freshness_policy = FreshnessPolicy(maximum_lag_minutes=15),
 )
 def gdelt_partitions(context):
     # Get latest record id
