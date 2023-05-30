@@ -52,6 +52,39 @@ format_fields as (
 
 ),
 
+extract_geographical_fields as (
+
+    select
+        *,
+        split_part(primary_location, '#', 2) as action_geo_full_name,
+        split_part(primary_location, '#', 3) as action_geo_country_code,
+        case
+            when regexp_count(split_part(primary_location, '#', 2), ',') = 2 then
+                trim(split_part(split_part(primary_location, '#', 2), ',', 3))
+            when regexp_count(split_part(primary_location, '#', 2), ',') = 1 then
+                trim(split_part(split_part(primary_location, '#', 2), ',', 2))
+            else
+                trim(split_part(primary_location, '#', 2))
+        end as action_geo_country_name,
+        case
+            when regexp_count(split_part(primary_location, '#', 2), ',') = 2 then
+                trim(split_part(split_part(primary_location, '#', 2), ',', 2))
+            when regexp_count(split_part(primary_location, '#', 2), ',') = 1 then
+                trim(split_part(split_part(primary_location, '#', 2), ',', 1))
+            else null
+        end as action_geo_state_name,
+        case
+            when regexp_count(split_part(primary_location, '#', 2), ',') = 2 then
+                trim(split_part(split_part(primary_location, '#', 2), ',', 1))
+            else null
+        end as action_geo_city_name,
+        cast(split_part(primary_location, '#', 5) as number(8,6)) as action_geo_latitude,
+        cast(split_part(primary_location, '#', 6) as number(9,6)) as action_geo_longitude
+    
+    from format_fields
+
+),
+
 event_key as (
 
     select
@@ -59,9 +92,32 @@ event_key as (
             'creation_date',
             'primary_location'
         ]) }} as gdelt_event_sk,
-        *
+        
+        gdelt_gkg_article_id,
+        article_url,
 
-    from format_fields
+        themes,
+        locations,
+        primary_location,
+        action_geo_full_name,
+        action_geo_country_code,
+        action_geo_country_name,
+        action_geo_state_name,
+        action_geo_city_name,
+        action_geo_latitude,
+        action_geo_longitude,
+        persons,
+        organizations,
+        social_image_url,
+        social_video_url,
+
+        creation_date,
+        creation_ts,
+        dagster_partition_id,
+        bq_partition_ts,
+        source_file_date
+
+    from extract_geographical_fields
 
 ),
 
