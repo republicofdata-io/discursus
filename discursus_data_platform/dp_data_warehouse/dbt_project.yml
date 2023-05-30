@@ -45,11 +45,11 @@ models:
             columns: true
             
         staging:
-            materialized: view
+            materialized: table
             schema: staging
 
         integration:
-            materialized: view
+            materialized: table
             schema: integration
             
         warehouse:

@@ -14,7 +14,7 @@ bridge as (
 
     select distinct
         {{ dbt_utils.generate_surrogate_key([
-            'published_date',
+            'event_date',
             'action_geo_latitude',
             'action_geo_longitude'
         ]) }} as event_fk,
