@@ -1,63 +1,47 @@
-with s_gdelt_events as (
+with s_historical_gdelt_events as (
 
-    select * from {{ ref('stg__gdelt__events') }}
-
-),
-
-s_countries as (
-
-    select * from {{ ref('stg__seed__fips_countries') }}
-
-),
-
-{% set partition_window = 'published_date, action_geo_latitude, action_geo_longitude' %}
-
-get_unique_geo as (
-
-    select distinct
-        s_gdelt_events.gdelt_event_natural_key,
-        s_gdelt_events.published_date,
-        first_value(s_gdelt_events.action_geo_full_name) over (partition by {{ partition_window }} order by s_gdelt_events.action_geo_full_name) as action_geo_full_name,
-        s_gdelt_events.action_geo_country_code,
-        s_countries.country_name as action_geo_country_name,
-        s_gdelt_events.action_geo_latitude,
-        s_gdelt_events.action_geo_longitude,
-        s_gdelt_events.action_geo_h3_r3
-
-    from s_gdelt_events
-    left join s_countries on s_gdelt_events.action_geo_country_code = s_countries.country_code
-
-),
-
-extract_state_city as (
-
-    select distinct
-        gdelt_event_natural_key,
-        published_date,
+    select
+        gdelt_event_sk,
+        published_date as event_date,
         action_geo_full_name,
         action_geo_country_code,
         action_geo_country_name,
-        case
-            when regexp_count(action_geo_full_name, ',') = 1 then trim(split_part(action_geo_full_name, ',', 1))
-            when regexp_count(action_geo_full_name, ',') = 2 then trim(split_part(action_geo_full_name, ',', 2))
-            else ''
-        end as action_geo_state_name,
-        case
-            when regexp_count(action_geo_full_name, ',') = 2 then trim(split_part(action_geo_full_name, ',', 1))
-            else ''
-        end as action_geo_city_name,
+        action_geo_state_name,
+        action_geo_city_name,
         action_geo_latitude,
         action_geo_longitude,
-        action_geo_h3_r3
+        action_geo_h3_r3,
+        'gdelt historical' as event_source
 
-    from get_unique_geo
+    from {{ ref('stg__gdelt__events') }}
 
 ),
 
-final as (
+s_gdelt_articles as (
 
-    select * from extract_state_city
+    select
+        gdelt_event_sk,
+        creation_date as event_date,
+        action_geo_full_name,
+        action_geo_country_code,
+        action_geo_country_name,
+        action_geo_state_name,
+        action_geo_city_name,
+        action_geo_latitude,
+        action_geo_longitude,
+        action_geo_h3_r3,
+        'gdelt' as event_source
+        
+    from {{ ref('stg__gdelt__articles') }}
+
+),
+
+merge_sources as (
+
+    select * from s_historical_gdelt_events
+    union all
+    select * from s_gdelt_articles
 
 )
 
-select * from final
+select * from merge_sources

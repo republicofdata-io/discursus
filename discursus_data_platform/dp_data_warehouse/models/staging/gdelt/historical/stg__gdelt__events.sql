@@ -2,11 +2,12 @@
     config(
         materialized = 'incremental',
         incremental_strategy = 'delete+insert',
-        unique_key = 'gdelt_event_natural_key'
+        unique_key = 'gdelt_event_natural_key',
+        dagster_auto_materialize_policy = {"type": "lazy"},
     )
 }}
 
-with source as (
+with s_gdelt_events as (
 
     select * from {{ source('gdelt', 'gdelt_events') }}
     
@@ -23,10 +24,16 @@ with source as (
 
 ),
 
-base as (
+s_countries as (
+
+    select * from {{ ref('stg__seed__fips_countries') }}
+
+),
+
+format_fields as (
 
     select distinct
-        cast(gdelt_id as bigint) as gdelt_event_natural_key,
+        cast(gdelt_id as string) as gdelt_event_sk,
 
         to_timestamp(cast(date_added as string), 'YYYYMMDDHH24MISS') as creation_ts,
         to_date(
@@ -112,7 +119,49 @@ base as (
         end as mention_url
 
 
-    from source
+    from s_gdelt_events
+
+),
+
+{% set partition_window = 'published_date, action_geo_latitude, action_geo_longitude' %}
+
+get_unique_geo as (
+
+    select distinct
+        format_fields.gdelt_event_sk,
+        format_fields.published_date,
+        first_value(format_fields.action_geo_full_name) over (partition by {{ partition_window }} order by format_fields.action_geo_full_name) as action_geo_full_name,
+        format_fields.action_geo_country_code,
+        s_countries.country_name as action_geo_country_name,
+        format_fields.action_geo_latitude,
+        format_fields.action_geo_longitude
+
+    from format_fields
+    left join s_countries on format_fields.action_geo_country_code = s_countries.country_code
+
+),
+
+extract_state_city as (
+
+    select distinct
+        gdelt_event_sk,
+        published_date,
+        action_geo_full_name,
+        action_geo_country_code,
+        action_geo_country_name,
+        case
+            when regexp_count(action_geo_full_name, ',') = 1 then trim(split_part(action_geo_full_name, ',', 1))
+            when regexp_count(action_geo_full_name, ',') = 2 then trim(split_part(action_geo_full_name, ',', 2))
+            else ''
+        end as action_geo_state_name,
+        case
+            when regexp_count(action_geo_full_name, ',') = 2 then trim(split_part(action_geo_full_name, ',', 1))
+            else ''
+        end as action_geo_city_name,
+        action_geo_latitude,
+        action_geo_longitude
+
+    from get_unique_geo
 
 ),
 
@@ -122,8 +171,9 @@ encode_h3_cells as (
         *,
         analytics_toolbox.carto.h3_fromlonglat(action_geo_longitude, action_geo_latitude, 3) as action_geo_h3_r3
     
-    from base
+    from extract_state_city
 
 )
 
 select * from encode_h3_cells
+where action_geo_city_name != ''

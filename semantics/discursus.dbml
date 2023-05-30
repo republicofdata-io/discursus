@@ -12,6 +12,7 @@ table events_fct [headercolor: #7DB9B6] {
     action_geo_city_name varchar
     action_geo_longitude numeric
     action_geo_latitude numeric
+    action_geo_h3_r3 varchar
 }
 
 table movements_dim [headercolor: #E96479] {

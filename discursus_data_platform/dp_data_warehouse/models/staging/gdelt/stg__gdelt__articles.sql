@@ -71,17 +71,27 @@ extract_geographical_fields as (
                 trim(split_part(split_part(primary_location, '#', 2), ',', 2))
             when regexp_count(split_part(primary_location, '#', 2), ',') = 1 then
                 trim(split_part(split_part(primary_location, '#', 2), ',', 1))
-            else null
+            else ''
         end as action_geo_state_name,
         case
             when regexp_count(split_part(primary_location, '#', 2), ',') = 2 then
                 trim(split_part(split_part(primary_location, '#', 2), ',', 1))
-            else null
+            else ''
         end as action_geo_city_name,
         cast(split_part(primary_location, '#', 5) as number(8,6)) as action_geo_latitude,
         cast(split_part(primary_location, '#', 6) as number(9,6)) as action_geo_longitude
     
     from format_fields
+
+),
+
+encode_h3_cells as (
+
+    select
+        *,
+        analytics_toolbox.carto.h3_fromlonglat(action_geo_longitude, action_geo_latitude, 3) as action_geo_h3_r3
+    
+    from extract_geographical_fields
 
 ),
 
@@ -106,6 +116,7 @@ event_key as (
         action_geo_city_name,
         action_geo_latitude,
         action_geo_longitude,
+        action_geo_h3_r3,
         persons,
         organizations,
         social_image_url,
@@ -117,7 +128,7 @@ event_key as (
         bq_partition_ts,
         source_file_date
 
-    from extract_geographical_fields
+    from encode_h3_cells
 
 ),
 
@@ -130,3 +141,4 @@ filter_articles as (
 )
 
 select * from filter_articles
+where action_geo_city_name != ''

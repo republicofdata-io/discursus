@@ -2,7 +2,8 @@
     config(
         materialized = 'incremental',
         incremental_strategy = 'delete+insert',
-        unique_key = 'mention_url'
+        unique_key = 'mention_url',
+        dagster_auto_materialize_policy = {"type": "lazy"},
     )
 }}
 
