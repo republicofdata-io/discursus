@@ -10,7 +10,8 @@ sources:
       error_after: {count: 2, period: day}
 
     tables:
-      - name: gdelt_articles
+      - name: gdelt_gkg_articles
+        identifier: gdelt_articles
       - name: gdelt_articles_enhanced
         identifier: gdelt_enhanced_articles
       - name: gdelt_article_summaries
