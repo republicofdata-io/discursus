@@ -312,7 +312,7 @@ def gdelt_article_summaries(context, gdelt_articles_enhanced):
         
         Title: {row['title']}
         Description: {row['description']}
-        Content: {row['content'][:2500]}
+        Content: {row['content'][:2350]}
 
         CONCISE SUMMARY:"""
     
