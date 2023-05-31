@@ -12,6 +12,8 @@ from discursus_data_platform import (
     dp_sources,
     dp_apps
 )
+from discursus_data_platform.dp_sources.gdelt_ops import gdelt_partitions_job
+from discursus_data_platform.dp_sources.gdelt_ops import gdelt_partitions_schedule
 
 dbt_project_dir = file_relative_path(__file__, "./dp_data_warehouse/")
 dbt_profile_dir = file_relative_path(__file__, "./dp_data_warehouse/config/")
@@ -41,4 +43,8 @@ my_assets = with_resources(
 
 @repository
 def discursus_repo():
-    return my_assets
+    return [
+        my_assets,
+        gdelt_partitions_job,
+        gdelt_partitions_schedule
+    ]
