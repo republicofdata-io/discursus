@@ -36,6 +36,7 @@ def gdelt_gkg_articles(context):
 
     # Define S3 path
     dagster_partition_date = dagster_partition_id[:8]
+    bq_partition_ts = dagster_partition_date + '000000'
     gdelt_asset_source_path = 'sources/gdelt/' + dagster_partition_date + '/' + dagster_partition_id + '.articles.csv'
 
     # Fetch articles for partition
@@ -58,7 +59,8 @@ def gdelt_gkg_articles(context):
         
         from `gdelt-bq.gdeltv2.gkg_partitioned`
 
-        where DATE = {dagster_partition_id}
+        where _PARTITIONTIME = parse_timestamp('%Y%m%d%H%M%S', '{bq_partition_ts}')
+        and DATE = {dagster_partition_id}
 
         ),
 
@@ -135,7 +137,7 @@ def gdelt_gkg_articles(context):
 
     # Transfer to Snowflake
     q_load_gdelt_articles = "alter pipe gdelt_articles_pipe refresh;"
-    context.resources.snowflake_resource.execute_query(q_load_gdelt_articles)
+    
     
     # Return asset
     return Output(
