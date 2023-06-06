@@ -25,7 +25,6 @@ gdelt_partitions_def = DynamicPartitionsDefinition(name="dagster_partition_id")
     resource_defs = {
         'aws_resource': my_resources.my_aws_resource,
         'bigquery_resource': my_resources.my_bigquery_resource,
-        'snowflake_resource': my_resources.my_snowflake_resource,
     },
     auto_materialize_policy=AutoMaterializePolicy.eager(max_materializations_per_minute=None),
     partitions_def=gdelt_partitions_def,
@@ -135,10 +134,6 @@ def gdelt_gkg_articles(context):
     # Save data to S3
     context.resources.aws_resource.s3_put(gdelt_gkg_articles_df, 'discursus-io', gdelt_asset_source_path)
 
-    # Transfer to Snowflake
-    q_load_gdelt_articles = "alter pipe gdelt_articles_pipe refresh;"
-    
-    
     # Return asset
     return Output(
         value = gdelt_gkg_articles_df, 
@@ -160,7 +155,6 @@ def gdelt_gkg_articles(context):
         'aws_resource': my_resources.my_aws_resource,
         'gdelt_resource': my_resources.my_gdelt_resource,
         'web_scraper_resource': my_resources.my_web_scraper_resource,
-        'snowflake_resource': my_resources.my_snowflake_resource,
     },
     auto_materialize_policy=AutoMaterializePolicy.eager(max_materializations_per_minute=None),
     partitions_def=gdelt_partitions_def,
@@ -205,10 +199,6 @@ def gdelt_articles_enhanced(context, gdelt_gkg_articles):
     # Save data to S3
     context.resources.aws_resource.s3_put(gdelt_articles_enhanced_df, 'discursus-io', gdelt_asset_source_path)
 
-    # Transfer to Snowflake
-    q_load_gdelt_mentions_enhanced_events = "alter pipe gdelt_enhanced_articles_pipe refresh;"
-    snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_mentions_enhanced_events)
-
     # Return asset
     return Output(
         value = gdelt_articles_enhanced_df, 
@@ -228,7 +218,6 @@ def gdelt_articles_enhanced(context, gdelt_gkg_articles):
         'aws_resource': my_resources.my_aws_resource,
         'gdelt_resource': my_resources.my_gdelt_resource,
         'openai_resource': my_resources.my_openai_resource,
-        'snowflake_resource': my_resources.my_snowflake_resource
     },
     auto_materialize_policy=AutoMaterializePolicy.eager(max_materializations_per_minute=None),
     partitions_def=gdelt_partitions_def,
@@ -267,10 +256,6 @@ def gdelt_article_summaries(context, gdelt_articles_enhanced):
 
      # Save data to S3
     context.resources.aws_resource.s3_put(gdelt_article_summaries_df, 'discursus-io', gdelt_asset_source_path)
-
-    # Transfer to Snowflake
-    q_load_gdelt_article_summaries_events = "alter pipe gdelt_article_summaries_pipe refresh;"
-    snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_article_summaries_events)
 
     # Return asset
     return Output(
