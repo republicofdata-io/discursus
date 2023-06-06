@@ -9,15 +9,16 @@ from dagster_aws.s3 import s3_pickle_io_manager, s3_resource
 from discursus_data_platform.utils.resources import my_resources
 
 
-# Dynamic partition for GDELT articles
+#####
+# Op, job and schedule to fetch new GDELT partitions
+#####
 gdelt_partitions_def = DynamicPartitionsDefinition(name="dagster_partition_id")
 
 
 @op(
-    description = "List of new GDELT partitions to fill",
+    description = "Populates list of GDELT partitions",
     required_resource_keys = {
         'bigquery_resource',
-        'snowflake_resource',
     },
 )
 def gdelt_partitions(context):
@@ -70,10 +71,9 @@ def gdelt_partitions(context):
 
 
 @job(
-    description="GDELT Operations",
+    description="Populates list of GDELT partitions",
     resource_defs={
         'bigquery_resource': my_resources.my_bigquery_resource,
-        'snowflake_resource': my_resources.my_snowflake_resource,
     },
 )
 def gdelt_partitions_job():
@@ -81,3 +81,42 @@ def gdelt_partitions_job():
 
 
 gdelt_partitions_schedule = ScheduleDefinition(job=gdelt_partitions_job, cron_schedule="00,15,30,45 * * * *")
+
+
+
+#####
+# Op, job and schedule to refresh Snowflake pipes
+#####
+@op(
+    description = "Refresh Snowflake pipes",
+    required_resource_keys = {
+        'snowflake_resource',
+    },
+)
+def snowflake_pipes(context):
+    # Transfer latest GDELT articles
+    q_load_gdelt_articles = "alter pipe gdelt_articles_pipe refresh;"
+    snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_articles)
+
+    # Transfer latest enhanced GDELT articles
+    q_load_gdelt_mentions_enhanced_events = "alter pipe gdelt_enhanced_articles_pipe refresh;"
+    snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_mentions_enhanced_events)
+
+    # Transfer latest GDELT article summaries
+    q_load_gdelt_article_summaries_events = "alter pipe gdelt_article_summaries_pipe refresh;"
+    snowpipe_result = context.resources.snowflake_resource.execute_query(q_load_gdelt_article_summaries_events)
+
+    return None
+
+
+@job(
+    description="Refresh Snowflake pipes",
+    resource_defs={
+        'snowflake_resource': my_resources.my_snowflake_resource,
+    },
+)
+def snowflake_pipes_job():
+   snowflake_pipes()
+
+
+snowflake_pipes_schedule = ScheduleDefinition(job=snowflake_pipes_job, cron_schedule="15 3,9,15,21 * * *")
