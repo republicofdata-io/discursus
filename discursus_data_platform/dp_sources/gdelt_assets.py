@@ -259,16 +259,19 @@ def gdelt_article_summaries(context, gdelt_articles_enhanced):
     
         # Keep retrying the request until it succeeds
         while True:
+            completion_str = ''
+            
             try:
                 completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt[:2000], max_tokens=1500)
+                df_length = len(gdelt_article_summaries_df)
+                gdelt_article_summaries_df.loc[df_length] = [row['article_url'], completion_str] # type: ignore
                 break
             except openai.error.RateLimitError as e:
                 # Wait for 5 seconds before retrying
                 time.sleep(5)
                 continue
-
-        df_length = len(gdelt_article_summaries_df)
-        gdelt_article_summaries_df.loc[df_length] = [row['article_url'], completion_str] # type: ignore
+            except openai.error.InvalidRequestError as e:
+                break
 
      # Save data to S3
     context.resources.aws_resource.s3_put(gdelt_article_summaries_df, 'discursus-io', gdelt_asset_source_path)
