@@ -260,7 +260,7 @@ def gdelt_article_summaries(context, gdelt_articles_enhanced):
         # Keep retrying the request until it succeeds
         while True:
             try:
-                completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt[:2500], max_tokens=1500)
+                completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt[:2000], max_tokens=1500)
                 break
             except openai.error.RateLimitError as e:
                 # Wait for 5 seconds before retrying
