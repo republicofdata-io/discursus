@@ -205,6 +205,13 @@ def gdelt_articles_enhanced(context, gdelt_gkg_articles):
         df_length = len(gdelt_articles_enhanced_df)
         gdelt_articles_enhanced_df.loc[df_length] = scraped_row # type: ignore
     
+    # Remove rows with little or no content
+    gdelt_articles_enhanced_df = gdelt_articles_enhanced_df[gdelt_articles_enhanced_df['content'].str.len() > 1000]
+
+    # Deduplicate syndicated articles
+    gdelt_articles_enhanced_df['title_hash'] = gdelt_articles_enhanced_df['title'].apply(compute_hash)
+    gdelt_articles_enhanced_df = gdelt_articles_enhanced_df.drop_duplicates(subset='title_hash')
+    
     # Save data to S3
     context.resources.aws_resource.s3_put(gdelt_articles_enhanced_df, 'discursus-io', gdelt_asset_source_path)
 
