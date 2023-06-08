@@ -266,7 +266,7 @@ def gdelt_article_summaries(context, gdelt_articles_enhanced):
                 df_length = len(gdelt_article_summaries_df)
                 gdelt_article_summaries_df.loc[df_length] = [row['article_url'], completion_str] # type: ignore
                 break
-            except openai.error.RateLimitError as e:
+            except (openai.error.RateLimitError, openai.error.APIError) as e:
                 # Wait for 5 seconds before retrying
                 time.sleep(5)
                 continue
