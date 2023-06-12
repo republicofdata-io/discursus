@@ -195,7 +195,9 @@ def gdelt_articles_enhanced(context, gdelt_gkg_articles):
         try:
             scraped_article = context.resources.web_scraper_resource.scrape_article(row["article_url"])
         except IndexError:
-            continue
+            break
+        except ConnectionResetError:
+            break
 
         if scraped_article is None:
             continue
