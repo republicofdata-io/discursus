@@ -10,6 +10,7 @@ from dagster_aws.s3 import s3_pickle_io_manager, s3_resource
 import hashlib
 import openai.error
 import pandas as pd
+import signal
 import time
 
 from discursus_data_platform.utils.resources import my_resources
@@ -21,6 +22,13 @@ gdelt_partitions_def = DynamicPartitionsDefinition(name="dagster_partition_id")
 # Helper function to compute hash
 def compute_hash(text):
     return hashlib.md5(text.encode('utf-8')).hexdigest()
+
+# This function will be called when the timer runs out
+def handler(signum, frame):
+    raise TimeoutError("Operation timed out")
+
+# Set the function to be called on timer expiration
+signal.signal(signal.SIGALRM, handler)
 
 
 @asset(
@@ -257,7 +265,8 @@ def gdelt_article_summaries(context, gdelt_articles_enhanced):
 
         CONCISE SUMMARY:"""
     
-        # Keep retrying the request until it succeeds
+        # Keep retrying the request until it succeeds or timeout
+        signal.alarm(60)  # Start a 60 second timer
         while True:
             completion_str = ''
             
@@ -265,12 +274,16 @@ def gdelt_article_summaries(context, gdelt_articles_enhanced):
                 completion_str = context.resources.openai_resource.chat_completion(model='gpt-3.5-turbo', prompt=prompt[:2000], max_tokens=1500)
                 df_length = len(gdelt_article_summaries_df)
                 gdelt_article_summaries_df.loc[df_length] = [row['article_url'], completion_str] # type: ignore
+                signal.alarm(0)  # Cancel the timer
                 break
             except (openai.error.RateLimitError, openai.error.APIError) as e:
                 # Wait for 5 seconds before retrying
                 time.sleep(5)
                 continue
             except openai.error.InvalidRequestError as e:
+                break
+            except TimeoutError as e:
+                context.log.warn(f'Timed out while processing row: {row["article_url"]}')
                 break
 
      # Save data to S3
