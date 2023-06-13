@@ -4,6 +4,7 @@ project discursus {
 
 table events_fct [headercolor: #7DB9B6] {
     event_pk varchar [pk]
+    movement_fk varchar [ref: - movements_dim.movement_pk]
     event_date date
     action_geo_full_name varchar
     action_geo_country_code varchar
@@ -40,12 +41,6 @@ table actors_dim [headercolor: #E96479] { //To be added
     actor_pk varchar [pk]
     actor_name varchar
     actor_type varchar
-}
-
-table events_movements_bridge [headercolor: #4D455D] {
-    event_movement_pk varchar [pk]
-    event_fk varchar [ref: - events_fct.event_pk]
-    movement_fk varchar [ref: - movements_dim.movement_pk]
 }
 
 table events_observations_bridge [headercolor: #4D455D] {

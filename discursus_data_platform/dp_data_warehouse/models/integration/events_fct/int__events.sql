@@ -1,7 +1,8 @@
 with s_events as (
 
     select distinct
-        event_date, 
+        event_date,
+        movement_name,
         action_geo_full_name,
         action_geo_country_code,
         action_geo_country_name,
