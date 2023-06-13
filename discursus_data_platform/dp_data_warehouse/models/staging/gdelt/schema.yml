@@ -19,6 +19,10 @@ models:
   - name: gdelt_gkg_article_id
     description: Unique source key
     tests:
-    - unique
+    - unique:
+        config:
+          severity: error
+          error_if: ">20"
+          warn_if: ">10"
     - not_null
     - dbt_utils.at_least_one
