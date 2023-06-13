@@ -268,7 +268,7 @@ def gdelt_article_summaries(context, gdelt_articles_enhanced):
         CONCISE SUMMARY:"""
     
         # Keep retrying the request until it succeeds or timeout
-        signal.alarm(60)  # Start a 60 second timer
+        signal.alarm(120)  # Start a 60 second timer
         while True:
             completion_str = ''
             
@@ -278,7 +278,7 @@ def gdelt_article_summaries(context, gdelt_articles_enhanced):
                 gdelt_article_summaries_df.loc[df_length] = [row['article_url'], completion_str] # type: ignore
                 signal.alarm(0)  # Cancel the timer
                 break
-            except (openai.error.RateLimitError, openai.error.APIError) as e:
+            except (openai.error.RateLimitError, openai.error.APIError, openai.error.Timeout) as e:
                 # Wait for 5 seconds before retrying
                 time.sleep(5)
                 continue
