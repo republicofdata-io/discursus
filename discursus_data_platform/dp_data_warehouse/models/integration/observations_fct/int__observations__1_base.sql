@@ -80,6 +80,17 @@ merge_sources as (
     union all
     select * from articles
 
+),
+
+dedup_articles as (
+
+    select
+        *,
+        row_number() over (partition by observation_page_title order by published_date) as row_number
+
+    from merge_sources
+
 )
 
-select * from merge_sources
+select * from dedup_articles
+where row_number = 1
