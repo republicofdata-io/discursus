@@ -27,7 +27,7 @@ format_fields as (
     select
         lower(cast(article_identifier as string)) as article_url,
 
-        lower(cast(summary as string)) as summary,
+        cast(summary as string) as summary,
 
         source_file_date
 
