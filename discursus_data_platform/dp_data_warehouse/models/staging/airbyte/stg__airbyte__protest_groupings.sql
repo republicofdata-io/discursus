@@ -1,3 +1,10 @@
+{{
+    config(
+        dagster_freshness_policy = {"maximum_lag_minutes": 24*60},
+        dagster_auto_materialize_policy = {"type": "eager"},
+    )
+}}
+
 with source as (
 
     select * from {{ source('airbyte', 'protest_groupings') }}

@@ -47,6 +47,10 @@ models:
         staging:
             materialized: table
             schema: staging
+            gdelt:
+                historical:
+                    +dagster_freshness_policy: {}
+                    +dagster_auto_materialize_policy: {}
 
         integration:
             materialized: table
