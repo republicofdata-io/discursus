@@ -1,6 +1,5 @@
 from dagster import (
     AssetSelection, 
-    build_asset_reconciliation_sensor,
     file_relative_path,
     load_assets_from_package_module,
     repository, 
@@ -10,11 +9,11 @@ from dagster_aws.s3 import s3_pickle_io_manager, s3_resource
 from dagster_dbt import dbt_cli_resource, load_assets_from_dbt_project
 
 from discursus_data_platform import (
-    dp_gdelt,
-    dp_movement_groupings,
-    dp_data_warehouse,
+    dp_sources,
     dp_apps
 )
+from discursus_data_platform.dp_sources.gdelt_ops import gdelt_partitions_job, snowflake_pipes_job
+from discursus_data_platform.dp_sources.gdelt_ops import gdelt_partitions_schedule, snowflake_pipes_schedule
 
 dbt_project_dir = file_relative_path(__file__, "./dp_data_warehouse/")
 dbt_profile_dir = file_relative_path(__file__, "./dp_data_warehouse/config/")
@@ -26,8 +25,7 @@ my_assets = with_resources(
         key_prefix = ["data_warehouse"],
         use_build_command = False
     ) + 
-    load_assets_from_package_module(dp_gdelt) +
-    load_assets_from_package_module(dp_movement_groupings) +
+    load_assets_from_package_module(dp_sources) + # type: ignore
     load_assets_from_package_module(dp_apps),
     resource_defs = {
         "dbt": dbt_cli_resource.configured(
@@ -43,15 +41,12 @@ my_assets = with_resources(
     },
 )
 
-asset_sensor = [
-    build_asset_reconciliation_sensor(
-        asset_selection=AssetSelection.all(),
-        name="asset_reconciliation_sensor",
-        minimum_interval_seconds = 60 * 5
-    )
-]
-
-
 @repository
 def discursus_repo():
-    return my_assets + asset_sensor
+    return [
+        my_assets,
+        gdelt_partitions_job,
+        gdelt_partitions_schedule,
+        snowflake_pipes_job,
+        snowflake_pipes_schedule
+    ]

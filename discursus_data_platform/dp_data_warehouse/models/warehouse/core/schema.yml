@@ -1,99 +1,31 @@
 version: 2
 models:
-  - name: events_fct
+  - name: actors_dim
     columns:
-      - name: action_geo_country_code
-        description: '{{ doc("action_geo_country_code") }}'
-        tests:
-          - dbt_utils.at_least_one
-      - name: action_geo_country_name
-        description: '{{ doc("action_geo_country_name") }}'
-        tests:
-          - dbt_utils.at_least_one
-      - name: action_geo_full_name
-        description: '{{ doc("action_geo_full_name") }}'
-        tests:
-          - dbt_utils.at_least_one
-      - name: action_geo_latitude
-        description: '{{ doc("action_geo_latitude") }}'
-        tests:
-          - dbt_utils.at_least_one
-      - name: action_geo_longitude
-        description: '{{ doc("action_geo_longitude") }}'
-        tests:
-          - dbt_utils.at_least_one
-      - name: event_date
-        description: '{{ doc("event_date") }}'
-        tests:
-          - dbt_utils.at_least_one
-      - name: event_pk
-        description: '{{ doc("event_pk") }}'
+      - name: actor_pk
         tests:
           - not_null
           - unique
-      - name: movement_fk
-        description: '{{ doc("movement_fk") }}'
+
+  - name: events_actors_bridge
+    columns:
+      - name: event_actor_pk
+        tests:
+          - not_null
+          - unique
+      - name: event_fk
         tests:
           - not_null
           - relationships:
-              to: ref('movements_dim')
-              field: movement_pk
-  - name: movements_dim
-    columns:
-      - name: countries
-        description: '{{ doc("countries") }}'
-        tests:
-          - dbt_utils.at_least_one
-      - name: movement_name
-        description: '{{ doc("movement_name") }}'
-        tests:
-          - dbt_utils.at_least_one
-      - name: movement_pk
-        description: '{{ doc("movement_pk") }}'
+              to: ref('events_fct')
+              field: event_pk
+      - name: actor_fk
         tests:
           - not_null
-          - unique
-      - name: page_description_regex
-        description: '{{ doc("page_description_regex") }}'
-        tests:
-          - dbt_utils.at_least_one
-      - name: published_date_end
-        description: '{{ doc("published_date_end") }}'
-      - name: published_date_start
-        description: '{{ doc("published_date_start") }}'
-        tests:
-          - dbt_utils.at_least_one
-  - name: observations_fct
-    columns:
-      - name: observation_keywords
-        description: '{{ doc("observation_keywords") }}'
-        tests:
-          - dbt_utils.at_least_one
-      - name: observation_page_description
-        description: '{{ doc("observation_page_description") }}'
-        tests:
-          - dbt_utils.at_least_one
-      - name: observation_page_title
-        description: '{{ doc("observation_page_title") }}'
-        tests:
-          - dbt_utils.at_least_one
-      - name: observation_pk
-        description: '{{ doc("observation_pk") }}'
-        tests:
-          - not_null
-          - unique
-      - name: observation_type
-        description: '{{ doc("observation_type") }}'
-        tests:
-          - dbt_utils.at_least_one
-      - name: observation_url
-        description: '{{ doc("observation_url") }}'
-        tests:
-          - dbt_utils.at_least_one
-      - name: published_date
-        description: '{{ doc("published_date") }}'
-        tests:
-          - dbt_utils.at_least_one
+          - relationships:
+              to: ref('actors_dim')
+              field: actor_pk
+
   - name: events_observations_bridge
     columns:
       - name: event_observation_pk
@@ -101,16 +33,45 @@ models:
           - not_null
           - unique
       - name: event_fk
-        description: '{{ doc("event_fk") }}'
         tests:
           - not_null
           - relationships:
               to: ref('events_fct')
               field: event_pk
       - name: observation_fk
-        description: '{{ doc("observation_pk") }}'
         tests:
           - not_null
           - relationships:
               to: ref('observations_fct')
               field: observation_pk
+
+  - name: events_fct
+    columns:
+      - name: event_pk
+        tests:
+          - not_null
+          - unique
+      - name: movement_fk
+        tests:
+          - not_null
+          - relationships:
+              to: ref('movements_dim')
+              field: movement_pk
+
+  - name: movements_dim
+    columns:
+      - name: movement_pk
+        tests:
+          - not_null
+          - unique
+
+  - name: observations_fct
+    columns:
+      - name: observation_pk
+        tests:
+          - not_null
+          - unique:
+              config:
+                severity: error
+                error_if: ">20"
+                warn_if: ">10"

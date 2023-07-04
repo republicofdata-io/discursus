@@ -6,14 +6,14 @@ table events_fct [headercolor: #7DB9B6] {
     event_pk varchar [pk]
     movement_fk varchar [ref: - movements_dim.movement_pk]
     event_date date
-    action_geo_country_name varchar
     action_geo_full_name varchar
     action_geo_country_code varchar
+    action_geo_country_name varchar
+    action_geo_state_name varchar
+    action_geo_city_name varchar
     action_geo_longitude numeric
     action_geo_latitude numeric
-    event_category varchar //To be added
-    participants_estimate integer //To be added
-    sentiment_score numeric //To be added
+    action_geo_h3_r3 varchar
 }
 
 table movements_dim [headercolor: #E96479] {
@@ -23,8 +23,6 @@ table movements_dim [headercolor: #E96479] {
     published_date_end date
     countries varchar
     page_description_regex varchar
-    movement_cause varchar //To be added
-    movement_demands varchar //To be added
 }
 
 table observations_fct [headercolor: #7DB9B6] {
@@ -35,21 +33,14 @@ table observations_fct [headercolor: #7DB9B6] {
     observation_page_title varchar
     observation_page_description varchar
     observation_keywords varchar
-    news_source_bias varchar //To be added
-    observation_summary text //To be added
+    observation_summary text
+    observation_source varchar
 }
 
-table key_figures_dim [headercolor: #E96479] { //To be added
-    key_figure_pk varchar [pk]
-    organization_fk varchar [ref: - organizations_dim.organization_pk]
-    key_figure_name varchar
-    key_figure_role varchar
-}
-
-table organizations_dim [headercolor: #E96479] { //To be added
-    organization_pk varchar [pk]
-    organization_name varchar
-    organization_type varchar
+table actors_dim [headercolor: #E96479] { //To be added
+    actor_pk varchar [pk]
+    actor_name varchar
+    actor_type varchar
 }
 
 table events_observations_bridge [headercolor: #4D455D] {
@@ -58,26 +49,8 @@ table events_observations_bridge [headercolor: #4D455D] {
     observation_fk varchar [ref: - observations_fct.observation_pk]
 }
 
-table movements_key_figures_bridge [headercolor: #4D455D] { //To be added
-    movement_key_figure_pk varchar [pk]
-    movement_fk varchar [ref: - movements_dim.movement_pk]
-    key_figure_fk varchar [ref: - key_figures_dim.key_figure_pk]
-}
-
-table movements_organizations_bridge [headercolor: #4D455D] { //To be added
-    movement_organization_pk varchar [pk]
-    movement_fk varchar [ref: - movements_dim.movement_pk]
-    organization_fk varchar [ref: - organizations_dim.organization_pk]
-}
-
-table events_key_figures_bridge [headercolor: #4D455D] { //To be added
-    event_key_figure_pk varchar [pk]
+table events_actors_bridge [headercolor: #4D455D] { //To be added
+    event_actor_pk varchar [pk]
     event_fk varchar [ref: - events_fct.event_pk]
-    key_figure_fk varchar [ref: - key_figures_dim.key_figure_pk]
-}
-
-table events_organizations_bridge [headercolor: #4D455D] { //To be added
-    event_organization_pk varchar [pk]
-    event_fk varchar [ref: - events_fct.event_pk]
-    organization_fk varchar [ref: - organizations_dim.organization_pk]
+    actor_fk varchar [ref: - actors_dim.actor_pk]
 }

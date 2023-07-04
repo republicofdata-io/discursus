@@ -1,7 +1,6 @@
 {{ 
     config(
-        unique_key='observation_pk',
-        dagster_freshness_policy = {"maximum_lag_minutes": 6 * 60}
+        unique_key='observation_pk'
     )
 }}
 
@@ -15,17 +14,18 @@ final as (
 
     select distinct
         {{ dbt_utils.generate_surrogate_key([
-            'published_date',
+            'event_date',
             'observation_url'
         ]) }} as observation_pk,
 
-        published_date,
+        event_date as published_date,
 
         observation_type,
         observation_url,
         observation_page_title,
-        observation_page_description,
-        observation_keywords
+        observation_summary,
+        observation_keywords,
+        observation_source
 
     from s_observations
 

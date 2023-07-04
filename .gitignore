@@ -131,12 +131,9 @@ dmypy.json
 
 dev/
 
-# Docker
-Dockerfile_app
-
-# Droughty
+# Dev
+.DS_Store
+.vscode/
 droughty_profiles.yml
-
-# dbt
 target/
 dbt_packages/

@@ -1,13 +1,12 @@
 {{ 
     config(
-        unique_key='event_observation_pk',
-        dagster_freshness_policy = {"maximum_lag_minutes": 6 * 60}
+        unique_key='event_observation_pk'
     )
 }}
 
 with s_observations as (
 
-    select * from {{ ref('int__observations') }}
+    select * from {{ ref('int__events_observations') }}
 
 ),
 
@@ -15,14 +14,15 @@ bridge as (
 
     select distinct
         {{ dbt_utils.generate_surrogate_key([
-            'published_date',
+            'event_date',
             'observation_url'
         ]) }} as observation_fk, 
         {{ dbt_utils.generate_surrogate_key([
-            'published_date',
+            'event_date',
             'movement_name',
-            'action_geo_latitude',
-            'action_geo_longitude'
+            'action_geo_country_name',
+            'action_geo_state_name',
+            'action_geo_city_name'
         ]) }} as event_fk
 
     from s_observations

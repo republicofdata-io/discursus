@@ -1,4 +1,4 @@
 .PHONY: docker
 
-dagit:
-	dagit --package-name discursus_data_platform
+dagster:
+	dagster dev --module-name discursus_data_platform

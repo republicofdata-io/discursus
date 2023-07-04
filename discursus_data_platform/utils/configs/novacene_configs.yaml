@@ -1,9 +1,0 @@
-resources:
-  novacene_resource:
-    config:
-      host: 
-        env: ML_HOST
-      login: 
-        env: ML_LOGIN
-      password: 
-        env: ML_PASSWORD
