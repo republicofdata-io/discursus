@@ -1,3 +1,11 @@
+{{
+    config(
+        materialized = 'incremental',
+        incremental_strategy = 'delete+insert',
+        unique_key = "event_date||'-'||movement_name",
+    )
+}}
+
 with s_events as (
 
     select distinct
@@ -14,6 +22,12 @@ with s_events as (
         event_source
     
     from {{ ref('int__events__3_associate_movements') }}
+
+    {% if is_incremental() %}
+        where event_date >= (select max(event_date) from {{ this }})
+    {% else %}
+        where event_date >= dateadd(week, -52, event_date)
+    {% endif %}
 
 )
 

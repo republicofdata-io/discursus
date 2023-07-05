@@ -1,5 +1,7 @@
 {{ 
     config(
+        materialized = 'incremental',
+        incremental_strategy = 'delete+insert',
         unique_key='event_actor_pk'
     )
 }}
@@ -7,6 +9,12 @@
 with s_events_actors as (
 
     select * from {{ ref('int__events_actors') }}
+
+    {% if is_incremental() %}
+        where event_date >= (select max(event_date) from {{ this }})
+    {% else %}
+        where event_date >= dateadd(week, -52, current_date)
+    {% endif %}
 
 ),
 
@@ -23,7 +31,8 @@ bridge as (
         {{ dbt_utils.generate_surrogate_key([
             'actor_name',
             'actor_type'
-        ]) }} as actor_fk
+        ]) }} as actor_fk,
+        event_date
 
     from s_events_actors
 
