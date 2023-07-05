@@ -1,6 +1,20 @@
+{{
+    config(
+        materialized = 'incremental',
+        incremental_strategy = 'delete+insert',
+        unique_key = "gdelt_event_sk",
+    )
+}}
+
 with s_historical_mentions as (
 
     select * from {{ ref('stg__gdelt__mentions') }}
+
+    {% if is_incremental() %}
+        where source_file_date >= (select max(published_date) from {{ this }})
+    {% else %}
+        where source_file_date >= dateadd(week, -52, source_file_date)
+    {% endif %}
 
 ),
 
@@ -9,6 +23,12 @@ s_historical_mention_summaries as (
     select * from {{ ref('stg__gdelt__mention_summaries') }}
     where mention_url is not null
 
+    {% if is_incremental() %}
+        and source_file_date >= (select max(published_date) from {{ this }})
+    {% else %}
+        and source_file_date >= dateadd(week, -52, source_file_date)
+    {% endif %}
+
 ),
 
 s_historical_mention_metadata as (
@@ -16,11 +36,23 @@ s_historical_mention_metadata as (
     select * from {{ ref('stg__gdelt__mentions_metadata') }}
     where mention_url is not null
 
+    {% if is_incremental() %}
+        and source_file_date >= (select max(published_date) from {{ this }})
+    {% else %}
+        and source_file_date >= dateadd(week, -52, source_file_date)
+    {% endif %}
+
 ),
 
 s_articles as (
 
     select * from {{ ref('stg__gdelt__articles') }}
+
+    {% if is_incremental() %}
+        where source_file_date >= (select max(published_date) from {{ this }})
+    {% else %}
+        where source_file_date >= dateadd(week, -52, source_file_date)
+    {% endif %}
 
 ),
 
@@ -28,11 +60,23 @@ s_article_summaries as (
 
     select * from {{ ref('stg__gdelt__articles_summary') }}
 
+    {% if is_incremental() %}
+        where source_file_date >= (select max(published_date) from {{ this }})
+    {% else %}
+        where source_file_date >= dateadd(week, -52, source_file_date)
+    {% endif %}
+
 ),
 
 s_article_enhanced as (
 
     select * from {{ ref('stg__gdelt__articles_enhanced') }}
+
+    {% if is_incremental() %}
+        where source_file_date >= (select max(published_date) from {{ this }})
+    {% else %}
+        where source_file_date >= dateadd(week, -52, source_file_date)
+    {% endif %}
 
 ),
 

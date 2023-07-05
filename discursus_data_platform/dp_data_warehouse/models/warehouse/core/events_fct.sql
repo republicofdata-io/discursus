@@ -1,5 +1,7 @@
 {{ 
     config(
+        materialized = 'incremental',
+        incremental_strategy = 'delete+insert',
         unique_key='event_pk'
     )
 }}
@@ -7,6 +9,12 @@
 with s_events as (
 
     select * from {{ ref('int__events') }}
+
+    {% if is_incremental() %}
+        where event_date >= (select max(event_date) from {{ this }})
+    {% else %}
+        where event_date >= dateadd(week, -52, event_date)
+    {% endif %}
 
 ),
 

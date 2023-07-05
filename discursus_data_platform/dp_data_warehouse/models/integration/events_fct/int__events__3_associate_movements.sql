@@ -1,6 +1,20 @@
+{{
+    config(
+        materialized = 'incremental',
+        incremental_strategy = 'delete+insert',
+        unique_key = "event_date||'-'||movement_name",
+    )
+}}
+
 with s_events as (
 
     select * from {{ ref('int__events__2_associate_observations') }}
+
+    {% if is_incremental() %}
+        where event_date >= (select max(event_date) from {{ this }})
+    {% else %}
+        where event_date >= dateadd(week, -52, event_date)
+    {% endif %}
 
 ),
 

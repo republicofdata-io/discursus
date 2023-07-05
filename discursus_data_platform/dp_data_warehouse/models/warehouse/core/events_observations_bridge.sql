@@ -1,5 +1,7 @@
 {{ 
     config(
+        materialized = 'incremental',
+        incremental_strategy = 'delete+insert',
         unique_key='event_observation_pk'
     )
 }}
@@ -7,6 +9,12 @@
 with s_observations as (
 
     select * from {{ ref('int__events_observations') }}
+
+    {% if is_incremental() %}
+        where event_date >= (select max(event_date) from {{ this }})
+    {% else %}
+        where event_date >= dateadd(week, -52, event_date)
+    {% endif %}
 
 ),
 
@@ -23,7 +31,8 @@ bridge as (
             'action_geo_country_name',
             'action_geo_state_name',
             'action_geo_city_name'
-        ]) }} as event_fk
+        ]) }} as event_fk,
+        event_date
 
     from s_observations
 
