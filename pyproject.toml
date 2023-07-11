@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "discursus-data-platform"
 version = "0.1.0"
-description = "The discursus project is an OSS social analytics data product that continuously delivers data on protest movements throughout North America."
+description = "The discursus.io project is an OSINT project to decode social movements in North America."
 authors = ["Olivier Dupuis <odupuis@lantrns.co>"]
 license = "MIT"
 packages = [{include = "discursus_data_platform"}]
