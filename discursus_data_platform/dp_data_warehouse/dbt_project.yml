@@ -7,11 +7,8 @@ config-version: 2
 profile: discursus
 
 model-paths: ["models"]
-analysis-paths: ["analysis"]
-test-paths: ["tests"]
 seed-paths: ["data"]
 macro-paths: ["macros"]
-docs-paths: ["wh_docs"]
 
 target-path: "target"
 clean-targets:
@@ -21,11 +18,6 @@ clean-targets:
 seeds:
     discursus_dw:
         +schema: seed
-
-        actor_types:
-            +column_types:
-                CODE: varchar(3)
-                LABEL: varchar
 
         fips_country:
             +column_types:
