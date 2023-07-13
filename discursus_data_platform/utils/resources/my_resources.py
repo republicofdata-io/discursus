@@ -3,11 +3,10 @@ from dagster_snowflake import snowflake_resource
 from dagster_dbt import dbt_cli_resource
 from dagster_hex.resources import hex_resource
 
-from discursus_data_platform.utils.resources import bigquery_resource
+from discursus_data_platform.utils.resources import bigquery_resource, web_scraper_resource
 
 from saf_aws import aws_resource
 from saf_gdelt import gdelt_resource
-from saf_web_scraper import web_scraper_resource
 from saf_openai import openai_resource
 
 
