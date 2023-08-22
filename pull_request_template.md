@@ -13,8 +13,9 @@ Are there any changes to the lineage of assets produced? If so, please include g
 Please select option that is relevant.
 
 - [ ] New feature (adds functionality)
+- [ ] Improvements (improves existing functionality)
 - [ ] Bug fix (fixes an issue)
-- [ ] Infrastructure (provides the necessary resources for platform to run)
+- [ ] Tech debt (Under the hood improvements)
 
 # Checklist:
 
